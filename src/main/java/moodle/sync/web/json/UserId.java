@@ -12,7 +12,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class Courselist {
-    private List<Course> courses;
+public class UserId {
+    private int userid;
 }
-

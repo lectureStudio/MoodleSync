@@ -9,4 +9,5 @@ public interface StartView extends View {
 
 	void setOnSync(Action action);
 
+	void setOnSettings(Action action);
 }

@@ -23,11 +23,8 @@ public class SettingsPresenter extends Presenter<SettingsView> {
 
     @Override
     public void initialize() {
-        view.setOnExit(this::onExit);
+        view.setOnExit(this::close);
         //view.setOnSync(this::onSync);
     }
 
-    private void onExit() {
-        context.getEventBus().post(new CloseApplicationCommand());
-    }
 }

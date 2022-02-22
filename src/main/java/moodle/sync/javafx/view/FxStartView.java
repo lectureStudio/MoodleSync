@@ -21,6 +21,9 @@ public class FxStartView extends VBox implements StartView, FxView {
 	@FXML
 	private Button syncButton;
 
+	@FXML
+	private Button settingsButton;
+
 
 	public FxStartView() {
 		super();
@@ -34,5 +37,10 @@ public class FxStartView extends VBox implements StartView, FxView {
 	@Override
 	public void setOnSync(Action action) {
 		FxUtils.bindAction(syncButton, action);
+	}
+
+	@Override
+	public void setOnSettings(Action action) {
+		FxUtils.bindAction(settingsButton, action);
 	}
 }

@@ -18,8 +18,6 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     @FXML
     private Button closesettingsButton;
 
-
-
     public FxSettingsView() {
         super();
     }

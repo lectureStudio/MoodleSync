@@ -11,7 +11,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class File {
+public class MoodleFile {
     private String filename;
     private String filepath;
     private int filesize;
