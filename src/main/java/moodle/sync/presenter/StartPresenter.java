@@ -2,12 +2,11 @@ package moodle.sync.presenter;
 
 import javax.inject.Inject;
 
-import moodle.sync.web.client.MultipartBody;
-import moodle.sync.web.json.*;
-import moodle.sync.web.service.MoodleFileService;
+import moodle.sync.config.MoodleSyncConfiguration;
+import moodle.sync.web.json.Course;
 import moodle.sync.web.service.MoodleUploadService;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
+
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.presenter.command.CloseApplicationCommand;
@@ -19,8 +18,9 @@ import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.StandardCopyOption;
+import java.lang.module.Configuration;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StartPresenter extends Presenter<StartView> {
 
@@ -41,9 +41,14 @@ public class StartPresenter extends Presenter<StartView> {
 
 	@Override
 	public void initialize() {
+
+		MoodleSyncConfiguration config = (MoodleSyncConfiguration) context.getConfiguration();
+
 		view.setOnExit(this::onExit);
 		view.setOnSync(this::onSync);
 		view.setOnSettings(this::onSettings);
+		view.setCourse(config.recentCourseProperty());
+		view.setCourses(moodleService.getEnrolledCourses());
 	}
 
 	private void onSettings() {
@@ -75,4 +80,5 @@ public class StartPresenter extends Presenter<StartView> {
 					"start.sync.error.message");
 		}
 	}
+
 }
