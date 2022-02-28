@@ -6,6 +6,7 @@ import moodle.sync.web.json.MoodleUpload;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProviders;
 import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
+import moodle.sync.web.json.MultipartBody;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -24,5 +25,5 @@ public interface MoodleUploadClient {
     @Path("")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.TEXT_PLAIN)
-    String setFile(@QueryParam("token") String token, @FormParam("filename") InputStream data);
+    String setFile(@QueryParam("token") String token, @MultipartForm MultipartBody data);
 }

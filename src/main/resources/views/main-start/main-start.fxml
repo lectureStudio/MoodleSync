@@ -7,6 +7,8 @@
 
 <?import moodle.sync.javafx.CourseListCell?>
 <?import moodle.sync.javafx.CourseCellFactory?>
+<?import moodle.sync.javafx.SectionListCell?>
+<?import moodle.sync.javafx.SectionCellFactory?>
 <fx:root alignment="CENTER" type="VBox" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane>
@@ -38,6 +40,16 @@
                      </buttonCell>
                      <cellFactory>
                         <CourseCellFactory/>
+                     </cellFactory>
+                  </ComboBox>
+               </children>
+               <children>
+                  <ComboBox fx:id="selectsectionCombo" promptText="%start.selectsection">
+                     <buttonCell>
+                        <SectionListCell/>
+                     </buttonCell>
+                     <cellFactory>
+                        <SectionCellFactory/>
                      </cellFactory>
                   </ComboBox>
                </children>

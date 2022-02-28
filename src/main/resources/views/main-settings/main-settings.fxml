@@ -4,27 +4,33 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<fx:root type="VBox" alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" type="VBox" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label text="Einstellungen" />
-      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+      <Label alignment="TOP_CENTER" text="Einstellungen">
+         <padding>
+            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+         </padding></Label>
+      <GridPane alignment="CENTER" vgap="15.0">
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
          <children>
+            <Label text="Root Verzeichnis" GridPane.rowIndex="2" />
+            <TextField fx:id="syncRootPath" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Button fx:id="syncRootPathButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="%settings.search" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <Label text="Sicherheitstoken" GridPane.rowIndex="1" />
+            <TextField fx:id="tokenField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="moodleField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" />
             <Label text="Moodle Plattform" />
-            <TextField fx:id="moodleField" />
          </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-         <children>
-            <Label text="Sicherheitstoken" />
-            <TextField fx:id="tokenField" />
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-         <children>
-            <Label text="Root Verzeichnis" />
-            <TextField fx:id="rootdirectoryField" />
-            <Button fx:id="rootButton" mnemonicParsing="false" text="%settings.search" />
-         </children></HBox>
+      </GridPane>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
          <children>
             <Button fx:id="closesettingsButton" mnemonicParsing="false" text="%settings.close" />

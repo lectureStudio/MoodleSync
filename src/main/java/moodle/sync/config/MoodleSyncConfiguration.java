@@ -1,6 +1,7 @@
 package moodle.sync.config;
 
 import moodle.sync.web.json.Course;
+import moodle.sync.web.json.Section;
 import org.lecturestudio.core.app.configuration.Configuration;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.beans.StringProperty;
@@ -11,6 +12,12 @@ public class MoodleSyncConfiguration extends Configuration {
 	private final StringProperty syncRootPath = new StringProperty();
 
 	private final ObjectProperty<Course> recentCourse = new ObjectProperty<>();
+
+	private final StringProperty moodleToken = new StringProperty();
+
+	private final ObjectProperty<Section> recentSection = new ObjectProperty<>();
+
+
 	/**
 	 * Get the path where the synchronized files are stored at.
 	 *
@@ -49,5 +56,29 @@ public class MoodleSyncConfiguration extends Configuration {
 
 	public ObjectProperty<Course> recentCourseProperty() {
 		return recentCourse;
+	}
+
+	public String getMoodleToken() {
+		return moodleToken.get();
+	}
+
+	public void setMoodleToken(String token) {
+		this.moodleToken.set(token);
+	}
+
+	public StringProperty moodleTokenProperty() {
+		return moodleToken;
+	}
+
+	public Section getRecentSection() {
+		return recentSection.get();
+	}
+
+	public void setRecentSection(Section section) {
+		this.recentSection.set(section);
+	}
+
+	public ObjectProperty<Section> recentSectionProperty() {
+		return recentSection;
 	}
 }

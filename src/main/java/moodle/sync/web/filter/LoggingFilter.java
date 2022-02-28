@@ -42,6 +42,11 @@ public class LoggingFilter implements ClientRequestFilter, ClientResponseFilter 
         StringBuilder builder = new StringBuilder("----- <Request> ------------\n");
         builder.append("  Method: ").append(requestContext.getMethod()).append("\n");
         builder.append("  URI: ").append(requestContext.getUri()).append("\n");
+        for(var header : requestContext.getHeaders().entrySet()){
+            builder.append("  Header: ").append(header.getKey()).append("\n");
+            builder.append("  Headervalue: ").append(header.getValue()).append("\n");
+        }
+        builder.append("  URI: ").append(requestContext.getEntity()).append("\n");
         builder.append("----- </Request> ----------\n");
 
         System.out.println(builder.toString());

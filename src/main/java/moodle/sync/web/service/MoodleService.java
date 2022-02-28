@@ -32,16 +32,16 @@ public class MoodleService {
 		return moodleClient.getDraft("json", "45047a7ae8ceef74553e6da702106396", "core_files_get_unused_draft_itemid");
 	}
 
-	public List<Course> getEnrolledCourses(){
-		return moodleClient.getCourses("json","45047a7ae8ceef74553e6da702106396","core_enrol_get_users_courses", 2);
+	public List<Course> getEnrolledCourses(String token){
+		return moodleClient.getCourses("json",token,"core_enrol_get_users_courses", 2);
 	}
 
 	public int getUserId() {
 		return moodleClient.getUserId("json","45047a7ae8ceef74553e6da702106396","core_webservice_get_site_info").getUserid();
 	}
 
-	public List<Section> getCourseContent(){
-		return moodleClient.getCourseContent("json","45047a7ae8ceef74553e6da702106396","core_course_get_contents", 3);
+	public List<Section> getCourseContent(String token, int courseid){
+		return moodleClient.getCourseContent("json",token,"core_course_get_contents", courseid);
 	}
 
 	public void setMoveModule(){

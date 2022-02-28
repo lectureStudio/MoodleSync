@@ -11,6 +11,7 @@ public class DefaultConfiguration extends MoodleSyncConfiguration {
 		setUIControlSize(9);
 		setStartMaximized(false);
 		setAdvancedUIMode(false);
+		setSyncRootPath(System.getProperty("user.dir"));
 	}
 
 }
