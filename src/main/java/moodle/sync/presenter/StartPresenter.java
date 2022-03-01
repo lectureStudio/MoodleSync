@@ -10,6 +10,7 @@ import moodle.sync.web.json.Coursecontent;
 import moodle.sync.web.json.Module;
 import moodle.sync.web.json.Section;
 
+import okhttp3.*;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.presenter.Presenter;
@@ -23,6 +24,8 @@ import moodle.sync.web.service.MoodleService;
 import org.lecturestudio.web.api.exception.MatrixUnauthorizedException;
 import org.lecturestudio.web.api.service.DLZRoomService;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,20 +111,72 @@ public class StartPresenter extends Presenter<StartView> {
 	private void onSync() {
 		try {
 			try{
+				//Create Directory if not existend
 				FileService fileService = new FileService();
 				Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName());
 				System.out.println(execute);
 				fileService.DirectoryManager(execute);
+
+				//URLs and Resources in Moodle Section
 				List<Module> choosenSectionModules = new ArrayList<Module>();
 				for(int i = 0; i < config.getRecentSection().getModules().size(); i++){
-					if(config.getRecentSection().getModules().get(i).getModname().equals("url") || config.getRecentSection().getModules().get(i).getModname().equals("resource")){
+					if(/*config.getRecentSection().getModules().get(i).getModname().equals("url") || */config.getRecentSection().getModules().get(i).getModname().equals("resource")){
 						choosenSectionModules.add(config.getRecentSection().getModules().get(i));
 					}
 				}
 				System.out.println(choosenSectionModules.size());
-				for(int i = 0; i < choosenSectionModules.size(); i++){
+				/*for(int i = 0; i < choosenSectionModules.size(); i++){
 					System.out.println(choosenSectionModules.get(i).getName());
+				}*/
+				List<String> moduleNames = new ArrayList<>();
+				//choosenSectionModules.forEach(module -> moduleNames.add(module.getContents().get(0).getFilename()));
+				for(int i = 0; i < choosenSectionModules.size(); i++){
+					moduleNames.add(choosenSectionModules.get(i).getContents().get(0).getFilename());
+					System.out.println(choosenSectionModules.get(i).getContents().get(0).getFilename());
 				}
+
+				//Objects inside the sync-directory -> Filenames
+				List<String> fileNames = new ArrayList<>();
+				try {
+					DirectoryStream<Path> filesInDirectory = Files.newDirectoryStream(execute);
+					filesInDirectory.forEach(path -> fileNames.add(path.getFileName().toString()));
+					System.out.println(fileNames.size());
+				}
+				catch (Exception e){
+				}
+
+				//Case: File not uploaded
+				//Look which are not on moodle
+
+				List<String> differences = new ArrayList<>(fileNames);
+				differences.removeAll(moduleNames);
+				//Initiate Upload
+				for(int i = 0; i < differences.size(); i++){
+					OkHttpClient client = new OkHttpClient().newBuilder()
+							.build();
+					MediaType mediaType = MediaType.parse("text/plain");
+					RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
+							.addFormDataPart(differences.get(i),config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName() + "/" + differences.get(i),
+									RequestBody.create(MediaType.parse("application/octet-stream"),
+											new File(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName() + "/" + differences.get(i))))
+							.build();
+					Request request = new Request.Builder()
+							.url("http://localhost/webservice/upload.php?token=31a1f216fd60a5be89c6a25debe82505")
+							.method("POST", body)
+							.build();
+					Response response = client.newCall(request).execute();
+					String answer[] = response.body().string().split(",");
+					for (int x=0; x<answer.length; x++){
+						System.out.println(answer[x]);
+					}
+					String[] itemidString = answer[6].split(":");
+					String[] fileName = answer[4].split(":");
+					byte[] fileNameBytes = fileName[1].getBytes("UTF-8");
+					String fileNameEncoded = new String(fileNameBytes, StandardCharsets.UTF_8);
+					System.out.println(fileNameEncoded);
+					moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), itemidString[1], fileNameEncoded);
+				}
+
 			}
 			catch (Throwable e){
 

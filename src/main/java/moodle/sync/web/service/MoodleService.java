@@ -52,8 +52,8 @@ public class MoodleService {
 		moodleClient.setUrl("json", "f11d219efda839cb5c85bd4e420fa11c" ,"local_course_add_new_course_module_url", 3 , 1, "Test aus Java","http://www.moodle.com" , null);
 	}
 
-	public void setResource(){
-		moodleClient.setResource("json", "f11d219efda839cb5c85bd4e420fa11c", "local_course_add_new_course_module_resource", 3, 1, 113747439, "Resource aus Java", null);
+	public void setResource(String token, int courseid, int sectionid, String itemid, String name){
+		moodleClient.setResource("json", token, "local_course_add_new_course_module_resource", courseid,  sectionid,  itemid,  name, null);
 	}
 
 }

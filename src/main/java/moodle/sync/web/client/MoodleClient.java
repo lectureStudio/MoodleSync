@@ -55,5 +55,5 @@ public interface MoodleClient {
 	//Resource veröffentlichen - nicht hochladen!
 	@POST
 	@Path("")
-	void setResource(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("sectionnum") int sectionnum, @QueryParam("itemid") int itemid, @QueryParam("displayname") String displayname, @QueryParam("beforemod") Integer beforemod);
+	void setResource(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("sectionnum") int sectionnum, @QueryParam("itemid") String itemid, @QueryParam("displayname") String displayname, @QueryParam("beforemod") Integer beforemod);
 }

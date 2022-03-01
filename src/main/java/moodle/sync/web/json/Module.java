@@ -20,4 +20,6 @@ public class Module {
     private Integer contextid;//Activity context id.
     private Boolean uservisible;//Is the module visible for the user?
     private String modname;
+    private List<Content> contents;
+
 }
