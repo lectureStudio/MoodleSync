@@ -7,18 +7,19 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.VBox;
-import moodle.sync.javafx.UploadElementTableItem;
 import moodle.sync.presenter.SyncPresenter;
 import moodle.sync.util.UploadElement;
+import moodle.sync.util.UploadElementTableItem;
 import moodle.sync.view.SyncView;
+import moodle.sync.web.json.Course;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.ConsumerAction;
 import org.lecturestudio.javafx.event.CellButtonActionEvent;
 import org.lecturestudio.javafx.util.FxUtils;
 import org.lecturestudio.javafx.view.FxView;
 import org.lecturestudio.javafx.view.FxmlView;
+import org.lecturestudio.web.api.filter.RegexRule;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,21 +39,12 @@ public class FxSyncView extends VBox implements SyncView, FxView {
 
 
 
-
     @Override
     public void setOnSync(Action action){
         FxUtils.bindAction(finalSyncButton, action);
-        //executeAction(action, synclist);
     }
-
-
-
     @Override
     public void setFiles(List<UploadElement> files){
-        final ObservableList<UploadElement> data = FXCollections.observableArrayList();
-        for(UploadElement file : files){
-            data.add(file);
-        }
         FxUtils.invoke(() -> {
             syncItemsTableView.getItems().clear();
 
@@ -62,22 +54,15 @@ public class FxSyncView extends VBox implements SyncView, FxView {
         });
     }
 
-    @Override
-    public void returnList(){
+    public List<UploadElement> returnList(){
         List<UploadElement> synclist = new ArrayList<>();
         for(int i = 0; i < syncItemsTableView.getItems().size(); i++){
-            System.out.println(syncItemsTableView.getItems().get(i).getUploadElement().getChecked());
+            synclist.add(syncItemsTableView.getItems().get(i).getUploadElement());
         }
-    }
-    @FXML
-    private void onUpload(CellButtonActionEvent event) {
-        UploadElementTableItem item = (UploadElementTableItem) event.getCellItem();
-        System.out.println(item.getFilename());
+        return synclist;
     }
 
-    private void finish(){
-        System.out.println(syncItemsTableView.getItems().get(0).getChecked());
-    }
+
     /*@FXML
     private void initialize() {
         // Set table column resize policy.

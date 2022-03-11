@@ -14,17 +14,17 @@ public class UploadElement {
 
     private Path path;
 
-    private int uploaded;
+    private boolean uploaded;
 
     private int ifuploaded;
 
     private boolean checked;
 
-    public UploadElement(Path path, int uploaded, int ifuploaded){
+    public UploadElement(Path path, boolean uploaded, int ifuploaded, boolean checked){
         this.path = path;
         this.uploaded = uploaded;
         this.ifuploaded = ifuploaded;
-        this.checked = false;
+        this.checked = checked;
     }
 
     public java.lang.Boolean getChecked() {

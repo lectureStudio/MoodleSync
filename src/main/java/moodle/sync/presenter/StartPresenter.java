@@ -109,10 +109,10 @@ public class StartPresenter extends Presenter<StartView> {
         context.getEventBus().post(new CloseApplicationCommand());
     }
 
-
     private void onSync() {
         try {
-            //Create Directory if not existed
+            context.getEventBus().post(new ShowPresenterCommand<>(SyncPresenter.class));
+            /*//Create Directory if not existed
             FileService fileService = new FileService();
             Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName());
             fileService.directoryManager(execute);
@@ -123,7 +123,7 @@ public class StartPresenter extends Presenter<StartView> {
             //List containing modules in choosen section
             List<Module> modules = new ArrayList<>();
             for (int i = 0; i < config.getRecentSection().getModules().size(); i++) {
-                if (/*config.getRecentSection().getModules().get(i).getModname().equals("url") ||*/ config.getRecentSection().getModules().get(i).getModname().equals("resource")) {
+                if (config.getRecentSection().getModules().get(i).getModname().equals("url") || config.getRecentSection().getModules().get(i).getModname().equals("resource")) {
                     modules.add(config.getRecentSection().getModules().get(i));
                 }
             }
@@ -134,21 +134,20 @@ public class StartPresenter extends Presenter<StartView> {
 
             //Every file inside the directory gets checked whether its filename is on Moodle or not and then is handled differently
             for (Path item : filelist) {
-                int uploaded = 0;
+                boolean uploaded = false;
                 int ifuploaded = 0;
                 for (int i = 0; i < modules.size(); i++) {
                     if (item.getFileName().toString().equals(modules.get(i).getContents().get(0).getFilename())) {
-                        uploaded = 1;
+                        uploaded = true;
                         ifuploaded = i;
                         break;
                     }
-                    uploaded = 2;
                 }
-                elements.add(new UploadElement(item, uploaded, ifuploaded));
+                elements.add(new UploadElement(item, uploaded, ifuploaded, false));
             }
 
             config.setUploadList(new UploadList(elements));
-            context.getEventBus().post(new ShowPresenterCommand<>(SyncPresenter.class));
+            context.getEventBus().post(new ShowPresenterCommand<>(SyncPresenter.class));*/
 
                 /*
                 //Case 1: file is uploaded; uploaded = true

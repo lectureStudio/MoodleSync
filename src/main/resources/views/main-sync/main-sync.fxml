@@ -10,11 +10,11 @@
 <?import javafx.scene.control.cell.PropertyValueFactory?>
 <?import org.lecturestudio.javafx.factory.ButtonCellFactory?>
 <?import moodle.sync.javafx.ButtonCellValueFactory?>
-<?import moodle.sync.javafx.CheckBoxCellFactory?>
-<?import moodle.sync.javafx.CheckBoxCellValueFactory?>
 <?import javafx.scene.control.cell.CheckBoxListCell?>
 <?import javafx.scene.control.cell.CheckBoxTableCell?>
 
+<?import moodle.sync.util.UploadElementCellValueFactory?>
+<?import moodle.sync.util.CheckBoxTableCellFactory?>
 <fx:root type="VBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <TableView fx:id="syncItemsTableView" editable="true" fixedCellSize="50.0">
@@ -27,12 +27,12 @@
                   <PropertyValueFactory property="fileName"/>
                </cellValueFactory>
             </TableColumn>
-            <TableColumn fx:id="checkBoxTableColumn" prefWidth="75.0" text="%sync.change" >
+            <TableColumn editable="true" prefWidth="75.0" text="%sync.change" >
                <cellFactory>
-                  <CheckBoxTableCell/>
+                  <CheckBoxTableCellFactory/>
                </cellFactory>
                <cellValueFactory>
-                  <PropertyValueFactory property="checked"/>
+                  <UploadElementCellValueFactory/>
                </cellValueFactory>
             </TableColumn>
          </columns>
