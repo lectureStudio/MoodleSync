@@ -38,4 +38,10 @@ public class Course {
     //private List<File> overviewfiles; //Da muss als Type der List noch Files rein
     //private Boolean showactivitydates;
     //private Boolean showcompletionconditions;
+
+
+    @Override
+    public String toString() {
+        return displayname;
+    }
 }

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.cell.TextFieldTableCell?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.cell.TextFieldTableCell?>
+
+
+<?import javafx.scene.control.cell.PropertyValueFactory?>
+<?import org.lecturestudio.javafx.factory.ButtonCellFactory?>
+<?import moodle.sync.javafx.ButtonCellValueFactory?>
+<?import moodle.sync.javafx.CheckBoxCellFactory?>
+<?import moodle.sync.javafx.CheckBoxCellValueFactory?>
+<?import javafx.scene.control.cell.CheckBoxListCell?>
+<?import javafx.scene.control.cell.CheckBoxTableCell?>
+
+<fx:root type="VBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="syncItemsTableView" editable="true" fixedCellSize="50.0">
+         <columns>
+            <TableColumn editable="true" prefWidth="75.0" text="%sync.file" >
+                    <cellFactory>
+                       <TextFieldTableCell fx:factory="forTableColumn"/>
+                    </cellFactory>
+               <cellValueFactory>
+                  <PropertyValueFactory property="fileName"/>
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn fx:id="checkBoxTableColumn" prefWidth="75.0" text="%sync.change" >
+               <cellFactory>
+                  <CheckBoxTableCell/>
+               </cellFactory>
+               <cellValueFactory>
+                  <PropertyValueFactory property="checked"/>
+               </cellValueFactory>
+            </TableColumn>
+         </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy></TableView>
+   </children>
+   <children>
+      <Button fx:id="finalSyncButton" text="%sync.sync" />
+   </children>
+</fx:root>

@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class Content {
-    private String filename;
-    private Long timemodified;
+public class SiteInfo {
+    private int userid;
 }

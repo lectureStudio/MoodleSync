@@ -1,6 +1,7 @@
 package moodle.sync.web.service;
 
 import java.net.URI;
+import java.security.KeyStore;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,32 +29,45 @@ public class MoodleService {
 				.build(MoodleClient.class);
 	}
 
-	public Draft getDraft() {
-		return moodleClient.getDraft("json", "45047a7ae8ceef74553e6da702106396", "core_files_get_unused_draft_itemid");
+	public Draft getDraft(String token) {
+		return moodleClient.getDraft("json", token, "core_files_get_unused_draft_itemid");
 	}
 
-	public List<Course> getEnrolledCourses(String token){
-		return moodleClient.getCourses("json",token,"core_enrol_get_users_courses", 2);
+	public List<Course> getEnrolledCourses(String token, int userid){
+		return moodleClient.getCourses("json",token,"core_enrol_get_users_courses", userid);
 	}
 
-	public int getUserId() {
-		return moodleClient.getUserId("json","45047a7ae8ceef74553e6da702106396","core_webservice_get_site_info").getUserid();
+	public int getUserId(String token) {
+		SiteInfo info = moodleClient.getSiteInfo("json", token,"core_webservice_get_site_info");
+		return info.getUserid();
 	}
 
 	public List<Section> getCourseContent(String token, int courseid){
 		return moodleClient.getCourseContent("json",token,"core_course_get_contents", courseid);
 	}
 
-	public void setMoveModule(){
-		moodleClient.setMoveModule("json","f11d219efda839cb5c85bd4e420fa11c","local_course_move_module_to_specific_position", 8, 13, 79);
+	public List<Section> getCourseContentSection(String token, int courseid, int sectionid){
+		return moodleClient.getCourseContentSection("json",token,"core_course_get_contents", courseid, "sectionid", sectionid);
 	}
 
-	public void setUrl(){
-		moodleClient.setUrl("json", "f11d219efda839cb5c85bd4e420fa11c" ,"local_course_add_new_course_module_url", 3 , 1, "Test aus Java","http://www.moodle.com" , null);
+	public void setMoveModule(String token, int cmid, int sectionid, int beforemod){
+		moodleClient.setMoveModule("json",token,"local_course_move_module_to_specific_position", cmid, sectionid, beforemod);
 	}
 
-	public void setResource(String token, int courseid, int sectionid, String itemid, String name){
+	public void setUrl(String token, int courseid, int section, String urlname, String url){
+		moodleClient.setUrl("json", token ,"local_course_add_new_course_module_url", courseid , section, urlname, url, null);
+	}
+
+	public void setResource(String token, int courseid, int sectionid, Long itemid, String name){
 		moodleClient.setResource("json", token, "local_course_add_new_course_module_resource", courseid,  sectionid,  itemid,  name, null);
+	}
+
+	public void setResource(String token, int courseid, int sectionid, Long itemid, String name, int beforemod){
+		moodleClient.setResource("json", token, "local_course_add_new_course_module_resource", courseid,  sectionid,  itemid,  name, beforemod);
+	}
+
+	public void removeResource(String token, int cmids){
+		moodleClient.removeResource("json", token, "core_course_delete_modules", cmids);
 	}
 
 }

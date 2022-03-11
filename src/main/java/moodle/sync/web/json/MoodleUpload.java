@@ -1,5 +1,6 @@
 package moodle.sync.web.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,10 +11,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 
 public class MoodleUpload {
-    private String component;
-    private Integer contextid;
-    private Integer userid;
-    private Integer itemid;
+    private String filename;
+    private Long itemid;
 }

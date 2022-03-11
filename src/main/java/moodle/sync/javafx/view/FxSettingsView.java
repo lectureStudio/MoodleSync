@@ -53,5 +53,7 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     public void setSelectSyncRootPath(Action action) {
         FxUtils.bindAction(syncRootPathButton, action);
     }
+
+
 }
 

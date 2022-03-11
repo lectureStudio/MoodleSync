@@ -23,4 +23,9 @@ public class Section {
     private Integer hiddenbynumsections;
     private Boolean uservisible;
     private List<Module> modules;
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }
