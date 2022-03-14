@@ -10,9 +10,9 @@
          <padding>
             <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
          </padding></Label>
-      <GridPane alignment="CENTER" vgap="15.0">
+      <GridPane alignment="CENTER" vgap="10.0">
          <columnConstraints>
-            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
+            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
             <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
          </columnConstraints>
@@ -22,13 +22,38 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
          </rowConstraints>
          <children>
-            <Label text="Root Verzeichnis" GridPane.rowIndex="2" />
+            <Label text="%settings.root" GridPane.rowIndex="2" />
             <TextField fx:id="syncRootPath" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Button fx:id="syncRootPathButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" text="%settings.search" GridPane.columnIndex="2" GridPane.rowIndex="2" />
-            <Label text="Sicherheitstoken" GridPane.rowIndex="1" />
+            <Label text="%settings.token" GridPane.rowIndex="1" />
             <TextField fx:id="tokenField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <TextField fx:id="moodleField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" />
-            <Label text="Moodle Plattform" />
+            <Label text="%settings.lms" />
+         </children>
+      </GridPane>
+      <Separator prefWidth="200.0">
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </Separator>
+      <GridPane alignment="CENTER" vgap="10.0">
+        <columnConstraints>
+            <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="%settings.ftp" />
+            <Label text="%setings.ftpusername" GridPane.rowIndex="1" />
+            <Label text="%settings.ftppassword" GridPane.rowIndex="2" />
+            <TextField prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" />
+            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">

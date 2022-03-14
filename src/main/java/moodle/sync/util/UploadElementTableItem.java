@@ -13,21 +13,25 @@ public class UploadElementTableItem {
 
     private BooleanProperty selected;
 
+    private StringProperty message;
+
     private UploadElement uploadElement;
 
-    public UploadElementTableItem(String fileName, boolean selected, UploadElement uploadElement){
+    public UploadElementTableItem(String fileName, boolean selected, String message, UploadElement uploadElement){
         this.fileName = new SimpleStringProperty(fileName);
         this.selected = new SimpleBooleanProperty(selected);
+        this.message = new SimpleStringProperty(message);
         this.uploadElement = uploadElement;
     }
 
     public UploadElementTableItem(UploadElement uploadElement){
         this.fileName = new SimpleStringProperty(uploadElement.getPath().getFileName().toString());
         this.selected = new SimpleBooleanProperty(uploadElement.getChecked());
+        this.message = new SimpleStringProperty(uploadElement.getAction().message);
         this.uploadElement = uploadElement;
     }
     public UploadElementTableItem(){
-        this(null, false, null);
+        this(null, false,null, null);
     }
 
     public StringProperty fileNameProperty() { return fileName; }
@@ -36,6 +40,11 @@ public class UploadElementTableItem {
 
     public void setFileName(String value) { this.fileName.set(value); }
 
+    public StringProperty messageProperty() { return message; }
+
+    public String getMessage() { return this.message.get(); }
+
+    public void setMessage(String value) { this.message.set(value); }
 
     public BooleanProperty selectedProperty() { return selected; }
 

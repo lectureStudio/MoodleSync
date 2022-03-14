@@ -3,6 +3,7 @@ package moodle.sync.presenter;
 import moodle.sync.config.MoodleSyncConfiguration;
 import moodle.sync.javafx.UploadList;
 import moodle.sync.util.FileService;
+import moodle.sync.util.MoodleAction;
 import moodle.sync.util.UploadElement;
 import moodle.sync.util.UploadElementTableItem;
 import moodle.sync.view.SyncView;
@@ -10,6 +11,7 @@ import moodle.sync.web.MoodleUploadTemp;
 import moodle.sync.web.json.Module;
 import moodle.sync.web.json.MoodleUpload;
 import moodle.sync.web.service.MoodleService;
+import org.apache.tika.Tika;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.presenter.command.ShowPresenterCommand;
@@ -82,6 +84,9 @@ public class SyncPresenter extends Presenter<SyncView> {
 
             //Every file inside the directory gets checked whether its filename is on Moodle or not and then is handled differently
             for (Path item : fileList) {
+                Tika tika = new Tika();
+                String mimeType = tika.detect(item);
+                System.out.println(mimeType);
                 boolean uploaded = false;
                 int ifuploaded = 0;
                 for (int i = 0; i < modules.size(); i++) {
@@ -90,15 +95,15 @@ public class SyncPresenter extends Presenter<SyncView> {
                         ifuploaded = i;
                         Module online = modules.get(i);
                         Long onlinemodified = online.getContents().get(0).getTimemodified() * 1000;
-                        Long filemodified = Files.readAttributes(item, BasicFileAttributes.class).lastModifiedTime().toMillis();
+                        Long filemodified = Files.getLastModifiedTime(item).toMillis();
                         if (filemodified > onlinemodified) {
-                            elements.add(new UploadElement(item, uploaded, ifuploaded, false));
+                            elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleSynchronize));
                             break;
                         }
                     }
                 }
                 if(uploaded == false){
-                    elements.add(new UploadElement(item, uploaded, ifuploaded, false));
+                    elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleUpload));
                 }
             }
             config.setUploadList(new UploadList(elements));

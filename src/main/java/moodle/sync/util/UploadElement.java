@@ -1,6 +1,5 @@
 package moodle.sync.util;
 
-import javafx.beans.property.SimpleBooleanProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,11 +19,14 @@ public class UploadElement {
 
     private boolean checked;
 
-    public UploadElement(Path path, boolean uploaded, int ifuploaded, boolean checked){
+    private MoodleAction action;
+
+    public UploadElement(Path path, boolean uploaded, int ifuploaded, boolean checked, MoodleAction action){
         this.path = path;
         this.uploaded = uploaded;
         this.ifuploaded = ifuploaded;
         this.checked = checked;
+        this.action = action;
     }
 
     public java.lang.Boolean getChecked() {

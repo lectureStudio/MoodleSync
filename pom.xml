@@ -68,6 +68,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>1.12</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-text</artifactId>
 			<version>1.9</version>
@@ -102,7 +107,6 @@
 			<artifactId>javafx-web</artifactId>
 			<version>${javafx.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.lecturestudio.core</groupId>
 			<artifactId>lect-core</artifactId>

@@ -15,8 +15,9 @@
 
 <?import moodle.sync.util.UploadElementCellValueFactory?>
 <?import moodle.sync.util.CheckBoxTableCellFactory?>
-<fx:root type="VBox" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="VBox" alignment="CENTER" spacing="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
+
       <TableView fx:id="syncItemsTableView" editable="true" fixedCellSize="50.0">
          <columns>
             <TableColumn editable="true" prefWidth="75.0" text="%sync.file" >
@@ -27,7 +28,15 @@
                   <PropertyValueFactory property="fileName"/>
                </cellValueFactory>
             </TableColumn>
-            <TableColumn editable="true" prefWidth="75.0" text="%sync.change" >
+            <TableColumn editable="false" prefWidth="75.0" text="%sync.change">
+               <cellFactory>
+                  <TextFieldTableCell fx:factory="forTableColumn"/>
+               </cellFactory>
+               <cellValueFactory>
+                  <PropertyValueFactory property="message"/>
+               </cellValueFactory>
+            </TableColumn>
+            <TableColumn styleClass="check" editable="true" prefWidth="75.0" text="%sync.upload" >
                <cellFactory>
                   <CheckBoxTableCellFactory/>
                </cellFactory>
@@ -43,4 +52,5 @@
    <children>
       <Button fx:id="finalSyncButton" text="%sync.sync" />
    </children>
+
 </fx:root>
