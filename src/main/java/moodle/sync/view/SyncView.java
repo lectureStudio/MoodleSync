@@ -13,12 +13,13 @@ import java.util.List;
 
 public interface SyncView extends View {
 
+    void setOnClose(Action action);
+
     void setOnSync(Action action);
 
     void setFiles(List<UploadElement> files);
 
     List<UploadElement> returnList();
 
-    //void returnList();
 
 }

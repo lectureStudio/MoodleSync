@@ -8,6 +8,12 @@ public interface SettingsView extends View {
 
     void setOnExit(Action action);
 
+    void setMoodleField(StringProperty moodleURL);
+
+    void setFormatsMoodle(StringProperty moodleformats);
+
+    void setFormatsFileserver(StringProperty fileserverformats);
+
     void setMoodleToken(StringProperty moodleToken);
 
     void setSyncRootPath(StringProperty path);

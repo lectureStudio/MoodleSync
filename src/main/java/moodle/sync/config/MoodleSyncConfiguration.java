@@ -22,6 +22,11 @@ public class MoodleSyncConfiguration extends Configuration {
 
 	private final ObjectProperty<UploadList> uploadList = new ObjectProperty<>();
 
+	private final StringProperty moodleUrl = new StringProperty();
+
+	private final StringProperty formatsMoodle = new StringProperty();
+
+	private final StringProperty formatsFileserver = new StringProperty();
 
 	/**
 	 * Get the path where the synchronized files are stored at.
@@ -97,5 +102,41 @@ public class MoodleSyncConfiguration extends Configuration {
 
 	public ObjectProperty<UploadList> uploadListProperty() {
 		return uploadList;
+	}
+
+	public String getMoodleUrl() {
+		return moodleUrl.get();
+	}
+
+	public void setMoodleUrl(String url) {
+		this.moodleUrl.set(url);
+	}
+
+	public StringProperty moodleUrlProperty() {
+		return moodleUrl;
+	}
+
+	public String getFormatsMoodle() {
+		return formatsMoodle.get();
+	}
+
+	public void setFormatsMoodle(String formats) {
+		this.formatsMoodle.set(formats);
+	}
+
+	public StringProperty formatsMoodleProperty() {
+		return formatsMoodle;
+	}
+
+	public String getFormatsFileserver() {
+		return formatsFileserver.get();
+	}
+
+	public void setFormatsFileserver(String formats) {
+		this.formatsFileserver.set(formats);
+	}
+
+	public StringProperty formatsFileserverProperty() {
+		return formatsFileserver;
 	}
 }

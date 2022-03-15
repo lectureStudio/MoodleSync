@@ -1,8 +1,6 @@
 package moodle.sync.javafx.view;
 
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableView;
@@ -11,14 +9,10 @@ import moodle.sync.presenter.SyncPresenter;
 import moodle.sync.util.UploadElement;
 import moodle.sync.util.UploadElementTableItem;
 import moodle.sync.view.SyncView;
-import moodle.sync.web.json.Course;
 import org.lecturestudio.core.view.Action;
-import org.lecturestudio.core.view.ConsumerAction;
-import org.lecturestudio.javafx.event.CellButtonActionEvent;
 import org.lecturestudio.javafx.util.FxUtils;
 import org.lecturestudio.javafx.view.FxView;
 import org.lecturestudio.javafx.view.FxmlView;
-import org.lecturestudio.web.api.filter.RegexRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +27,18 @@ public class FxSyncView extends VBox implements SyncView, FxView {
     @FXML
     private Button finalSyncButton;
 
+    @FXML
+    private Button closeButton;
+
     public FxSyncView() {
         super();
     }
 
 
+    @Override
+    public void setOnClose(Action action){
+        FxUtils.bindAction(closeButton, action);
+    }
 
     @Override
     public void setOnSync(Action action){

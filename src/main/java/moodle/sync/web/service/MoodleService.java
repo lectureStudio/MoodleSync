@@ -7,6 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import moodle.sync.config.MoodleSyncConfiguration;
 import moodle.sync.web.json.*;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
@@ -27,10 +28,6 @@ public class MoodleService {
 		moodleClient = RestClientBuilder.newBuilder()
 				.baseUri(URI.create(apiUrl))
 				.build(MoodleClient.class);
-	}
-
-	public Draft getDraft(String token) {
-		return moodleClient.getDraft("json", token, "core_files_get_unused_draft_itemid");
 	}
 
 	public List<Course> getEnrolledCourses(String token, int userid){

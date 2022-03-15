@@ -50,7 +50,11 @@
          </columnResizePolicy></TableView>
    </children>
    <children>
-      <Button fx:id="finalSyncButton" text="%sync.sync" />
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="70.0">
+         <children>
+            <Button fx:id="closeButton" text="%sync.back" />
+            <Button fx:id="finalSyncButton" text="%sync.sync" />
+         </children>
+      </HBox>
    </children>
-
 </fx:root>

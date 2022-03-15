@@ -2,6 +2,7 @@ package moodle.sync.javafx.view;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import moodle.sync.presenter.SettingsPresenter;
@@ -28,6 +29,15 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     private TextField syncRootPath;
 
     @FXML
+    private TextField moodleField;
+
+    @FXML
+    private TextArea formatsmoodle;
+
+    @FXML
+    private TextArea formatsfileserver;
+
+    @FXML
     private Button syncRootPathButton;
 
     public FxSettingsView() {
@@ -40,8 +50,23 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     }
 
     @Override
+    public void setMoodleField(StringProperty moodleURL){
+        moodleField.textProperty().bindBidirectional(new LectStringProperty(moodleURL));
+    }
+
+    @Override
     public void setMoodleToken(StringProperty moodleToken) {
         tokenField.textProperty().bindBidirectional(new LectStringProperty(moodleToken));
+    }
+
+    @Override
+    public void setFormatsMoodle(StringProperty moodleformats) {
+        formatsmoodle.textProperty().bindBidirectional(new LectStringProperty(moodleformats));
+    }
+
+    @Override
+    public void setFormatsFileserver(StringProperty fileserverformats) {
+        formatsfileserver.textProperty().bindBidirectional(new LectStringProperty(fileserverformats));
     }
 
     @Override

@@ -6,6 +6,7 @@ import moodle.sync.view.SettingsView;
 import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
 import org.lecturestudio.core.app.ApplicationContext;
+import org.lecturestudio.core.beans.StringProperty;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.presenter.command.CloseApplicationCommand;
 import org.lecturestudio.core.view.DirectoryChooserView;
@@ -22,7 +23,7 @@ public class SettingsPresenter extends Presenter<SettingsView> {
 
     @Inject
     SettingsPresenter(ApplicationContext context, SettingsView view,
-                   ViewContextFactory viewFactory, MoodleService moodleService) {
+                   ViewContextFactory viewFactory) {
         super(context, view);
 
         this.viewFactory = viewFactory;
@@ -34,6 +35,9 @@ public class SettingsPresenter extends Presenter<SettingsView> {
         MoodleSyncConfiguration config = (MoodleSyncConfiguration) context.getConfiguration();
 
         view.setOnExit(this::close);
+        view.setMoodleField(config.moodleUrlProperty());
+        view.setFormatsMoodle(config.formatsMoodleProperty());
+        view.setFormatsFileserver(config.formatsFileserverProperty());
         view.setMoodleToken(config.moodleTokenProperty());
         view.setSyncRootPath(config.syncRootPathProperty());
         view.setSelectSyncRootPath(this::selectRecordingPath);

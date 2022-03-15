@@ -11,6 +11,7 @@ import moodle.sync.web.MoodleUploadTemp;
 import moodle.sync.web.json.Module;
 import moodle.sync.web.json.MoodleUpload;
 import moodle.sync.web.service.MoodleService;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.presenter.Presenter;
@@ -28,6 +29,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SyncPresenter extends Presenter<SyncView> {
@@ -58,13 +60,14 @@ public class SyncPresenter extends Presenter<SyncView> {
 
         view.setFiles(uploadElements);
         view.setOnSync(this::execute);
+        view.setOnClose(this::close);
     }
 
     public void prepareSync() {
         try {
             //Create Directory if not existed
             FileService fileService = new FileService();
-            Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName());
+            Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
             fileService.directoryManager(execute);
 
             //Update Recent Secton
@@ -80,13 +83,31 @@ public class SyncPresenter extends Presenter<SyncView> {
             //List containing all files in directory
             List<Path> fileList = fileService.getFilesInDirectory(execute);
 
+            //Sort by filetype
+            List<Path> fileListMoodle = new ArrayList<>();
+            List<Path> fileListFileserver = new ArrayList<>();
+            List<Path> fileTypeNotFound = new ArrayList<>();
+
+            for(Path file : fileList){
+                if(contains(config.getFormatsMoodle().split(","), FilenameUtils.getExtension(file.getFileName().toString()))){
+                    fileListMoodle.add(file);
+                }
+                else if(contains(config.getFormatsFileserver().split(","), FilenameUtils.getExtension(file.getFileName().toString()))){
+                    fileListFileserver.add(file);
+                }
+                else{
+                    fileTypeNotFound.add(file);
+                }
+            }
+
             List<UploadElement> elements = new ArrayList<>();
 
+            //Handling for Filetype "upload to moodle"
             //Every file inside the directory gets checked whether its filename is on Moodle or not and then is handled differently
-            for (Path item : fileList) {
-                Tika tika = new Tika();
+            for (Path item : fileListMoodle) {
+                /**Tika tika = new Tika();
                 String mimeType = tika.detect(item);
-                System.out.println(mimeType);
+                System.out.println(mimeType);*/
                 boolean uploaded = false;
                 int ifuploaded = 0;
                 for (int i = 0; i < modules.size(); i++) {
@@ -105,6 +126,20 @@ public class SyncPresenter extends Presenter<SyncView> {
                 if(uploaded == false){
                     elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleUpload));
                 }
+            }
+
+            //Handling for filetype "upload to fileserver"
+            for (Path item : fileListFileserver) {
+                boolean uploaded = false;
+                int ifuploaded = 0;
+                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.FTPUpload));
+            }
+
+            //Handling for filetype "filetypenotfound"
+            for (Path item : fileTypeNotFound) {
+                boolean uploaded = false;
+                int ifuploaded = 0;
+                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.DatatypeNotKnown));
             }
             config.setUploadList(new UploadList(elements));
         } catch (Throwable e) {
@@ -146,17 +181,8 @@ public class SyncPresenter extends Presenter<SyncView> {
         }
         close();
     }
-
-
-    private void toggleFile(UploadElement uploadElement) {
-        //uploadElement.setExecute(true);
-    }
-
-    private void execute(List<UploadElement> uploads) {
-        for (int i = 0; i < uploads.size(); i++) {
-            System.out.println(uploads.get(i).getPath());
-            System.out.println(uploads.get(i).getChecked());
-        }
+    public static boolean contains(final String[] arr, final String key) {
+        return Arrays.asList(arr).contains(key);
     }
 
 }

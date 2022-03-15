@@ -19,12 +19,6 @@ import java.util.List;
 })
 public interface MoodleClient {
 
-	//Draftarea für Upload
-	@POST
-	@Path("")
-	@Produces(MediaType.APPLICATION_JSON)
-	Draft getDraft(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function);
-
 	//Kursübersicht
 	@POST
 	@Path("")
