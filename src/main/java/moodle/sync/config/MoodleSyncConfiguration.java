@@ -1,8 +1,5 @@
 package moodle.sync.config;
 
-import javafx.beans.property.ListProperty;
-import moodle.sync.javafx.UploadList;
-import moodle.sync.util.UploadElement;
 import moodle.sync.web.json.Course;
 import moodle.sync.web.json.Section;
 import org.lecturestudio.core.app.configuration.Configuration;
@@ -19,8 +16,6 @@ public class MoodleSyncConfiguration extends Configuration {
 	private final StringProperty moodleToken = new StringProperty();
 
 	private final ObjectProperty<Section> recentSection = new ObjectProperty<>();
-
-	private final ObjectProperty<UploadList> uploadList = new ObjectProperty<>();
 
 	private final StringProperty moodleUrl = new StringProperty();
 
@@ -90,18 +85,6 @@ public class MoodleSyncConfiguration extends Configuration {
 
 	public ObjectProperty<Section> recentSectionProperty() {
 		return recentSection;
-	}
-
-	public UploadList getUploadList() {
-		return uploadList.get();
-	}
-
-	public void setUploadList(UploadList uploadList) {
-		this.uploadList.set(uploadList);
-	}
-
-	public ObjectProperty<UploadList> uploadListProperty() {
-		return uploadList;
 	}
 
 	public String getMoodleUrl() {

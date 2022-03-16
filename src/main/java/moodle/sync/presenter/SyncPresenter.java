@@ -1,33 +1,24 @@
 package moodle.sync.presenter;
 
 import moodle.sync.config.MoodleSyncConfiguration;
-import moodle.sync.javafx.UploadList;
 import moodle.sync.util.FileService;
 import moodle.sync.util.MoodleAction;
 import moodle.sync.util.UploadElement;
-import moodle.sync.util.UploadElementTableItem;
 import moodle.sync.view.SyncView;
 import moodle.sync.web.MoodleUploadTemp;
 import moodle.sync.web.json.Module;
 import moodle.sync.web.json.MoodleUpload;
 import moodle.sync.web.service.MoodleService;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.tika.Tika;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.presenter.Presenter;
-import org.lecturestudio.core.presenter.command.ShowPresenterCommand;
-import org.lecturestudio.core.util.ListChangeListener;
-import org.lecturestudio.core.util.ObservableList;
 import org.lecturestudio.core.view.NotificationType;
 import org.lecturestudio.core.view.ViewContextFactory;
-import org.lecturestudio.web.api.filter.RegexRule;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +33,8 @@ public class SyncPresenter extends Presenter<SyncView> {
 
     private List<Module> modules;
 
+    private List<UploadElement> uploadElements;
+
     @Inject
     SyncPresenter(ApplicationContext context, SyncView view,
                   ViewContextFactory viewFactory, MoodleService moodleService) {
@@ -54,16 +47,16 @@ public class SyncPresenter extends Presenter<SyncView> {
 
     @Override
     public void initialize() {
-        prepareSync();
-        UploadList uploadList = config.getUploadList();
-        List<UploadElement> uploadElements = uploadList.getElements();
+
+        uploadElements = prepareSync();
 
         view.setFiles(uploadElements);
         view.setOnSync(this::execute);
         view.setOnClose(this::close);
     }
 
-    public void prepareSync() {
+    public List<UploadElement> prepareSync() {
+        List<UploadElement> elements = new ArrayList<>();
         try {
             //Create Directory if not existed
             FileService fileService = new FileService();
@@ -100,8 +93,6 @@ public class SyncPresenter extends Presenter<SyncView> {
                 }
             }
 
-            List<UploadElement> elements = new ArrayList<>();
-
             //Handling for Filetype "upload to moodle"
             //Every file inside the directory gets checked whether its filename is on Moodle or not and then is handled differently
             for (Path item : fileListMoodle) {
@@ -118,13 +109,13 @@ public class SyncPresenter extends Presenter<SyncView> {
                         Long onlinemodified = online.getContents().get(0).getTimemodified() * 1000;
                         Long filemodified = Files.getLastModifiedTime(item).toMillis();
                         if (filemodified > onlinemodified) {
-                            elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleSynchronize));
+                            elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleSynchronize, true));
                             break;
                         }
                     }
                 }
                 if(uploaded == false){
-                    elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleUpload));
+                    elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleUpload, true));
                 }
             }
 
@@ -132,27 +123,27 @@ public class SyncPresenter extends Presenter<SyncView> {
             for (Path item : fileListFileserver) {
                 boolean uploaded = false;
                 int ifuploaded = 0;
-                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.FTPUpload));
+                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.FTPUpload, true));
             }
 
             //Handling for filetype "filetypenotfound"
             for (Path item : fileTypeNotFound) {
                 boolean uploaded = false;
                 int ifuploaded = 0;
-                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.DatatypeNotKnown));
+                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.DatatypeNotKnown, false));
             }
-            config.setUploadList(new UploadList(elements));
         } catch (Throwable e) {
             e.printStackTrace();
         }
+        return elements;
     }
 
     private void execute() {
         try {
-            List<UploadElement> sync = view.returnList();
+            List<UploadElement> sync = uploadElements;
 
             for (UploadElement item : sync) {
-                if (item.getChecked()) {
+                if (item.getChecked().get()) {
 
                     //Case 1: file is uploaded; uploaded = true
                     if (item.isUploaded()) {
@@ -160,7 +151,7 @@ public class SyncPresenter extends Presenter<SyncView> {
                         //Warum mal 1000?
 
                         MoodleUploadTemp uploader = new MoodleUploadTemp();
-                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName() + "/" + item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName() + "/" + item.getPath().getFileName().toString());
+                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */+ item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/" */+ item.getPath().getFileName().toString());
                         moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename(), online.getId());
                         moodleService.removeResource(config.getMoodleToken(), online.getId());
 
@@ -168,7 +159,7 @@ public class SyncPresenter extends Presenter<SyncView> {
                     //Case 2: file not uploaded; uploaded = false
                     else {
                         MoodleUploadTemp uploader = new MoodleUploadTemp();
-                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName() + "/" + item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + config.recentSectionProperty().get().getName() + "/" + item.getPath().getFileName().toString());
+                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */+ item.getPath().getFileName().toString());
                         moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename());
                     }
                 }

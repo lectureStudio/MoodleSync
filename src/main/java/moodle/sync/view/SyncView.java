@@ -19,7 +19,6 @@ public interface SyncView extends View {
 
     void setFiles(List<UploadElement> files);
 
-    List<UploadElement> returnList();
 
 
 }

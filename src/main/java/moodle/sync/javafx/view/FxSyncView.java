@@ -55,26 +55,4 @@ public class FxSyncView extends VBox implements SyncView, FxView {
         });
     }
 
-    public List<UploadElement> returnList(){
-        List<UploadElement> synclist = new ArrayList<>();
-        for(int i = 0; i < syncItemsTableView.getItems().size(); i++){
-            synclist.add(syncItemsTableView.getItems().get(i).getUploadElement());
-        }
-        return synclist;
-    }
-
-
-    /*@FXML
-    private void initialize() {
-        // Set table column resize policy.
-        ObservableList<TableColumn<FilesTableItem, ?>> columns = quizRegexTableView.getColumns();
-
-        // Set table column edit policy.
-        @SuppressWarnings("unchecked")
-        TableColumn<FilesTableItem, String> regexColumn = (TableColumn<FilesTableItem, String>) columns.get(0);
-        regexColumn.setOnEditCommit(event -> {
-            FilesTableItem item = event.getTableView().getItems().get(event.getTablePosition().getRow());
-            item.setQuizRegex(event.getNewValue());
-        });
-    }*/
 }

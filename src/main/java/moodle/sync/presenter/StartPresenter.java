@@ -4,38 +4,20 @@ import javax.inject.Inject;
 
 import moodle.sync.config.DefaultConfiguration;
 import moodle.sync.config.MoodleSyncConfiguration;
-import moodle.sync.javafx.UploadList;
-import moodle.sync.util.FileService;
-import moodle.sync.util.UploadElement;
-import moodle.sync.web.MoodleUploadTemp;
 import moodle.sync.web.json.*;
 
-import moodle.sync.web.json.Module;
-import okhttp3.*;
-import org.apache.commons.text.StringEscapeUtils;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.presenter.command.CloseApplicationCommand;
 import org.lecturestudio.core.presenter.command.ShowPresenterCommand;
-import org.lecturestudio.core.util.FileUtils;
 import org.lecturestudio.core.view.NotificationType;
 import org.lecturestudio.core.view.ViewContextFactory;
 
 import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
-import org.lecturestudio.web.api.exception.MatrixUnauthorizedException;
-import org.lecturestudio.web.api.service.DLZRoomService;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class StartPresenter extends Presenter<StartView> {
 

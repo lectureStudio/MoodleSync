@@ -17,21 +17,26 @@ public class UploadElementTableItem {
 
     private UploadElement uploadElement;
 
-    public UploadElementTableItem(String fileName, boolean selected, String message, UploadElement uploadElement){
+    private BooleanProperty selectable;
+
+    public UploadElementTableItem(String fileName, boolean selected, String message, UploadElement uploadElement, boolean selectable){
         this.fileName = new SimpleStringProperty(fileName);
         this.selected = new SimpleBooleanProperty(selected);
         this.message = new SimpleStringProperty(message);
         this.uploadElement = uploadElement;
+        this.selectable = new SimpleBooleanProperty(selectable);
     }
 
     public UploadElementTableItem(UploadElement uploadElement){
         this.fileName = new SimpleStringProperty(uploadElement.getPath().getFileName().toString());
-        this.selected = new SimpleBooleanProperty(uploadElement.getChecked());
+        this.selected = uploadElement.getChecked();
         this.message = new SimpleStringProperty(uploadElement.getAction().message);
         this.uploadElement = uploadElement;
+        this.selectable = new SimpleBooleanProperty(uploadElement.getSelectable());
     }
+
     public UploadElementTableItem(){
-        this(null, false,null, null);
+        this(null, false,null, null, false);
     }
 
     public StringProperty fileNameProperty() { return fileName; }
@@ -51,6 +56,12 @@ public class UploadElementTableItem {
     public boolean isSelected() { return this.selected.get(); }
 
     public void setSelected(boolean value) { this.selected.set(value); }
+
+    public BooleanProperty selectableProperty() { return selectable; }
+
+    public boolean isSelectable() { return this.selectable.get(); }
+
+    public void setSelectable(boolean value) { this.selectable.set(value); }
 
     public UploadElement getUploadElement(){
         uploadElement.setChecked(isSelected());

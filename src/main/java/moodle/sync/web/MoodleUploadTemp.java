@@ -24,7 +24,7 @@ public class MoodleUploadTemp {
                                     new File(pathname)))
                     .build();
             Request request = new Request.Builder()
-                    .url("http://localhost/webservice/upload.php?token=31a1f216fd60a5be89c6a25debe82505")
+                    .url("http://localhost/webservice/upload.php?token=f11d219efda839cb5c85bd4e420fa11c")
                     .method("POST", body)
                     .build();
             ResponseBody response = client.newCall(request).execute().body();
