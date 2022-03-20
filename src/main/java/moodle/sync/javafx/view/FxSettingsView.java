@@ -29,10 +29,22 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     private TextField syncRootPath;
 
     @FXML
+    private TextField ftpfield;
+
+    @FXML
+    private TextField ftpuser;
+
+    @FXML
+    private TextField ftppassword;
+
+    @FXML
     private TextField moodleField;
 
     @FXML
     private TextArea formatsmoodle;
+
+    @FXML
+    private TextField ftpport;
 
     @FXML
     private TextArea formatsfileserver;
@@ -57,6 +69,26 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     @Override
     public void setMoodleToken(StringProperty moodleToken) {
         tokenField.textProperty().bindBidirectional(new LectStringProperty(moodleToken));
+    }
+
+    @Override
+    public void setFtpField(StringProperty ftpURL){
+        ftpfield.textProperty().bindBidirectional(new LectStringProperty(ftpURL));
+    }
+
+    @Override
+    public void setFtpPort(StringProperty ftpPort){
+        ftpport.textProperty().bindBidirectional(new LectStringProperty(ftpPort));
+    }
+
+    @Override
+    public void setFtpUser(StringProperty ftpUser){
+        ftpuser.textProperty().bindBidirectional(new LectStringProperty(ftpUser));
+    }
+
+    @Override
+    public void setFtpPassword(StringProperty ftpPassword){
+        ftppassword.textProperty().bindBidirectional(new LectStringProperty(ftpPassword));
     }
 
     @Override

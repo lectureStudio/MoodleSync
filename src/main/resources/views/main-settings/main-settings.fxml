@@ -30,7 +30,7 @@
       </GridPane>
       <Label prefWidth="612.0" styleClass="text-head" text="%settings.lmslabel">
          <padding>
-            <Insets bottom="5.0" top="10.0" />
+            <Insets bottom="5.0" top="15.0" />
          </padding>
       </Label>
       <GridPane alignment="CENTER" vgap="15.0">
@@ -84,9 +84,9 @@
             <Label text="%settings.ftp" />
             <Label text="%settings.ftpusername" GridPane.rowIndex="1" />
             <Label text="%settings.ftppassword" GridPane.rowIndex="2" />
-            <TextField prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="ftpfield" prefHeight="25.0" prefWidth="282.0" GridPane.columnIndex="1" />
+            <TextField fx:id="ftpuser" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="ftppassword" GridPane.columnIndex="1" GridPane.rowIndex="2" />
             <Label text="%settings.dataformatsfilesverer" GridPane.rowIndex="3" />
             <TextArea fx:id="formatsfileserver" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <padding>
@@ -96,6 +96,11 @@
                   <Insets bottom="5.0" top="15.0" />
                </GridPane.margin>
             </TextArea>
+            <TextField fx:id="ftpport" opacity="0.57" promptText="Port" text="Port" GridPane.columnIndex="2">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+            </TextField>
          </children>
       </GridPane>
       <HBox alignment="CENTER" spacing="50.0">

@@ -3,6 +3,7 @@ package moodle.sync.config;
 import moodle.sync.web.json.Course;
 import moodle.sync.web.json.Section;
 import org.lecturestudio.core.app.configuration.Configuration;
+import org.lecturestudio.core.beans.IntegerProperty;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.beans.StringProperty;
 
@@ -22,6 +23,14 @@ public class MoodleSyncConfiguration extends Configuration {
 	private final StringProperty formatsMoodle = new StringProperty();
 
 	private final StringProperty formatsFileserver = new StringProperty();
+
+	private final StringProperty ftpserver = new StringProperty();
+
+	private final StringProperty ftpuser = new StringProperty();
+
+	private final StringProperty ftppassword = new StringProperty();
+
+	private final StringProperty ftpport = new StringProperty();
 
 	/**
 	 * Get the path where the synchronized files are stored at.
@@ -121,5 +130,53 @@ public class MoodleSyncConfiguration extends Configuration {
 
 	public StringProperty formatsFileserverProperty() {
 		return formatsFileserver;
+	}
+
+	public String getFileserver() {
+		return ftpserver.get();
+	}
+
+	public void setFileserver(String fileserver) {
+		this.ftpserver.set(fileserver);
+	}
+
+	public StringProperty FileserverProperty() {
+		return ftpserver;
+	}
+
+	public String getUserFileserver() {
+		return ftpuser.get();
+	}
+
+	public void setUserFileserver(String user) {
+		this.ftpuser.set(user);
+	}
+
+	public StringProperty userFileserverProperty() {
+		return ftpuser;
+	}
+
+	public String getPasswordFileserver() {
+		return ftppassword.get();
+	}
+
+	public void setPasswordFileserver(String formats) {
+		this.ftppassword.set(formats);
+	}
+
+	public StringProperty passwordFileserverProperty() {
+		return ftppassword;
+	}
+
+	public String getPortFileserver() {
+		return ftpport.get();
+	}
+
+	public void setPortFileserver(String port) {
+		this.ftpport.set(port);
+	}
+
+	public StringProperty portFileserverProperty() {
+		return ftpport;
 	}
 }

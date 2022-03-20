@@ -41,6 +41,10 @@ public class SettingsPresenter extends Presenter<SettingsView> {
         view.setMoodleToken(config.moodleTokenProperty());
         view.setSyncRootPath(config.syncRootPathProperty());
         view.setSelectSyncRootPath(this::selectRecordingPath);
+        view.setFtpField(config.FileserverProperty());
+        view.setFtpPort(config.portFileserverProperty());
+        view.setFtpUser(config.userFileserverProperty());
+        view.setFtpPassword(config.passwordFileserverProperty());
     }
 
     private void selectRecordingPath() {

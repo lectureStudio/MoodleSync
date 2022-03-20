@@ -1,6 +1,8 @@
 package moodle.sync.presenter;
 
 import moodle.sync.config.MoodleSyncConfiguration;
+import moodle.sync.fileserver.FileServerClientFTP;
+import moodle.sync.util.FileServerFile;
 import moodle.sync.util.FileService;
 import moodle.sync.util.MoodleAction;
 import moodle.sync.util.UploadElement;
@@ -10,18 +12,29 @@ import moodle.sync.web.json.Module;
 import moodle.sync.web.json.MoodleUpload;
 import moodle.sync.web.service.MoodleService;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.net.PrintCommandListener;
+import org.apache.commons.net.ftp.FTP;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPReply;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.view.NotificationType;
 import org.lecturestudio.core.view.ViewContextFactory;
 
 import javax.inject.Inject;
+import java.io.FileInputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SyncPresenter extends Presenter<SyncView> {
 
@@ -34,6 +47,7 @@ public class SyncPresenter extends Presenter<SyncView> {
     private List<Module> modules;
 
     private List<UploadElement> uploadElements;
+
 
     @Inject
     SyncPresenter(ApplicationContext context, SyncView view,
@@ -96,9 +110,6 @@ public class SyncPresenter extends Presenter<SyncView> {
             //Handling for Filetype "upload to moodle"
             //Every file inside the directory gets checked whether its filename is on Moodle or not and then is handled differently
             for (Path item : fileListMoodle) {
-                /**Tika tika = new Tika();
-                String mimeType = tika.detect(item);
-                System.out.println(mimeType);*/
                 boolean uploaded = false;
                 int ifuploaded = 0;
                 for (int i = 0; i < modules.size(); i++) {
@@ -119,11 +130,40 @@ public class SyncPresenter extends Presenter<SyncView> {
                 }
             }
 
-            //Handling for filetype "upload to fileserver"
-            for (Path item : fileListFileserver) {
-                boolean uploaded = false;
-                int ifuploaded = 0;
-                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.FTPUpload, true));
+            if(fileListFileserver.size() != 0) {
+                List<FileServerFile> files = null;
+                try {
+                    FileServerClientFTP fileClient = new FileServerClientFTP(config);
+
+                    fileClient.connect();
+
+                    files = fileClient.getFiles(/*config.getRecentSection().getName()*/ "");
+
+                    fileClient.disconnect();
+                }
+                catch (Exception e){
+                    e.printStackTrace();
+                }
+                //Handling for filetype fileListServer -> already uploaded
+                for (Path item : fileListFileserver) {
+                    boolean uploaded = false;
+                    int ifuploaded = 0;
+                    for(int i = 0; i < files.size(); i++){
+                        if(item.getFileName().toString().equals(files.get(i).getFilename())) {
+                            uploaded = true;
+                            ifuploaded = i;
+                            Long filemodified = Files.getLastModifiedTime(item).toMillis();
+                            Long onlinemodified = files.get(i).getLastTimeModified();
+                            if (filemodified > onlinemodified) {
+                                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.FTPSynchronize, true));
+                                break;
+                            }
+                        }
+                    }
+                    if(uploaded == false) {
+                        elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.FTPUpload, true));
+                    }
+                }
             }
 
             //Handling for filetype "filetypenotfound"
@@ -141,29 +181,57 @@ public class SyncPresenter extends Presenter<SyncView> {
     private void execute() {
         try {
             List<UploadElement> sync = uploadElements;
+            List<UploadElement> syncmoodle = new ArrayList<>();
+            List<UploadElement> syncftp = new ArrayList<>();
 
-            for (UploadElement item : sync) {
+            for(UploadElement item : sync){
+                if(item.getAction() == MoodleAction.MoodleUpload || item.getAction() == MoodleAction.MoodleSynchronize){
+                    syncmoodle.add(item);
+                }
+                else if(item.getAction() == MoodleAction.FTPUpload || item.getAction() == MoodleAction.FTPSynchronize){
+                    syncftp.add(item);
+                }
+            }
+
+            for (UploadElement item : syncmoodle) {
                 if (item.getChecked().get()) {
-
-                    //Case 1: file is uploaded; uploaded = true
-                    if (item.isUploaded()) {
+                    //Moodle lookup
+                    if (item.getAction() == MoodleAction.MoodleUpload) {
+                        //Case 2: file not uploaded; uploaded = false
+                        MoodleUploadTemp uploader = new MoodleUploadTemp();
+                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getMoodleToken());
+                        moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename());
+                    } else if (item.getAction() == MoodleAction.MoodleSynchronize) {
                         Module online = modules.get(item.getIfuploaded());
-                        //Warum mal 1000?
+                        //Warum mal 1000? -> erklären
 
                         MoodleUploadTemp uploader = new MoodleUploadTemp();
-                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */+ item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/" */+ item.getPath().getFileName().toString());
+                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getMoodleToken());
                         moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename(), online.getId());
                         moodleService.removeResource(config.getMoodleToken(), online.getId());
-
-                    }
-                    //Case 2: file not uploaded; uploaded = false
-                    else {
-                        MoodleUploadTemp uploader = new MoodleUploadTemp();
-                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */+ item.getPath().getFileName().toString());
-                        moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename());
                     }
                 }
             }
+                if(syncftp.size() > 0) {
+                    try {
+                        FileServerClientFTP fileClient = new FileServerClientFTP(config);
+
+                        fileClient.connect();
+
+
+                        for (UploadElement item : syncftp) {
+                            if (item.getChecked().get()) {
+                                if (item.getAction() == MoodleAction.FTPUpload || item.getAction() == MoodleAction.FTPSynchronize) {
+                                    fileClient.uploadFile(item, config.getRecentSection().getName());
+                                }
+                            }
+                        }
+                        fileClient.disconnect();
+                    }
+                    catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
         } catch (Throwable e) {
             logException(e, "Sync failed");
 
@@ -175,5 +243,6 @@ public class SyncPresenter extends Presenter<SyncView> {
     public static boolean contains(final String[] arr, final String key) {
         return Arrays.asList(arr).contains(key);
     }
+
 
 }

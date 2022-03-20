@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MoodleUploadTemp {
 
-    public MoodleUpload upload(String name, String uri, String pathname) throws IOException {
+    public MoodleUpload upload(String name, String uri, String pathname, String token) throws IOException {
         try {
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
@@ -24,7 +24,7 @@ public class MoodleUploadTemp {
                                     new File(pathname)))
                     .build();
             Request request = new Request.Builder()
-                    .url("http://localhost/webservice/upload.php?token=f11d219efda839cb5c85bd4e420fa11c")
+                    .url("http://localhost/webservice/upload.php?token=" + token)
                     .method("POST", body)
                     .build();
             ResponseBody response = client.newCall(request).execute().body();
@@ -33,7 +33,6 @@ public class MoodleUploadTemp {
             System.out.println("--------------------------------------" + bodystring);
             List<MoodleUpload> entity = objectMapper.readValue(bodystring , new TypeReference<List<MoodleUpload>>(){});
             System.out.println(entity);
-            //String answer[] = response.body().string().split(",");
             return entity.get(0);
         }
         catch (Exception e){

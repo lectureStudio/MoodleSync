@@ -14,6 +14,14 @@ public interface SettingsView extends View {
 
     void setFormatsFileserver(StringProperty fileserverformats);
 
+    void setFtpField(StringProperty ftpURL);
+
+    void setFtpPort(StringProperty ftpPort);
+
+    void setFtpUser(StringProperty ftpUser);
+
+    void setFtpPassword(StringProperty ftpPassword);
+
     void setMoodleToken(StringProperty moodleToken);
 
     void setSyncRootPath(StringProperty path);
