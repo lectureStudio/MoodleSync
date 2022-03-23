@@ -9,7 +9,7 @@ public interface FileServerClient {
 
     List<FileServerFile> getFiles(String pathname);
 
-    boolean uploadFile(UploadElement item, String pathname);
+    String uploadFile(UploadElement item, String pathname);
 
     void disconnect();
 

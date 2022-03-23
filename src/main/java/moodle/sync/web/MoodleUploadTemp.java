@@ -13,18 +13,18 @@ import java.util.List;
 @NoArgsConstructor
 public class MoodleUploadTemp {
 
-    public MoodleUpload upload(String name, String uri, String pathname, String token) throws IOException {
+    public MoodleUpload upload(String name, String pathname, String moodleUrl, String token){
         try {
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
             MediaType mediaType = MediaType.parse("text/plain");
             RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
-                    .addFormDataPart(name, uri,
+                    .addFormDataPart(name, pathname,
                             RequestBody.create(MediaType.parse("application/octet-stream"),
                                     new File(pathname)))
                     .build();
             Request request = new Request.Builder()
-                    .url("http://localhost/webservice/upload.php?token=" + token)
+                    .url(moodleUrl + "/webservice/upload.php?token=" + token)
                     .method("POST", body)
                     .build();
             ResponseBody response = client.newCall(request).execute().body();

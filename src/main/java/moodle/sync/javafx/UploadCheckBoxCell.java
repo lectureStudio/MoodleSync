@@ -12,7 +12,6 @@ public class UploadCheckBoxCell extends CheckBoxTableCell<UploadElementTableItem
 
         TableRow<UploadElementTableItem> currentRow = getTableRow();
         if (currentRow.getItem() != null && !empty) {
-            System.out.println(currentRow.getItem().isSelectable());
             if (!currentRow.getItem().isSelectable()) {
                 this.setManaged(false);
                 this.setVisible(false);

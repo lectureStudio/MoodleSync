@@ -12,33 +12,18 @@ import moodle.sync.web.json.Module;
 import moodle.sync.web.json.MoodleUpload;
 import moodle.sync.web.service.MoodleService;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.net.PrintCommandListener;
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.view.NotificationType;
-import org.lecturestudio.core.view.ViewContextFactory;
 
 import javax.inject.Inject;
-import java.io.FileInputStream;
-import java.io.FilterInputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SyncPresenter extends Presenter<SyncView> {
-
-    private final ViewContextFactory viewFactory;
 
     private final MoodleSyncConfiguration config;
 
@@ -50,12 +35,10 @@ public class SyncPresenter extends Presenter<SyncView> {
 
 
     @Inject
-    SyncPresenter(ApplicationContext context, SyncView view,
-                  ViewContextFactory viewFactory, MoodleService moodleService) {
+    SyncPresenter(ApplicationContext context, SyncView view, MoodleService moodleService) {
         super(context, view);
 
         this.config = (MoodleSyncConfiguration) context.getConfiguration();
-        this.viewFactory = viewFactory;
         this.moodleService = moodleService;
     }
 
@@ -72,105 +55,61 @@ public class SyncPresenter extends Presenter<SyncView> {
     public List<UploadElement> prepareSync() {
         List<UploadElement> elements = new ArrayList<>();
         try {
-            //Create Directory if not existed
-            FileService fileService = new FileService();
-            Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
-            fileService.directoryManager(execute);
-
             //Update Recent Secton
             config.setRecentSection(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
 
-            //List containing resource modules in choosen section
-            modules = new ArrayList<>();
-            for (int i = 0; i < config.getRecentSection().getModules().size(); i++) {
-                if (/*config.getRecentSection().getModules().get(i).getModname().equals("url") ||*/ config.getRecentSection().getModules().get(i).getModname().equals("resource")) {
-                    modules.add(config.getRecentSection().getModules().get(i));
-                }
-            }
+            //Create Directory if not existed
+            Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
+            FileService.directoryManager(execute);
+
+
             //List containing all files in directory
-            List<Path> fileList = fileService.getFilesInDirectory(execute);
+            List<Path> fileList = FileService.getFilesInDirectory(execute);
 
             //Sort by filetype
             List<Path> fileListMoodle = new ArrayList<>();
             List<Path> fileListFileserver = new ArrayList<>();
             List<Path> fileTypeNotFound = new ArrayList<>();
 
-            for(Path file : fileList){
-                if(contains(config.getFormatsMoodle().split(","), FilenameUtils.getExtension(file.getFileName().toString()))){
+            for (Path file : fileList) {
+                if (contains(config.getFormatsMoodle().split(","), FilenameUtils.getExtension(file.getFileName().toString()))) {
                     fileListMoodle.add(file);
-                }
-                else if(contains(config.getFormatsFileserver().split(","), FilenameUtils.getExtension(file.getFileName().toString()))){
+                } else if (contains(config.getFormatsFileserver().split(","), FilenameUtils.getExtension(file.getFileName().toString()))) {
                     fileListFileserver.add(file);
-                }
-                else{
+                } else {
                     fileTypeNotFound.add(file);
                 }
             }
 
-            //Handling for Filetype "upload to moodle"
+            //Handling for Filetype "format moodle"
             //Every file inside the directory gets checked whether its filename is on Moodle or not and then is handled differently
+            //List containing resource modules in choosen section
+            modules = FileService.getModulesByType("resource", config.getRecentSection());
             for (Path item : fileListMoodle) {
-                boolean uploaded = false;
-                int ifuploaded = 0;
-                for (int i = 0; i < modules.size(); i++) {
-                    if (item.getFileName().toString().equals(modules.get(i).getContents().get(0).getFilename())) {
-                        uploaded = true;
-                        ifuploaded = i;
-                        Module online = modules.get(i);
-                        Long onlinemodified = online.getContents().get(0).getTimemodified() * 1000;
-                        Long filemodified = Files.getLastModifiedTime(item).toMillis();
-                        if (filemodified > onlinemodified) {
-                            elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleSynchronize, true));
-                            break;
-                        }
-                    }
-                }
-                if(uploaded == false){
-                    elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.MoodleUpload, true));
+                UploadElement temp = FileService.CheckMoodleModule(modules, item);
+                if (temp != null) {
+                    elements.add(temp);
                 }
             }
 
-            if(fileListFileserver.size() != 0) {
-                List<FileServerFile> files = null;
-                try {
-                    FileServerClientFTP fileClient = new FileServerClientFTP(config);
-
-                    fileClient.connect();
-
-                    files = fileClient.getFiles(/*config.getRecentSection().getName()*/ "");
-
-                    fileClient.disconnect();
-                }
-                catch (Exception e){
-                    e.printStackTrace();
-                }
-                //Handling for filetype fileListServer -> already uploaded
+            //Handling for Filetype "format fileserver"
+            //Only connect to fileserver if there are files which could be uploaded
+            if (fileListFileserver.size() != 0) {
+                FileServerClientFTP fileClient = new FileServerClientFTP(config);
+                fileClient.connect();
+                List<FileServerFile> files = fileClient.getFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> Directory angeben, wahrscheinlich nach Kursen
+                fileClient.disconnect();
                 for (Path item : fileListFileserver) {
-                    boolean uploaded = false;
-                    int ifuploaded = 0;
-                    for(int i = 0; i < files.size(); i++){
-                        if(item.getFileName().toString().equals(files.get(i).getFilename())) {
-                            uploaded = true;
-                            ifuploaded = i;
-                            Long filemodified = Files.getLastModifiedTime(item).toMillis();
-                            Long onlinemodified = files.get(i).getLastTimeModified();
-                            if (filemodified > onlinemodified) {
-                                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.FTPSynchronize, true));
-                                break;
-                            }
-                        }
-                    }
-                    if(uploaded == false) {
-                        elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.FTPUpload, true));
+                    UploadElement temp = FileService.CheckFileServerModule(files, item);
+                    if (temp != null) {
+                        elements.add(temp);
                     }
                 }
             }
 
             //Handling for filetype "filetypenotfound"
             for (Path item : fileTypeNotFound) {
-                boolean uploaded = false;
-                int ifuploaded = 0;
-                elements.add(new UploadElement(item, uploaded, ifuploaded, false, MoodleAction.DatatypeNotKnown, false));
+                elements.add(new UploadElement(item, false, 0, false, MoodleAction.DatatypeNotKnown, false));
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -184,11 +123,10 @@ public class SyncPresenter extends Presenter<SyncView> {
             List<UploadElement> syncmoodle = new ArrayList<>();
             List<UploadElement> syncftp = new ArrayList<>();
 
-            for(UploadElement item : sync){
-                if(item.getAction() == MoodleAction.MoodleUpload || item.getAction() == MoodleAction.MoodleSynchronize){
+            for (UploadElement item : sync) {
+                if (item.getAction() == MoodleAction.MoodleUpload || item.getAction() == MoodleAction.MoodleSynchronize) {
                     syncmoodle.add(item);
-                }
-                else if(item.getAction() == MoodleAction.FTPUpload || item.getAction() == MoodleAction.FTPSynchronize){
+                } else if ((item.getAction() == MoodleAction.FTPUpload && item.getChecked().get()) || (item.getAction() == MoodleAction.FTPSynchronize && item.getChecked().get())) {
                     syncftp.add(item);
                 }
             }
@@ -199,39 +137,32 @@ public class SyncPresenter extends Presenter<SyncView> {
                     if (item.getAction() == MoodleAction.MoodleUpload) {
                         //Case 2: file not uploaded; uploaded = false
                         MoodleUploadTemp uploader = new MoodleUploadTemp();
-                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getMoodleToken());
+                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
                         moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename());
                     } else if (item.getAction() == MoodleAction.MoodleSynchronize) {
                         Module online = modules.get(item.getIfuploaded());
-                        //Warum mal 1000? -> erklären
-
                         MoodleUploadTemp uploader = new MoodleUploadTemp();
-                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getMoodleToken());
+                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(),  config.getMoodleUrl(), config.getMoodleToken());
                         moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename(), online.getId());
                         moodleService.removeResource(config.getMoodleToken(), online.getId());
                     }
                 }
             }
-                if(syncftp.size() > 0) {
-                    try {
-                        FileServerClientFTP fileClient = new FileServerClientFTP(config);
 
-                        fileClient.connect();
-
-
-                        for (UploadElement item : syncftp) {
-                            if (item.getChecked().get()) {
-                                if (item.getAction() == MoodleAction.FTPUpload || item.getAction() == MoodleAction.FTPSynchronize) {
-                                    fileClient.uploadFile(item, config.getRecentSection().getName());
-                                }
+            if (syncftp.size() > 0) {
+                    FileServerClientFTP fileClient = new FileServerClientFTP(config);
+                    fileClient.connect();
+                    for (UploadElement item : syncftp) {
+                            if (item.getAction() == MoodleAction.FTPUpload) {
+                                String url = fileClient.uploadFile(item, config.getRecentCourse().getDisplayname());
+                                moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), item.getPath().getFileName().toString(), url);
+                            } else if (item.getAction() == MoodleAction.FTPSynchronize) {
+                                //Depends on fileserver -> does the url change?
+                                fileClient.uploadFile(item, config.getRecentCourse().getDisplayname());
                             }
-                        }
-                        fileClient.disconnect();
                     }
-                    catch (Exception e){
-                        e.printStackTrace();
-                    }
-                }
+                    fileClient.disconnect();
+            }
         } catch (Throwable e) {
             logException(e, "Sync failed");
 
@@ -240,9 +171,8 @@ public class SyncPresenter extends Presenter<SyncView> {
         }
         close();
     }
+
     public static boolean contains(final String[] arr, final String key) {
         return Arrays.asList(arr).contains(key);
     }
-
-
 }

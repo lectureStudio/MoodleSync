@@ -1,6 +1,8 @@
 package moodle.sync.util;
 
 import moodle.sync.config.MoodleSyncConfiguration;
+import moodle.sync.web.json.Module;
+import moodle.sync.web.json.Section;
 import org.lecturestudio.core.app.ApplicationContext;
 
 import java.io.IOException;
@@ -13,12 +15,9 @@ import java.util.List;
 
 public class FileService {
 
-    public FileService(){
-    }
-
     //Check if a Path exists, else create
 
-    public void directoryManager(Path p){
+    public static void directoryManager(Path p){
         try {
             Files.createDirectories(p);
         }
@@ -26,19 +25,9 @@ public class FileService {
         }
     }
 
-    //Returns List with all Filenames inside a directory
-    public List<String> getFileNamesInDirectory(Path p){
-        List<String> fileNames = new ArrayList<>();
-        try {
-            DirectoryStream<Path> filesInDirectory = Files.newDirectoryStream(p);
-            filesInDirectory.forEach(path -> fileNames.add(path.getFileName().toString()));
-        }
-        catch (Exception e){
-        }
-        return fileNames;
-    }
 
-    public List<Path> getFilesInDirectory(Path p) throws IOException {
+    //Returns List with all Paths inside a directory
+    public static List<Path> getFilesInDirectory(Path p) throws IOException {
         List<Path> result = new ArrayList<>();
         try(DirectoryStream<Path> stream = Files.newDirectoryStream(p)) {
             for (Path entry: stream) {
@@ -51,4 +40,62 @@ public class FileService {
         }
         return result;
     }
+
+    //Returns List with all Moodle-Moduls of a choosen Module-Type
+    public static List<Module> getModulesByType(String type1, Section section){
+        List<Module> modules = new ArrayList<>();
+        for (int i = 0; i < section.getModules().size(); i++) {
+            if (section.getModules().get(i).getModname().equals(type1)) {
+                modules.add(section.getModules().get(i));
+            }
+        }
+        return modules;
+    }
+
+    //Method, checks whether File by Format "MoodleFormat" is uploaded, if yes, check if its newer if not uploaded add it
+    public static UploadElement CheckMoodleModule(List<Module> module, Path path) throws IOException {
+        boolean uploaded = false;
+        int ifuploaded = 0;
+        for (int i = 0; i < module.size(); i++) {
+            if (path.getFileName().toString().equals(module.get(i).getContents().get(0).getFilename())) {
+                uploaded = true;
+                ifuploaded = i;
+                Long onlinemodified = module.get(i).getContents().get(0).getTimemodified() * 1000;
+                Long filemodified = Files.getLastModifiedTime(path).toMillis();
+                if (filemodified > onlinemodified) {
+                    return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.MoodleSynchronize, true);
+
+                }
+            }
+        }
+        if(uploaded == false) {
+            return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.MoodleUpload, true);
+        }
+
+        return null;
+    }
+
+    //Method, checks whether File by Format "MoodleFormat" is uploaded, if yes, check if its newer if not uploaded add it
+    public static UploadElement CheckFileServerModule(List<FileServerFile> files, Path path) throws IOException {
+        boolean uploaded = false;
+        int ifuploaded = 0;
+        for (int i = 0; i < files.size(); i++) {
+            if (path.getFileName().toString().equals(files.get(i).getFilename())) {
+                uploaded = true;
+                ifuploaded = i;
+                Long onlinemodified = files.get(i).getLastTimeModified();
+                Long filemodified = Files.getLastModifiedTime(path).toMillis();
+                if (filemodified > onlinemodified) {
+                    return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.FTPSynchronize, true);
+
+                }
+            }
+        }
+        if(uploaded == false) {
+            return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.FTPUpload, true);
+        }
+
+        return null;
+    }
 }
+

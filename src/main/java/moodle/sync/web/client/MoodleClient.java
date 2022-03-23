@@ -12,7 +12,7 @@ import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import java.util.List;
 
-@Path("/server.php")
+@Path("/webservice/rest/server.php")
 @RegisterProviders({
 		@RegisterProvider(LoggingFilter.class),
 		@RegisterProvider(JsonConfigProvider.class),

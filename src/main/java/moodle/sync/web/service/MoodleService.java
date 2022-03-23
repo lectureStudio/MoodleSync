@@ -12,10 +12,13 @@ import moodle.sync.web.json.*;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import moodle.sync.web.client.MoodleClient;
+import org.lecturestudio.core.beans.ChangeListener;
+import org.lecturestudio.core.beans.Observable;
+import org.lecturestudio.core.beans.StringProperty;
 
 public class MoodleService {
 
-	private final MoodleClient moodleClient;
+	private MoodleClient moodleClient;
 
 
 	/**
@@ -23,11 +26,16 @@ public class MoodleService {
 	 *
 	 * @param apiUrl The API service connection URL.
 	 */
-	@Inject
-	public MoodleService(@Named("moodle.api.url") String apiUrl) {
+	public MoodleService(StringProperty apiUrl) {
 		moodleClient = RestClientBuilder.newBuilder()
-				.baseUri(URI.create(apiUrl))
+				.baseUri(URI.create(apiUrl.get()))
 				.build(MoodleClient.class);
+
+		/*apiUrl.addListener((observable, oldValue, newValue) -> {
+			moodleClient = RestClientBuilder.newBuilder()
+					.baseUri(URI.create(newValue))
+					.build(MoodleClient.class);
+		});*/
 	}
 
 	public List<Course> getEnrolledCourses(String token, int userid){

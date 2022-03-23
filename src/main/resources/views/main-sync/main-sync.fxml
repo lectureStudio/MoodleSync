@@ -28,7 +28,7 @@
                   <PropertyValueFactory property="fileName"/>
                </cellValueFactory>
             </TableColumn>
-            <TableColumn editable="false" prefWidth="75.0" text="%sync.change">
+            <TableColumn editable="false" prefWidth="125.0" text="%sync.change">
                <cellFactory>
                   <TextFieldTableCell fx:factory="forTableColumn"/>
                </cellFactory>
@@ -36,7 +36,7 @@
                   <PropertyValueFactory property="message"/>
                </cellValueFactory>
             </TableColumn>
-            <TableColumn styleClass="check" editable="true" prefWidth="75.0" text="%sync.upload" >
+            <TableColumn styleClass="check" editable="true" prefWidth="25.0" text="%sync.upload" >
                <cellFactory>
                   <CheckBoxTableCellFactory/>
                </cellFactory>
@@ -47,7 +47,8 @@
          </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-         </columnResizePolicy></TableView>
+         </columnResizePolicy>
+      </TableView>
    </children>
    <children>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="70.0">

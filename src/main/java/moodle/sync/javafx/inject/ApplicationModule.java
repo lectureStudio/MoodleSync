@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 
 import javax.inject.Singleton;
 
+import moodle.sync.web.service.MoodleService;
 import org.lecturestudio.core.app.AppDataLocator;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.app.LocaleProvider;
@@ -93,6 +94,14 @@ public class ApplicationModule extends AbstractModule {
 
 	@Provides
 	@Singleton
+	MoodleService createMoodleService(Configuration config){
+		MoodleSyncConfiguration syncConfig = (MoodleSyncConfiguration) config;
+		System.out.println(syncConfig.getSyncRootPath());
+		return new MoodleService(syncConfig.moodleUrlProperty());
+	}
+
+	@Provides
+	@Singleton
 	MoodleSyncContext createApplicationContext(Configuration config,
 			Dictionary dict) throws Exception {
 		EventBus eventBus = ApplicationBus.get();
@@ -148,5 +157,6 @@ public class ApplicationModule extends AbstractModule {
 
 		return configuration;
 	}
+
 
 }

@@ -7,7 +7,9 @@ import moodle.sync.config.MoodleSyncConfiguration;
 import moodle.sync.web.json.*;
 
 import org.lecturestudio.core.app.ApplicationContext;
+import org.lecturestudio.core.beans.ChangeListener;
 import org.lecturestudio.core.beans.ObjectProperty;
+import org.lecturestudio.core.beans.Observable;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.presenter.command.CloseApplicationCommand;
 import org.lecturestudio.core.presenter.command.ShowPresenterCommand;
@@ -17,6 +19,7 @@ import org.lecturestudio.core.view.ViewContextFactory;
 import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StartPresenter extends Presenter<StartView> {
@@ -51,22 +54,34 @@ public class StartPresenter extends Presenter<StartView> {
         view.setOnExit(this::onExit);
         view.setOnSync(this::onSync);
         view.setOnSettings(this::onSettings);
-        view.setCourse(course());
+        view.setCourse(config.recentCourseProperty());
         view.setCourses(courses());
         view.setSection(config.recentSectionProperty());
         view.setSections(sections());
         view.setOnCourseChanged(this::onCourseChanged);
+
+        config.moodleTokenProperty().addListener((observable, oldToken, newToken) -> {
+            view.setCourses(courses());
+            view.setSections(sections());
+        });
+
+        config.recentCourseProperty().addListener((observable, oldCourse, newCourse) -> {
+                    view.setSections(sections());
+                    view.setSection(new ObjectProperty<Section>());
+        });
     }
 
     private void onCourseChanged(Course course) {
         view.setSections(sections());
     }
 
-    private ObjectProperty<Course> course() {
-        return config.recentCourseProperty();
-    }
-
     private List<Course> courses() {
+        String token = config.getMoodleToken();
+        String url = config.getMoodleUrl();
+        if(token == null || token.isEmpty() || token.isBlank() || url == null || url.isEmpty() || url.isBlank()){
+            List<Course> dummy = new ArrayList<>();
+          return dummy;
+        }
         List<Course> courses = List.of();
         try {
             courses = moodleService.getEnrolledCourses(config.getMoodleToken(), moodleService.getUserId(config.getMoodleToken()));
@@ -78,6 +93,11 @@ public class StartPresenter extends Presenter<StartView> {
     }
 
     private List<Section> sections() {
+        Course course = config.getRecentCourse();
+        if(course == null){
+            List<Section> dummy = new ArrayList<>();
+            return dummy;
+        }
         List<Section> content = moodleService.getCourseContent(config.getMoodleToken(), config.getRecentCourse().getId());
         coursecontent = content;
         return content;

@@ -30,6 +30,7 @@ public class FileServerClientFTP implements FileServerClient{
         this.config = config;
     }
 
+    @Override
     public void connect() {
         try {
             ftpClient.connect(config.getFileserver(), Integer.parseInt(config.getPortFileserver()));
@@ -47,6 +48,7 @@ public class FileServerClientFTP implements FileServerClient{
         }
     }
 
+    @Override
     public void disconnect() {
         try{
             ftpClient.disconnect();
@@ -72,18 +74,20 @@ public class FileServerClientFTP implements FileServerClient{
     }
 
     @Override
-    public boolean uploadFile(UploadElement item, String pathname) {
+    public String uploadFile(UploadElement item, String pathname) {
         //Evtl noch pathname einbringen
-        boolean reply = false;
+        String url = null;
         try{
             InputStream file  = Files.newInputStream(item.getPath());
-            reply = ftpClient.storeFile("/" + item.getPath().getFileName().toString() , file);
+            ftpClient.storeFile("/" + item.getPath().getFileName().toString() , file);
+            //ToDo add functionality URL
+            url = config.getFileserver() + "/" + pathname + "/" + item.getPath().getFileName().toString();
             file.close();
         }
         catch (Exception e){
             e.printStackTrace();
         }
-        return reply;
+        return url;
     }
 
 }

@@ -40,14 +40,14 @@ public class SettingsPresenter extends Presenter<SettingsView> {
         view.setFormatsFileserver(config.formatsFileserverProperty());
         view.setMoodleToken(config.moodleTokenProperty());
         view.setSyncRootPath(config.syncRootPathProperty());
-        view.setSelectSyncRootPath(this::selectRecordingPath);
+        view.setSelectSyncRootPath(this::selectSyncPath);
         view.setFtpField(config.FileserverProperty());
         view.setFtpPort(config.portFileserverProperty());
         view.setFtpUser(config.userFileserverProperty());
         view.setFtpPassword(config.passwordFileserverProperty());
     }
 
-    private void selectRecordingPath() {
+    private void selectSyncPath() {
         MoodleSyncConfiguration config = (MoodleSyncConfiguration) context.getConfiguration();
         String syncPath = config.getSyncRootPath();
         if(syncPath == null || syncPath.isEmpty() || syncPath.isBlank()){
