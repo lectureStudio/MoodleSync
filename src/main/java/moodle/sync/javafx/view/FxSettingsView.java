@@ -73,7 +73,6 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     @Override
     public void setMoodleField(StringProperty moodleURL){
         moodleField.textProperty().bindBidirectional(new LectStringProperty(moodleURL));
-        //moodleField.setTextFormatter(new TextFormatter<Object>());
         moodleField.textProperty().addListener(event -> {
             moodleField.pseudoClassStateChanged(
                     PseudoClass.getPseudoClass("error"),
@@ -124,12 +123,6 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     @Override
     public void setFormatsMoodle(StringProperty moodleformats) {
         formatsMoodle.textProperty().bindBidirectional(new LectStringProperty(moodleformats));
-        formatsMoodle.textProperty().addListener(event -> {
-            formatsMoodle.pseudoClassStateChanged(
-                    PseudoClass.getPseudoClass("error"),
-                    formatsMoodle.getText().matches("\\s")
-            );
-        });
     }
 
     @Override

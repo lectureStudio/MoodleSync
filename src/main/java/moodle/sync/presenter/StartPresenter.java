@@ -20,6 +20,8 @@ import org.lecturestudio.core.view.ViewContextFactory;
 import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,8 +84,11 @@ public class StartPresenter extends Presenter<StartView> {
         try {
             courses = moodleService.getEnrolledCourses(config.getMoodleToken(), moodleService.getUserId(config.getMoodleToken()));
         } catch (Exception e) {
+            logException(e, "Sync failed");
+
+            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                    "start.sync.error.invalidurl.message");
             config.setRecentCourse(null);
-            handleException(e, "", e.getMessage());
         }
         return courses;
     }
@@ -109,13 +114,21 @@ public class StartPresenter extends Presenter<StartView> {
 
     private void onSync() {
         if(config.getRecentCourse() == null) {
-            showNotification(NotificationType.ERROR, "sync.sync.error.title",
-                    "sync.sync.error.course.message");
+            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                    "start.sync.error.course.message");
             return;
         }
         else if(config.getRecentSection() == null){
-            showNotification(NotificationType.ERROR, "sync.sync.error.title",
-                    "sync.sync.error.section.message");
+            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                    "start.sync.error.section.message");
+            return;
+        }
+        try {
+            Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
+        } catch (Exception e) {
+            logException(e, "Sync failed");
+            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                    "start.sync.error.path.message");
             return;
         }
         try {
@@ -129,8 +142,8 @@ public class StartPresenter extends Presenter<StartView> {
     }
 
     private void updateCourses(){
-        view.setCourses(courses());
-        view.setSections(sections());
+            view.setCourses(courses());
+            view.setSections(sections());
     }
 
 }

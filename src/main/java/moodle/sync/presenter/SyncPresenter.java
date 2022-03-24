@@ -59,6 +59,7 @@ public class SyncPresenter extends Presenter<SyncView> {
             config.setRecentSection(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
 
             //Create Directory if not existed
+
             Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
             FileService.directoryManager(execute);
 
@@ -95,14 +96,33 @@ public class SyncPresenter extends Presenter<SyncView> {
             //Handling for Filetype "format fileserver"
             //Only connect to fileserver if there are files which could be uploaded
             if (fileListFileserver.size() != 0) {
-                FileServerClientFTP fileClient = new FileServerClientFTP(config);
-                fileClient.connect();
-                List<FileServerFile> files = fileClient.getFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> Directory angeben, wahrscheinlich nach Kursen
-                fileClient.disconnect();
-                for (Path item : fileListFileserver) {
-                    UploadElement temp = FileService.CheckFileServerModule(files, item);
-                    if (temp != null) {
-                        elements.add(temp);
+                String url = config.getFileserver();
+                String user = config.getUserFileserver();
+                String password = config.getPasswordFileserver();
+                if(url == null || url.isEmpty() || url.isBlank() || user == null || user.isEmpty() || user.isBlank() || password == null || password.isEmpty() || password.isBlank()){
+                    showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                            "sync.sync.error.fileserver1.message");
+                }
+                else {
+                    List<FileServerFile> files = List.of();
+                    try {
+                        FileServerClientFTP fileClient = new FileServerClientFTP(config);
+                        fileClient.connect();
+                        files = fileClient.getFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> Directory angeben, wahrscheinlich nach Kursen
+                        fileClient.disconnect();
+
+                        for (Path item : fileListFileserver) {
+                            UploadElement temp = FileService.CheckFileServerModule(files, item);
+                            if (temp != null) {
+                                elements.add(temp);
+                            }
+                        }
+                    }
+                    catch (Exception e){
+                        logException(e, "Sync failed");
+                        showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                                "sync.sync.error.fileserver2.message");
+
                     }
                 }
             }
@@ -168,8 +188,8 @@ public class SyncPresenter extends Presenter<SyncView> {
         } catch (Throwable e) {
             logException(e, "Sync failed");
 
-            showNotification(NotificationType.ERROR, "start.sync.error.title",
-                    "start.sync.error.message");
+            showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                    "sync.sync.error.message");
         }
         close();
     }

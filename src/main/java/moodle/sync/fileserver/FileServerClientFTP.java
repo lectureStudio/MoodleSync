@@ -12,6 +12,7 @@ import org.apache.commons.net.ftp.FTPReply;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,7 @@ public class FileServerClientFTP implements FileServerClient{
             ftpClient.login(config.getUserFileserver(), config.getPasswordFileserver());
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         }
-        catch (Exception e){
+        catch (IOException e){
             e.printStackTrace();
         }
     }
@@ -59,7 +60,7 @@ public class FileServerClientFTP implements FileServerClient{
     }
 
     @Override
-    public List<FileServerFile> getFiles(String pathname) {
+    public List<FileServerFile> getFiles(String pathname) throws Exception{
         List<FileServerFile> files = new ArrayList<>();
         try {
             FTPFile[] ftpFiles = ftpClient.listFiles(pathname);
@@ -68,7 +69,7 @@ public class FileServerClientFTP implements FileServerClient{
             }
         }
         catch (Exception e){
-            e.printStackTrace();
+            throw new Exception();
         }
         return files;
     }

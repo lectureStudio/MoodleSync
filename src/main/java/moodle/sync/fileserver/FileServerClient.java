@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface FileServerClient {
 
-    List<FileServerFile> getFiles(String pathname);
+    List<FileServerFile> getFiles(String pathname) throws Exception;
 
     String uploadFile(UploadElement item, String pathname);
 
