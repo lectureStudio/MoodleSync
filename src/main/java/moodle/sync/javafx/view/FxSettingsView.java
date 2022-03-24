@@ -20,6 +20,10 @@ import org.lecturestudio.javafx.util.FxUtils;
 import org.lecturestudio.javafx.view.FxView;
 import org.lecturestudio.javafx.view.FxmlView;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @FxmlView(name = "main-settings", presenter = SettingsPresenter.class)
 public class FxSettingsView extends VBox implements SettingsView, FxView {
 
@@ -73,7 +77,6 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
         moodleField.textProperty().addListener(event -> {
             moodleField.pseudoClassStateChanged(
                     PseudoClass.getPseudoClass("error"),
-                    !moodleField.getText().isEmpty() &&
                             !moodleField.getText().matches("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")
             );
         });
@@ -82,6 +85,12 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     @Override
     public void setMoodleToken(StringProperty moodleToken) {
         tokenField.textProperty().bindBidirectional(new LectStringProperty(moodleToken));
+        tokenField.textProperty().addListener(event -> {
+            tokenField.pseudoClassStateChanged(
+                    PseudoClass.getPseudoClass("error"),
+                    (tokenField.getText().isEmpty())
+            );
+        });
     }
 
     @Override
@@ -91,7 +100,7 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
             ftpField.pseudoClassStateChanged(
                     PseudoClass.getPseudoClass("error"),
                     (!ftpField.getText().isEmpty() &&
-                            !ftpField.getText().matches("^(((https?|ftp|file)://)|(ftp\\.))[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"))
+                            !ftpField.getText().matches("^(((https?|ftp)://)|(ftp\\.))[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"))
             );
         });
     }
@@ -135,7 +144,7 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
             syncRootPath.pseudoClassStateChanged(
                     PseudoClass.getPseudoClass("error"),
                     !syncRootPath.getText().isEmpty() &&
-                            !syncRootPath.getText().matches("([a-zA-Z]:)?(\\\\[a-zA-Z0-9_.-]+)+\\\\?")
+                            !Files.isDirectory(Paths.get(syncRootPath.getText()))
             );
         });
 

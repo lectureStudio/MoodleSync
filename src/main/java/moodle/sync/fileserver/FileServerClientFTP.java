@@ -18,7 +18,7 @@ import java.util.List;
 
 public class FileServerClientFTP implements FileServerClient{
 
-    private FTPClient ftpClient;
+    private final FTPClient ftpClient;
 
     private final MoodleSyncConfiguration config;
 
@@ -79,9 +79,9 @@ public class FileServerClientFTP implements FileServerClient{
         String url = null;
         try{
             InputStream file  = Files.newInputStream(item.getPath());
-            ftpClient.storeFile("/" + item.getPath().getFileName().toString() , file);
+            ftpClient.storeFile("/"  /*+ config.getRecentSection().getName() + "/" */+ item.getPath().getFileName().toString() , file);
             //ToDo add functionality URL
-            url = config.getFileserver() + "/" + pathname + "/" + item.getPath().getFileName().toString();
+            url = config.getFileserver() + "/" /*+  config.getRecentSection().getName() + "/" */+ item.getPath().getFileName().toString();
             file.close();
         }
         catch (Exception e){

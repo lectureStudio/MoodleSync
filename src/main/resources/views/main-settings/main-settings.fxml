@@ -49,11 +49,7 @@
             <Label text="%settings.token" GridPane.rowIndex="1" />
             <TextField fx:id="tokenField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label text="%settings.lms" />
-            <TextField fx:id="moodleField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1">
-               <textFormatter>
-                  <TextStringFormatter/>
-               </textFormatter>
-            </TextField>
+            <TextField fx:id="moodleField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1"/>
             <Label text="%settings.dataformatsmoodle" GridPane.rowIndex="2" />
             <TextArea fx:id="formatsMoodle" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <padding>

@@ -6,17 +6,41 @@ import lombok.NoArgsConstructor;
 import moodle.sync.web.json.MoodleUpload;
 import okhttp3.*;
 
+import javax.net.ssl.*;
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 @NoArgsConstructor
 public class MoodleUploadTemp {
 
+
     public MoodleUpload upload(String name, String pathname, String moodleUrl, String token){
         try {
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
+
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+
+            if (moodleUrl.startsWith("https")) {
+                X509TrustManager trustManager;
+                SSLSocketFactory sslSocketFactory;
+                try{
+                    trustManager = createTrustmanager();
+                    SSLContext sslContext = SSLContext.getInstance("TLSv1.2");
+                    sslContext.init(null, new TrustManager[] { trustManager }, new java.security.SecureRandom());
+                    sslSocketFactory = sslContext.getSocketFactory();
+                } catch(GeneralSecurityException e) {
+                    throw new RuntimeException(e);
+                }
+                builder.sslSocketFactory(sslSocketFactory, trustManager);
+                builder.hostnameVerifier((hostname, sslSession) -> hostname
+                        .equalsIgnoreCase(sslSession.getPeerHost()));
+
+            }
+
+            OkHttpClient client = builder.build();
             MediaType mediaType = MediaType.parse("text/plain");
             RequestBody body = new MultipartBody.Builder().setType(MultipartBody.FORM)
                     .addFormDataPart(name, pathname,
@@ -39,5 +63,28 @@ public class MoodleUploadTemp {
             e.printStackTrace();
             return null;
         }
+    }
+
+    private static X509TrustManager createTrustmanager() {
+        X509TrustManager tm;
+        try {
+            tm = new X509TrustManager() {
+                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                }
+
+                public X509Certificate[] getAcceptedIssuers() {
+                    return new X509Certificate[0];
+                }
+
+            };
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return tm;
     }
 }

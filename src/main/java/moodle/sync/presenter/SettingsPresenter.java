@@ -21,11 +21,14 @@ public class SettingsPresenter extends Presenter<SettingsView> {
 
     private final ViewContextFactory viewFactory;
 
+    private final MoodleService moodleService;
+
     @Inject
     SettingsPresenter(ApplicationContext context, SettingsView view,
-                   ViewContextFactory viewFactory) {
+                   ViewContextFactory viewFactory, MoodleService moodleService) {
         super(context, view);
 
+        this.moodleService = moodleService;
         this.viewFactory = viewFactory;
     }
 
@@ -45,6 +48,13 @@ public class SettingsPresenter extends Presenter<SettingsView> {
         view.setFtpPort(config.portFileserverProperty());
         view.setFtpUser(config.userFileserverProperty());
         view.setFtpPassword(config.passwordFileserverProperty());
+    }
+
+    @Override
+    public void close(){
+        MoodleSyncConfiguration config = (MoodleSyncConfiguration) context.getConfiguration();
+        moodleService.setApiUrl(config.getMoodleUrl());
+        super.close();
     }
 
     private void selectSyncPath() {

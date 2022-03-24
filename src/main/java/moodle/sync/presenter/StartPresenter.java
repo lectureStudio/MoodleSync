@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import moodle.sync.config.DefaultConfiguration;
 import moodle.sync.config.MoodleSyncConfiguration;
+import moodle.sync.presenter.command.ShowSettingsCommand;
 import moodle.sync.web.json.*;
 
 import org.lecturestudio.core.app.ApplicationContext;
@@ -60,11 +61,6 @@ public class StartPresenter extends Presenter<StartView> {
         view.setSections(sections());
         view.setOnCourseChanged(this::onCourseChanged);
 
-        config.moodleTokenProperty().addListener((observable, oldToken, newToken) -> {
-            view.setCourses(courses());
-            view.setSections(sections());
-        });
-
         config.recentCourseProperty().addListener((observable, oldCourse, newCourse) -> {
                     view.setSections(sections());
                     view.setSection(new ObjectProperty<Section>());
@@ -104,7 +100,7 @@ public class StartPresenter extends Presenter<StartView> {
     }
 
     private void onSettings() {
-        context.getEventBus().post(new ShowPresenterCommand<>(SettingsPresenter.class));
+        context.getEventBus().post(new ShowSettingsCommand(this::updateCourses));
     }
 
     private void onExit() {
@@ -112,6 +108,16 @@ public class StartPresenter extends Presenter<StartView> {
     }
 
     private void onSync() {
+        if(config.getRecentCourse() == null) {
+            showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                    "sync.sync.error.course.message");
+            return;
+        }
+        else if(config.getRecentSection() == null){
+            showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                    "sync.sync.error.section.message");
+            return;
+        }
         try {
             context.getEventBus().post(new ShowPresenterCommand<>(SyncPresenter.class));
         } catch (Throwable e) {
@@ -120,6 +126,11 @@ public class StartPresenter extends Presenter<StartView> {
             showNotification(NotificationType.ERROR, "start.sync.error.title",
                     "start.sync.error.message");
         }
+    }
+
+    private void updateCourses(){
+        view.setCourses(courses());
+        view.setSections(sections());
     }
 
 }

@@ -2,10 +2,15 @@ package moodle.sync.web.service;
 
 import java.net.URI;
 import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import moodle.sync.config.MoodleSyncConfiguration;
 import moodle.sync.web.json.*;
@@ -15,6 +20,7 @@ import moodle.sync.web.client.MoodleClient;
 import org.lecturestudio.core.beans.ChangeListener;
 import org.lecturestudio.core.beans.Observable;
 import org.lecturestudio.core.beans.StringProperty;
+import org.lecturestudio.web.api.net.OwnTrustManager;
 
 public class MoodleService {
 
@@ -27,15 +33,24 @@ public class MoodleService {
 	 * @param apiUrl The API service connection URL.
 	 */
 	public MoodleService(StringProperty apiUrl) {
-		moodleClient = RestClientBuilder.newBuilder()
-				.baseUri(URI.create(apiUrl.get()))
-				.build(MoodleClient.class);
+		setApiUrl(apiUrl.get());
+	}
 
-		/*apiUrl.addListener((observable, oldValue, newValue) -> {
-			moodleClient = RestClientBuilder.newBuilder()
-					.baseUri(URI.create(newValue))
-					.build(MoodleClient.class);
-		});*/
+	public void setApiUrl(String apiUrl){
+
+		if(apiUrl == null || apiUrl.isEmpty() || apiUrl.isBlank()){
+			return;
+		}
+		RestClientBuilder builder = RestClientBuilder.newBuilder();
+		builder.baseUri(URI.create(apiUrl));
+
+		if (apiUrl.startsWith("https")) {
+			builder.sslContext(createSSLContext());
+			builder.hostnameVerifier((hostname, sslSession) -> hostname
+					.equalsIgnoreCase(sslSession.getPeerHost()));
+		}
+
+		moodleClient = builder.build(MoodleClient.class);
 	}
 
 	public List<Course> getEnrolledCourses(String token, int userid){
@@ -75,4 +90,29 @@ public class MoodleService {
 		moodleClient.removeResource("json", token, "core_course_delete_modules", cmids);
 	}
 
+	private static SSLContext createSSLContext() {
+		SSLContext sslContext;
+
+		try {
+			TrustManager tm = new X509TrustManager() {
+				public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+				}
+
+				public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+				}
+
+				public X509Certificate[] getAcceptedIssuers() {
+					return null;
+				}
+			};
+
+			sslContext = SSLContext.getInstance("TLSv1.2");
+			sslContext.init(null, new TrustManager[] { tm }, null);
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		return sslContext;
+	}
 }

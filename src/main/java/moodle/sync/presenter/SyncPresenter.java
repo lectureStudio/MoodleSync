@@ -112,7 +112,9 @@ public class SyncPresenter extends Presenter<SyncView> {
                 elements.add(new UploadElement(item, false, 0, false, MoodleAction.DatatypeNotKnown, false));
             }
         } catch (Throwable e) {
-            e.printStackTrace();
+            logException(e, "Sync failed");
+                showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                        "sync.sync.error.message");
         }
         return elements;
     }
