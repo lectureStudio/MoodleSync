@@ -26,9 +26,11 @@ public class LoggingFilter implements ClientRequestFilter, ClientResponseFilter 
 
         if (MediaType.APPLICATION_JSON_TYPE.equals(responseContext.getMediaType())) {
             byte[] content = responseContext.getEntityStream().readAllBytes();
-
-            builder.append("  Body: " + new String(content, StandardCharsets.UTF_8)).append("\n");
-
+            String body = new String(content, StandardCharsets.UTF_8);
+            builder.append("  Body: " + body).append("\n");
+            if(body.contains("exception")){
+                throw new IOException("Fehlende Berechtigung");
+            }
             responseContext.setEntityStream(new ByteArrayInputStream(content));
         }
 

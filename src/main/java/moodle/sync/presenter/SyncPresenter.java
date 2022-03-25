@@ -19,6 +19,7 @@ import org.lecturestudio.core.view.NotificationType;
 import javax.inject.Inject;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -159,14 +160,31 @@ public class SyncPresenter extends Presenter<SyncView> {
                     if (item.getAction() == MoodleAction.MoodleUpload) {
                         //Case 2: file not uploaded; uploaded = false
                         MoodleUploadTemp uploader = new MoodleUploadTemp();
-                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
-                        moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename());
+                        try {
+                            MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
+                            moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename());
+                        }
+                        catch (Exception e){
+                            logException(e, "Sync failed");
+
+                            showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                                    MessageFormat.format(context.getDictionary().get("sync.sync.error.upload.message"),item.getPath().getFileName().toString()));
+                        }
+
                     } else if (item.getAction() == MoodleAction.MoodleSynchronize) {
                         Module online = modules.get(item.getIfuploaded());
-                        MoodleUploadTemp uploader = new MoodleUploadTemp();
-                        MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(),  config.getMoodleUrl(), config.getMoodleToken());
-                        moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename(), online.getId());
-                        moodleService.removeResource(config.getMoodleToken(), online.getId());
+                        try {
+                            MoodleUploadTemp uploader = new MoodleUploadTemp();
+                            MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
+                            moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename(), online.getId());
+                            moodleService.removeResource(config.getMoodleToken(), online.getId());
+                        }
+                        catch (Exception e){
+                            logException(e, "Sync failed");
+
+                            showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                                    "sync.sync.error.upload.message");
+                        }
                     }
                 }
             }

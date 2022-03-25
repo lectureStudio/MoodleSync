@@ -1,6 +1,5 @@
 package moodle.sync.web.client;
 
-import javax.print.attribute.standard.Media;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
@@ -8,7 +7,6 @@ import moodle.sync.web.filter.LoggingFilter;
 import moodle.sync.web.json.*;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProvider;
 import org.eclipse.microprofile.rest.client.annotation.RegisterProviders;
-import org.jboss.resteasy.annotations.providers.multipart.MultipartForm;
 
 import java.util.List;
 
@@ -50,7 +48,7 @@ public interface MoodleClient {
 	//Resource veröffentlichen - nicht hochladen!
 	@POST
 	@Path("")
-	void setResource(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("sectionnum") int sectionnum, @QueryParam("itemid") long itemid, @QueryParam("displayname") String displayname, @QueryParam("beforemod") Integer beforemod);
+    CheckBody setResource(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("sectionnum") int sectionnum, @QueryParam("itemid") long itemid, @QueryParam("displayname") String displayname, @QueryParam("beforemod") Integer beforemod);
 
 	@POST
 	@Path("")

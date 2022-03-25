@@ -20,6 +20,7 @@ import org.lecturestudio.core.view.ViewContextFactory;
 import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -123,10 +124,7 @@ public class StartPresenter extends Presenter<StartView> {
                     "start.sync.error.section.message");
             return;
         }
-        try {
-            Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
-        } catch (Exception e) {
-            logException(e, "Sync failed");
+            if(Files.isDirectory(Paths.get(config.getSyncRootPath())) == false) {
             showNotification(NotificationType.ERROR, "start.sync.error.title",
                     "start.sync.error.path.message");
             return;
