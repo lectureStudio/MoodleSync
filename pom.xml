@@ -9,8 +9,11 @@
 	<version>1.0.0</version>
 
 	<properties>
+		<build.output.dir>moodle-sync-${platform.name}-${platform.arch}</build.output.dir>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<javafx.version>17.0.2</javafx.version>
+		<jackson.version>2.13.2</jackson.version>
+		<log4j.version>2.17.1</log4j.version>
 		<resteasy.version>4.7.5.Final</resteasy.version>
 	</properties>
 
@@ -19,6 +22,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.2.2</version>
 				<configuration>
 					<classifier>${envClassifier}</classifier>
 					<archive>
@@ -29,16 +33,56 @@
 							<classpathLayoutType>custom</classpathLayoutType>
 							<customClasspathLayout>${artifact.artifactId}.${artifact.extension}</customClasspathLayout>
 						</manifest>
+						<manifestEntries>
+							<Class-Path>lib/javafx-controls-win.jar lib/javafx-graphics-win.jar lib/javafx-base-win.jar lib/javafx-fxml-win.jar lib/javafx-swing-win.jar lib/javafx-media-win.jar</Class-Path>
+						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.1.1</version>
+				<executions>
+					<execution>
+						<id>copy-installed</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>${project.groupId}</groupId>
+									<artifactId>${project.artifactId}</artifactId>
+									<version>${project.version}</version>
+									<type>${project.packaging}</type>
+								</artifactItem>
+							</artifactItems>
+							<stripVersion>true</stripVersion>
+							<outputDirectory>${project.build.directory}/${build.output.dir}</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>install</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<excludeArtifactIds>junit</excludeArtifactIds>
+							<stripVersion>true</stripVersion>
+							<excludeTransitive>false</excludeTransitive>
+							<excludeScope>provided</excludeScope>
+							<outputDirectory>${project.build.directory}/${build.output.dir}/lib</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.0</version>
 				<configuration>
 					<source>14</source>
 					<target>14</target>
@@ -65,6 +109,75 @@
 		</resources>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>3.2.1</version>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.3.2</version>
+					</plugin>
+					<!-- We want to sign the artifact, the POM, and all attached artifacts. -->
+					<!--
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+					</plugin>
+					-->
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>linux-x86_64</id>
+			<activation>
+				<os>
+					<family>unix</family>
+					<name>Linux</name>
+					<arch>amd64</arch>
+				</os>
+			</activation>
+			<properties>
+				<platform.arch>x86_64</platform.arch>
+				<platform.name>linux</platform.name>
+				<os.name>linux-${platform.arch}</os.name>
+			</properties>
+		</profile>
+		<profile>
+			<id>mac-x86_64</id>
+			<activation>
+				<os>
+					<family>mac</family>
+					<arch>x86_64</arch>
+				</os>
+			</activation>
+			<properties>
+				<platform.arch>x86_64</platform.arch>
+				<platform.name>mac</platform.name>
+				<os.name>macosx-${platform.arch}</os.name>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows-x86_64</id>
+			<activation>
+				<os>
+					<family>windows</family>
+					<arch>amd64</arch>
+				</os>
+			</activation>
+			<properties>
+				<platform.arch>x86_64</platform.arch>
+				<platform.name>windows</platform.name>
+				<os.name>windows-${platform.arch}</os.name>
+			</properties>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>
@@ -103,19 +216,82 @@
 			<version>${javafx.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.openjfx</groupId>
-			<artifactId>javafx-web</artifactId>
-			<version>${javafx.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.lecturestudio.core</groupId>
 			<artifactId>lect-core</artifactId>
 			<version>4.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.lecturestudio.javafx</groupId>
 			<artifactId>lect-javafx</artifactId>
 			<version>1.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.lecturestudio.web.api</groupId>
+			<artifactId>lect-web-api</artifactId>
+			<version>1.0.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>*</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>31.1-jre</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>5.1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jdk8</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-jsr310</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<!-- Used to compare app/release versions -->
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-artifact</artifactId>
+			<version>3.8.1</version>
 		</dependency>
 
 		<dependency>
