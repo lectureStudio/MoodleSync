@@ -4,10 +4,12 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.scene.control.TreeItem;
+import moodle.sync.util.UploadData.UploadElement;
 
 import java.util.Objects;
 
-public class UploadElementTableItem {
+public class UploadElementTableItem{
 
     private StringProperty fileName;
 
@@ -28,7 +30,7 @@ public class UploadElementTableItem {
     }
 
     public UploadElementTableItem(UploadElement uploadElement){
-        this.fileName = new SimpleStringProperty(uploadElement.getPath().getFileName().toString());
+        this.fileName = uploadElement.getFileName();
         this.selected = uploadElement.getChecked();
         this.message = new SimpleStringProperty(uploadElement.getAction().message);
         this.uploadElement = uploadElement;
@@ -36,7 +38,7 @@ public class UploadElementTableItem {
     }
 
     public UploadElementTableItem(){
-        this(null, false,null, null, false);
+        this("test", false,"nichts", new UploadElement(), false);
     }
 
     public StringProperty fileNameProperty() { return fileName; }

@@ -2,7 +2,7 @@ package moodle.sync.fileserver;
 
 import moodle.sync.config.MoodleSyncConfiguration;
 import moodle.sync.util.FileServerFile;
-import moodle.sync.util.UploadElement;
+import moodle.sync.util.UploadData.UploadElement;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -12,7 +12,6 @@ import org.apache.commons.net.ftp.FTPReply;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;

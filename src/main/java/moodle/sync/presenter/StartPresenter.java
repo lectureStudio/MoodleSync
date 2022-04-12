@@ -91,6 +91,9 @@ public class StartPresenter extends Presenter<StartView> {
                     "start.sync.error.invalidurl.message");
             config.setRecentCourse(null);
         }
+
+        //Kurs soll nicht angezeigt werden, wenn er abgelaufen ist -> Enddate auch bei TU dafür verantwortlich?
+        courses.removeIf(item -> (item.getEnddate() != 0 && item.getEnddate() < System.currentTimeMillis()));
         return courses;
     }
 

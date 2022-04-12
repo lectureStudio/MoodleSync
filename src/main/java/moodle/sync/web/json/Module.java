@@ -22,4 +22,7 @@ public class Module {
     private String modname;
     private List<Content> contents;
 
+    public Module(List<Content> contents){
+        this.contents = contents;
+    }
 }

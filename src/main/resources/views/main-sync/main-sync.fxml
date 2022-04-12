@@ -12,43 +12,38 @@
 <?import moodle.sync.javafx.ButtonCellValueFactory?>
 <?import javafx.scene.control.cell.CheckBoxListCell?>
 <?import javafx.scene.control.cell.CheckBoxTableCell?>
+<?import javafx.scene.control.cell.TextFieldTreeTableCell?>
+<?import javafx.scene.control.cell.TextFieldTreeCell?>
 
 <?import moodle.sync.util.UploadElementCellValueFactory?>
 <?import moodle.sync.util.CheckBoxTableCellFactory?>
+
+<?import javafx.scene.control.cell.TreeItemPropertyValueFactory?>
 <fx:root type="VBox" alignment="CENTER" spacing="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
 
-      <TableView fx:id="syncItemsTableView" editable="true" fixedCellSize="50.0">
+      <TreeTableView fx:id="syncItemsTableView" editable="true" fixedCellSize="50.0" showRoot="false">
          <columns>
-            <TableColumn editable="true" prefWidth="188.0" text="%sync.file" >
-                    <cellFactory>
-                       <TextFieldTableCell fx:factory="forTableColumn"/>
-                    </cellFactory>
+            <TreeTableColumn editable="true" prefWidth="188.0" text="%sync.file" >
                <cellValueFactory>
-                  <PropertyValueFactory property="fileName"/>
+                  <TreeItemPropertyValueFactory property="fileName"/>
                </cellValueFactory>
-            </TableColumn>
-            <TableColumn editable="false" prefWidth="360.0" text="%sync.change">
-               <cellFactory>
-                  <TextFieldTableCell fx:factory="forTableColumn"/>
-               </cellFactory>
+            </TreeTableColumn>
+            <TreeTableColumn editable="false" prefWidth="360.0" text="%sync.change">
                <cellValueFactory>
-                  <PropertyValueFactory property="message"/>
+                  <TreeItemPropertyValueFactory property="message"/>
                </cellValueFactory>
-            </TableColumn>
-            <TableColumn styleClass="check" editable="true" prefWidth="50.0" text="%sync.upload" >
+            </TreeTableColumn>
+            <TreeTableColumn styleClass="check" editable="true" prefWidth="50.0" text="%sync.upload" >
                <cellFactory>
                   <CheckBoxTableCellFactory/>
                </cellFactory>
                <cellValueFactory>
                   <UploadElementCellValueFactory/>
                </cellValueFactory>
-            </TableColumn>
+            </TreeTableColumn>
          </columns>
-         <columnResizePolicy>
-            <TableView fx:constant="UNCONSTRAINED_RESIZE_POLICY" />
-         </columnResizePolicy>
-      </TableView>
+      </TreeTableView>
    </children>
    <children>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="70.0">

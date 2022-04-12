@@ -1,9 +1,10 @@
 package moodle.sync.util;
 
-import moodle.sync.config.MoodleSyncConfiguration;
+import moodle.sync.util.UploadData.UploadData;
+import moodle.sync.util.UploadData.UploadElement;
+import moodle.sync.util.UploadData.UploadFolderElement;
 import moodle.sync.web.json.Module;
 import moodle.sync.web.json.Section;
-import org.lecturestudio.core.app.ApplicationContext;
 
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
@@ -27,11 +28,30 @@ public class FileService {
 
 
     //Returns List with all Paths inside a directory
-    public static List<Path> getFilesInDirectory(Path p) throws IOException {
+    public static List<Path> fileServerRequired(Path p) throws IOException {
         List<Path> result = new ArrayList<>();
         try(DirectoryStream<Path> stream = Files.newDirectoryStream(p)) {
             for (Path entry: stream) {
                 result.add(entry);
+            }
+        }
+        catch (DirectoryIteratorException ex){
+            // I/O error encounted during the iteration, the cause is an IOException
+            throw ex.getCause();
+        }
+        return result;
+    }
+
+    public static List<UploadData> getFilesInDirectory(Path p) throws IOException {
+        List<UploadData> result = new ArrayList<>();
+        try(DirectoryStream<Path> stream = Files.newDirectoryStream(p)) {
+            for (Path entry: stream) {
+                if(Files.isDirectory(entry)){
+                    result.add(new UploadFolderElement(getFilesInDirectory(entry), entry)); //Rekursiver aufruf gut?
+                }
+                else{
+                    result.add(new UploadElement(entry));
+                }
             }
         }
         catch (DirectoryIteratorException ex){
@@ -64,7 +84,6 @@ public class FileService {
                 Long filemodified = Files.getLastModifiedTime(path).toMillis();
                 if (filemodified > onlinemodified) {
                     return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.MoodleSynchronize, true);
-
                 }
             }
         }
