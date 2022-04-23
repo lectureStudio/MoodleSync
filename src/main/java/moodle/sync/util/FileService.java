@@ -47,7 +47,9 @@ public class FileService {
         try(DirectoryStream<Path> stream = Files.newDirectoryStream(p)) {
             for (Path entry: stream) {
                 if(Files.isDirectory(entry)){
-                    result.add(new UploadFolderElement(getFilesInDirectory(entry), entry)); //Rekursiver aufruf gut?
+                    if(!getFilesInDirectory(entry).isEmpty()){
+                        result.add(new UploadFolderElement(getFilesInDirectory(entry), entry, MoodleAction.DatatypeNotKnown, false)); //Rekursiver aufruf gut?
+                    }
                 }
                 else{
                     result.add(new UploadElement(entry));
@@ -80,14 +82,14 @@ public class FileService {
             if (path.getFileName().toString().equals(module.get(i).getContents().get(0).getFilename())) {
                 uploaded = true;
                 ifuploaded = i;
-                Long onlinemodified = module.get(i).getContents().get(0).getTimemodified() * 1000;
-                Long filemodified = Files.getLastModifiedTime(path).toMillis();
+                long onlinemodified = module.get(i).getContents().get(0).getTimemodified() * 1000;
+                long filemodified = Files.getLastModifiedTime(path).toMillis();
                 if (filemodified > onlinemodified) {
                     return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.MoodleSynchronize, true);
                 }
             }
         }
-        if(uploaded == false) {
+        if(!uploaded) {
             return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.MoodleUpload, true);
         }
 
@@ -102,15 +104,15 @@ public class FileService {
             if (path.getFileName().toString().equals(files.get(i).getFilename())) {
                 uploaded = true;
                 ifuploaded = i;
-                Long onlinemodified = files.get(i).getLastTimeModified();
-                Long filemodified = Files.getLastModifiedTime(path).toMillis();
+                long onlinemodified = files.get(i).getLastTimeModified();
+                long filemodified = Files.getLastModifiedTime(path).toMillis();
                 if (filemodified > onlinemodified) {
                     return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.FTPSynchronize, true);
 
                 }
             }
         }
-        if(uploaded == false) {
+        if(!uploaded) {
             return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.FTPUpload, true);
         }
 

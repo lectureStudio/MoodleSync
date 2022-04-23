@@ -1,5 +1,6 @@
 package moodle.sync.view;
 
+import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.beans.StringProperty;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.View;
@@ -27,4 +28,6 @@ public interface SettingsView extends View {
     void setSyncRootPath(StringProperty path);
 
     void setSelectSyncRootPath(Action action);
+
+    void setShowUnknownFormats(BooleanProperty unknownFormats);
 }

@@ -1,9 +1,10 @@
 package moodle.sync.config;
 
+
+import org.lecturestudio.core.beans.BooleanProperty;
 import moodle.sync.web.json.Course;
 import moodle.sync.web.json.Section;
 import org.lecturestudio.core.app.configuration.Configuration;
-import org.lecturestudio.core.beans.IntegerProperty;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.beans.StringProperty;
 
@@ -31,6 +32,8 @@ public class MoodleSyncConfiguration extends Configuration {
 	private final StringProperty ftppassword = new StringProperty();
 
 	private final StringProperty ftpport = new StringProperty();
+
+	private final BooleanProperty showUnknownFormats = new BooleanProperty();
 
 	/**
 	 * Get the path where the synchronized files are stored at.
@@ -178,5 +181,17 @@ public class MoodleSyncConfiguration extends Configuration {
 
 	public StringProperty portFileserverProperty() {
 		return ftpport;
+	}
+
+	public Boolean getShowUnknownFormats() {
+		return showUnknownFormats.get();
+	}
+
+	public void setShowUnknownFormats(Boolean unknownFormats) {
+		this.showUnknownFormats.set(unknownFormats);
+	}
+
+	public BooleanProperty showUnknownFormatsProperty() {
+		return showUnknownFormats;
 	}
 }

@@ -48,7 +48,7 @@
             <Label text="%settings.token" GridPane.rowIndex="1" />
             <TextField fx:id="tokenField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Label text="%settings.lms" />
-            <TextField fx:id="moodleField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1"/>
+            <TextField fx:id="moodleField" prefHeight="25.0" prefWidth="300.0" GridPane.columnIndex="1" />
             <Label text="%settings.dataformatsmoodle" GridPane.rowIndex="2" />
             <TextArea fx:id="formatsMoodle" GridPane.columnIndex="1" GridPane.rowIndex="2">
                <padding>
@@ -106,6 +106,21 @@
                   <Label alignment="CENTER_RIGHT" contentDisplay="RIGHT" prefHeight="25.0" prefWidth="60.0" text="%settings.port" />
                </children>
             </HBox>
+         </children>
+      </GridPane>
+      <GridPane prefHeight="45.0" prefWidth="612.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <CheckBox fx:id="showUnknownFormats" mnemonicParsing="false" text="%settings.showUnknownFormats">
+               <GridPane.margin>
+                  <Insets top="5.0" />
+               </GridPane.margin>
+            </CheckBox>
          </children>
       </GridPane>
       <HBox alignment="CENTER" spacing="50.0">

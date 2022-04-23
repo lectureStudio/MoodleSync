@@ -48,6 +48,7 @@ public class SettingsPresenter extends Presenter<SettingsView> {
         view.setFtpPort(config.portFileserverProperty());
         view.setFtpUser(config.userFileserverProperty());
         view.setFtpPassword(config.passwordFileserverProperty());
+        view.setShowUnknownFormats(config.showUnknownFormatsProperty());
     }
 
     @Override

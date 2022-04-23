@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import moodle.sync.javafx.view.FxStartView?>
 
-<fx:root type="StackPane" prefWidth="800" prefHeight="500" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="StackPane" prefWidth="800" prefHeight="600" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
 	<stylesheets>
 		<String fx:value="/resources/css/base.css" />
 	</stylesheets>

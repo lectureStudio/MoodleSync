@@ -52,6 +52,10 @@ public interface MoodleClient {
 
 	@POST
 	@Path("")
+	void setFolder(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("sectionnum") int sectionnum, @QueryParam("itemid") long itemid, @QueryParam("displayname") String displayname, @QueryParam("beforemod") Integer beforemod);
+
+	@POST
+	@Path("")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
     List<Section> getCourseContentSection(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("options[0][name]") String s, @QueryParam("options[0][value]") int sectionid);

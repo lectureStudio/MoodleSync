@@ -2,10 +2,7 @@ package moodle.sync.javafx.view;
 
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 import moodle.sync.presenter.SettingsPresenter;
@@ -13,8 +10,10 @@ import moodle.sync.presenter.StartPresenter;
 import moodle.sync.util.UserInputValidations;
 import moodle.sync.view.SettingsView;
 import moodle.sync.view.StartView;
+import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.beans.StringProperty;
 import org.lecturestudio.core.view.Action;
+import org.lecturestudio.javafx.beans.LectBooleanProperty;
 import org.lecturestudio.javafx.beans.LectStringProperty;
 import org.lecturestudio.javafx.util.FxUtils;
 import org.lecturestudio.javafx.view.FxView;
@@ -59,6 +58,9 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
 
     @FXML
     private Button syncRootPathButton;
+
+    @FXML
+    private CheckBox showUnknownFormats;
 
     public FxSettingsView() {
         super();
@@ -149,5 +151,9 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
     }
 
 
+    @Override
+    public void setShowUnknownFormats(BooleanProperty unknownFormats){
+        showUnknownFormats.selectedProperty().bindBidirectional(new LectBooleanProperty(unknownFormats));
+    }
 }
 

@@ -90,6 +90,14 @@ public class MoodleService {
 		moodleClient.removeResource("json", token, "core_course_delete_modules", cmids);
 	}
 
+	public void setFolder(String token, int courseid, int sectionnum,Long itemid, String name){
+		moodleClient.setFolder("json", token, "local_course_add_new_course_module_directory", courseid, sectionnum, itemid, name, null);
+	}
+
+	public void setFolder(String token, int courseid, int sectionnum,Long itemid, String name, int beforemod){
+		moodleClient.setFolder("json", token, "local_course_add_new_course_module_directory", courseid, sectionnum, itemid, name, beforemod);
+	}
+
 	private static SSLContext createSSLContext() {
 		SSLContext sslContext;
 

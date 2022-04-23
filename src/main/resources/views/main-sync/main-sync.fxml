@@ -29,12 +29,12 @@
                   <TreeItemPropertyValueFactory property="fileName"/>
                </cellValueFactory>
             </TreeTableColumn>
-            <TreeTableColumn editable="false" prefWidth="360.0" text="%sync.change">
+            <TreeTableColumn editable="false" prefWidth="357.0" text="%sync.change">
                <cellValueFactory>
                   <TreeItemPropertyValueFactory property="message"/>
                </cellValueFactory>
             </TreeTableColumn>
-            <TreeTableColumn styleClass="check" editable="true" prefWidth="50.0" text="%sync.upload" >
+            <TreeTableColumn styleClass="check" editable="true" prefWidth="40.0" text="%sync.upload" >
                <cellFactory>
                   <CheckBoxTableCellFactory/>
                </cellFactory>
