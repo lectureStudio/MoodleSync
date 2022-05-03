@@ -2,6 +2,9 @@ package moodle.sync.config;
 
 import java.util.Locale;
 
+/**
+ * This Class offers the possibility to generate a default configuration.
+ */
 public class DefaultConfiguration extends MoodleSyncConfiguration {
 
 	public DefaultConfiguration() {

@@ -84,7 +84,8 @@ public class SyncPresenter extends Presenter<SyncView> {
         List<UploadData> fileList = new ArrayList<>();
         try {
             //Update recent course-section.
-            config.setRecentSection(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
+            config.setRecentSection(moodleService.getCourseContentSection(config.getMoodleToken(),
+                    config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
 
             //Create Directory if not existed
             Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
@@ -108,7 +109,8 @@ public class SyncPresenter extends Presenter<SyncView> {
                 String url = config.getFileserver();
                 String user = config.getUserFileserver();
                 String password = config.getPasswordFileserver();
-                if (url == null || url.isEmpty() || url.isBlank() || user == null || user.isEmpty() || user.isBlank() || password == null || password.isEmpty() || password.isBlank()) {
+                if (url == null || url.isEmpty() || url.isBlank() || user == null || user.isEmpty() || user.isBlank()
+                        || password == null || password.isEmpty() || password.isBlank()) {
                     showNotification(NotificationType.ERROR, "sync.sync.error.title",
                             "sync.sync.error.fileserver1.message");
                 } else {

@@ -8,6 +8,9 @@ import org.lecturestudio.core.app.configuration.Configuration;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.beans.StringProperty;
 
+/**
+ * This class represents a configuration containing several settings.
+ */
 public class MoodleSyncConfiguration extends Configuration {
 
     //The path where the synchronized files are stored at.
