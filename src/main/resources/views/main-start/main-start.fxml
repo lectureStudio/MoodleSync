@@ -9,6 +9,12 @@
 <?import moodle.sync.javafx.CourseCellFactory?>
 <?import moodle.sync.javafx.SectionListCell?>
 <?import moodle.sync.javafx.SectionCellFactory?>
+
+<!--
+    In this document, the layout of the "start-page" is defined
+    @author Daniel Schröter
+-->
+
 <fx:root alignment="CENTER" type="VBox" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <BorderPane>

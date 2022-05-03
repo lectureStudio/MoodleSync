@@ -19,7 +19,6 @@ import javax.inject.Inject;
 
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.app.configuration.Configuration;
-//import org.lecturestudio.core.app.util.SaveConfigurationHandler;
 import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.bus.event.ViewVisibleEvent;
 import org.lecturestudio.core.input.KeyEvent;
@@ -47,6 +46,9 @@ import org.lecturestudio.web.api.service.VersionChecker;
 import moodle.sync.input.Shortcut;
 import moodle.sync.view.MainView;
 
+/**
+ * Class defining the logic of the "main-window".
+ */
 public class MainPresenter extends org.lecturestudio.core.presenter.MainPresenter<MainView> implements ViewHandler {
 
 	private final ObservableMap<Class<? extends View>, BooleanProperty> viewMap;

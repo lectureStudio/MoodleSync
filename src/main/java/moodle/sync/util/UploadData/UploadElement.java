@@ -14,28 +14,40 @@ import java.nio.file.Path;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UploadElement extends UploadData{
 
+/**
+ * Class representing a file in the sync. process.
+ *
+ * @author Daniel Schröter
+ */
+public class UploadElement extends UploadData {
+
+    //Local filepath.
     private Path path;
 
+    //True if this file is already uploaded.
     private boolean uploaded;
 
+    //If the file is uploaded, this identifies the corresponding course-module.
     private int ifuploaded;
 
+    //Property used for the CheckBoxes in the "sync-page".
     private BooleanProperty checked;
 
+    //Depending on fileformat, this declares how to handle a file.
     private MoodleAction action;
 
+    //Used for the CheckBoxes in the "sync-page". Declares whether this file should be checkable.
     private boolean selectable;
 
+    //Local filename.
     private StringProperty fileName;
 
-
-    public UploadElement(Path path){
+    public UploadElement(Path path) {
         this.path = path;
     }
 
-    public UploadElement(Path path, boolean uploaded, int ifuploaded, boolean checked, MoodleAction action, boolean selectable){
+    public UploadElement(Path path, boolean uploaded, int ifuploaded, boolean checked, MoodleAction action, boolean selectable) {
         this.path = path;
         this.uploaded = uploaded;
         this.ifuploaded = ifuploaded;
@@ -45,27 +57,57 @@ public class UploadElement extends UploadData{
         this.fileName = new SimpleStringProperty(path.getFileName().toString());
     }
 
+    /**
+     * Provides the checked property.
+     *
+     * @return checked property.
+     */
     public BooleanProperty getChecked() {
         return this.checked;
     }
 
+    /**
+     * Sets the checked property.
+     *
+     * @param checked True if the file is checked.
+     */
     public void setChecked(final java.lang.Boolean checked) {
-        this.checked=new SimpleBooleanProperty(checked);
+        this.checked = new SimpleBooleanProperty(checked);
     }
 
-    public java.lang.Boolean getSelectable(){
+    /**
+     * Check if the file should be selectable.
+     *
+     * @return True if it should be selectable.
+     */
+    public java.lang.Boolean getSelectable() {
         return this.selectable;
     }
 
+    /**
+     * Provides the fileName property.
+     *
+     * @return the fileName property.
+     */
     public StringProperty getFileName() {
         return this.fileName;
     }
 
+    /**
+     * Sets the fileName property.
+     *
+     * @param fileName the fileName to set.
+     */
     public void setFileName(final java.lang.String fileName) {
-        this.fileName=new SimpleStringProperty(fileName);
+        this.fileName = new SimpleStringProperty(fileName);
     }
 
-    public String getFileNameAsString(){
+    /**
+     * Provides the filename as a string.
+     *
+     * @return filename as a string.
+     */
+    public String getFileNameAsString() {
         return this.fileName.get();
     }
 

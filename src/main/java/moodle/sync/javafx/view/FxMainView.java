@@ -34,6 +34,9 @@ import javafx.stage.WindowEvent;
 
 import moodle.sync.view.MainView;
 
+/**
+ * Class implementing the functions of the "main-window".
+ */
 @FxmlView(name = "main-window")
 public class FxMainView extends StackPane implements MainView {
 

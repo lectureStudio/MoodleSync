@@ -10,6 +10,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 
+/**
+ * Class representing a Moodle-Course.
+ *
+ * @author Daniel Schröter
+ */
 public class Course {
     private Integer id;
     private String shortname;
@@ -35,10 +40,6 @@ public class Course {
     private Integer lastaccess;
     private Boolean isfavourite;
     private Boolean hidden;
-    //private List<File> overviewfiles; //Da muss als Type der List noch Files rein
-    //private Boolean showactivitydates;
-    //private Boolean showcompletionconditions;
-
 
     @Override
     public String toString() {

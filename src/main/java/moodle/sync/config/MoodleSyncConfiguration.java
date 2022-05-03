@@ -10,188 +10,185 @@ import org.lecturestudio.core.beans.StringProperty;
 
 public class MoodleSyncConfiguration extends Configuration {
 
-	/** The path where the synchronized files are stored at. */
-	private final StringProperty syncRootPath = new StringProperty();
+    //The path where the synchronized files are stored at.
+    private final StringProperty syncRootPath = new StringProperty();
 
-	private final ObjectProperty<Course> recentCourse = new ObjectProperty<>();
+    //The previously selected Course.
+    private final ObjectProperty<Course> recentCourse = new ObjectProperty<>();
 
-	private final StringProperty moodleToken = new StringProperty();
+    //The users Moodle-token.
+    private final StringProperty moodleToken = new StringProperty();
 
-	private final ObjectProperty<Section> recentSection = new ObjectProperty<>();
+    //The previously selected Section.
+    private final ObjectProperty<Section> recentSection = new ObjectProperty<>();
 
-	private final StringProperty moodleUrl = new StringProperty();
+    //The Url of the Moodle-Platform.
+    private final StringProperty moodleUrl = new StringProperty();
 
-	private final StringProperty formatsMoodle = new StringProperty();
+    //If a file belongs to this format, it should be synchronized with the Moodle-plattform.
+    private final StringProperty formatsMoodle = new StringProperty();
 
-	private final StringProperty formatsFileserver = new StringProperty();
+    //If a file belongs to this format, it should be synchronized with the fileserver.
+    private final StringProperty formatsFileserver = new StringProperty();
 
-	private final StringProperty ftpserver = new StringProperty();
+    //The Url of the fileserver.
+    private final StringProperty ftpserver = new StringProperty();
 
-	private final StringProperty ftpuser = new StringProperty();
+    //The users fileserver-username.
+    private final StringProperty ftpuser = new StringProperty();
 
-	private final StringProperty ftppassword = new StringProperty();
+    //The users fileserver-password.
+    private final StringProperty ftppassword = new StringProperty();
 
-	private final StringProperty ftpport = new StringProperty();
+    //The choosen port for the fileserver-communication.
+    private final StringProperty ftpport = new StringProperty();
 
-	private final BooleanProperty showUnknownFormats = new BooleanProperty();
-
-	/**
-	 * Get the path where the synchronized files are stored at.
-	 *
-	 * @return the sync root path.
-	 */
-	public String getSyncRootPath() {
-		return syncRootPath.get();
-	}
-
-	/**
-	 * Set the path where the synchronized files should be stored.
-	 *
-	 * @param path the root sync path to set.
-	 */
-	public void setSyncRootPath(String path) {
-		this.syncRootPath.set(path);
-	}
-
-	/**
-	 * Get the sync root path property.
-	 *
-	 * @return the sync root path property.
-	 */
-	public StringProperty syncRootPathProperty() {
-		return syncRootPath;
-	}
+    //Whether files of unknown fileformat should be displayed.
+    private final BooleanProperty showUnknownFormats = new BooleanProperty();
 
 
-	public Course getRecentCourse() {
-		return recentCourse.get();
-	}
+    public String getSyncRootPath() {
+        return syncRootPath.get();
+    }
 
-	public void setRecentCourse(Course course) {
-		this.recentCourse.set(course);
-	}
 
-	public ObjectProperty<Course> recentCourseProperty() {
-		return recentCourse;
-	}
+    public void setSyncRootPath(String path) {
+        this.syncRootPath.set(path);
+    }
 
-	public String getMoodleToken() {
-		return moodleToken.get();
-	}
+    public StringProperty syncRootPathProperty() {
+        return syncRootPath;
+    }
 
-	public void setMoodleToken(String token) {
-		this.moodleToken.set(token);
-	}
+    public Course getRecentCourse() {
+        return recentCourse.get();
+    }
 
-	public StringProperty moodleTokenProperty() {
-		return moodleToken;
-	}
+    public void setRecentCourse(Course course) {
+        this.recentCourse.set(course);
+    }
 
-	public Section getRecentSection() {
-		return recentSection.get();
-	}
+    public ObjectProperty<Course> recentCourseProperty() {
+        return recentCourse;
+    }
 
-	public void setRecentSection(Section section) {
-		this.recentSection.set(section);
-	}
+    public String getMoodleToken() {
+        return moodleToken.get();
+    }
 
-	public ObjectProperty<Section> recentSectionProperty() {
-		return recentSection;
-	}
+    public void setMoodleToken(String token) {
+        this.moodleToken.set(token);
+    }
 
-	public String getMoodleUrl() {
-		return moodleUrl.get();
-	}
+    public StringProperty moodleTokenProperty() {
+        return moodleToken;
+    }
 
-	public void setMoodleUrl(String url) {
-		this.moodleUrl.set(url);
-	}
+    public Section getRecentSection() {
+        return recentSection.get();
+    }
 
-	public StringProperty moodleUrlProperty() {
-		return moodleUrl;
-	}
+    public void setRecentSection(Section section) {
+        this.recentSection.set(section);
+    }
 
-	public String getFormatsMoodle() {
-		return formatsMoodle.get();
-	}
+    public ObjectProperty<Section> recentSectionProperty() {
+        return recentSection;
+    }
 
-	public void setFormatsMoodle(String formats) {
-		this.formatsMoodle.set(formats);
-	}
+    public String getMoodleUrl() {
+        return moodleUrl.get();
+    }
 
-	public StringProperty formatsMoodleProperty() {
-		return formatsMoodle;
-	}
+    public void setMoodleUrl(String url) {
+        this.moodleUrl.set(url);
+    }
 
-	public String getFormatsFileserver() {
-		return formatsFileserver.get();
-	}
+    public StringProperty moodleUrlProperty() {
+        return moodleUrl;
+    }
 
-	public void setFormatsFileserver(String formats) {
-		this.formatsFileserver.set(formats);
-	}
+    public String getFormatsMoodle() {
+        return formatsMoodle.get();
+    }
 
-	public StringProperty formatsFileserverProperty() {
-		return formatsFileserver;
-	}
+    public void setFormatsMoodle(String formats) {
+        this.formatsMoodle.set(formats);
+    }
 
-	public String getFileserver() {
-		return ftpserver.get();
-	}
+    public StringProperty formatsMoodleProperty() {
+        return formatsMoodle;
+    }
 
-	public void setFileserver(String fileserver) {
-		this.ftpserver.set(fileserver);
-	}
+    public String getFormatsFileserver() {
+        return formatsFileserver.get();
+    }
 
-	public StringProperty FileserverProperty() {
-		return ftpserver;
-	}
+    public void setFormatsFileserver(String formats) {
+        this.formatsFileserver.set(formats);
+    }
 
-	public String getUserFileserver() {
-		return ftpuser.get();
-	}
+    public StringProperty formatsFileserverProperty() {
+        return formatsFileserver;
+    }
 
-	public void setUserFileserver(String user) {
-		this.ftpuser.set(user);
-	}
+    public String getFileserver() {
+        return ftpserver.get();
+    }
 
-	public StringProperty userFileserverProperty() {
-		return ftpuser;
-	}
+    public void setFileserver(String fileserver) {
+        this.ftpserver.set(fileserver);
+    }
 
-	public String getPasswordFileserver() {
-		return ftppassword.get();
-	}
+    public StringProperty FileserverProperty() {
+        return ftpserver;
+    }
 
-	public void setPasswordFileserver(String formats) {
-		this.ftppassword.set(formats);
-	}
+    public String getUserFileserver() {
+        return ftpuser.get();
+    }
 
-	public StringProperty passwordFileserverProperty() {
-		return ftppassword;
-	}
+    public void setUserFileserver(String user) {
+        this.ftpuser.set(user);
+    }
 
-	public String getPortFileserver() {
-		return ftpport.get();
-	}
+    public StringProperty userFileserverProperty() {
+        return ftpuser;
+    }
 
-	public void setPortFileserver(String port) {
-		this.ftpport.set(port);
-	}
+    public String getPasswordFileserver() {
+        return ftppassword.get();
+    }
 
-	public StringProperty portFileserverProperty() {
-		return ftpport;
-	}
+    public void setPasswordFileserver(String formats) {
+        this.ftppassword.set(formats);
+    }
 
-	public Boolean getShowUnknownFormats() {
-		return showUnknownFormats.get();
-	}
+    public StringProperty passwordFileserverProperty() {
+        return ftppassword;
+    }
 
-	public void setShowUnknownFormats(Boolean unknownFormats) {
-		this.showUnknownFormats.set(unknownFormats);
-	}
+    public String getPortFileserver() {
+        return ftpport.get();
+    }
 
-	public BooleanProperty showUnknownFormatsProperty() {
-		return showUnknownFormats;
-	}
+    public void setPortFileserver(String port) {
+        this.ftpport.set(port);
+    }
+
+    public StringProperty portFileserverProperty() {
+        return ftpport;
+    }
+
+    public Boolean getShowUnknownFormats() {
+        return showUnknownFormats.get();
+    }
+
+    public void setShowUnknownFormats(Boolean unknownFormats) {
+        this.showUnknownFormats.set(unknownFormats);
+    }
+
+    public BooleanProperty showUnknownFormatsProperty() {
+        return showUnknownFormats;
+    }
 }

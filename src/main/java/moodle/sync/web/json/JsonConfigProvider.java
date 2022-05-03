@@ -11,6 +11,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 @Provider
+
 public class JsonConfigProvider implements ContextResolver<Jsonb> {
 
 	@Override

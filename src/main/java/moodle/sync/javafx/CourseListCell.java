@@ -6,6 +6,11 @@ import moodle.sync.web.json.Course;
 
 import static java.util.Objects.isNull;
 
+/**
+ * Class used to display the name of a Course inside a ListCell.
+ *
+ * @author Daniel Schröter
+ */
 public class CourseListCell extends ListCell<Course> {
 
     @Override
@@ -16,8 +21,7 @@ public class CourseListCell extends ListCell<Course> {
 
         if (isNull(item) || empty) {
             setText("");
-        }
-        else {
+        } else {
             setText(item.getDisplayname());
         }
     }

@@ -26,14 +26,22 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class defining the logic of the "start-page".
+ *
+ * @author Daniel Schröter
+ */
 public class StartPresenter extends Presenter<StartView> {
 
     private final ViewContextFactory viewFactory;
 
+    //Used MoodleService for executing Web Service API-Calls.
     private final MoodleService moodleService;
 
+    //Configuration providing the settings.
     private final MoodleSyncConfiguration config;
 
+    //Providing the content of a course. Used for the section-combobox.
     private List<Section> coursecontent;
 
 
@@ -50,7 +58,9 @@ public class StartPresenter extends Presenter<StartView> {
 
     @Override
     public void initialize() {
+        //Initialising all functions of the "start-page" with the help of the configuration.
         String syncPath = config.getSyncRootPath();
+        //Check whether a default path should be used to prevent unwanted behavior.
         if (syncPath == null || syncPath.isEmpty() || syncPath.isBlank()) {
             DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
             config.setSyncRootPath(defaultConfiguration.getSyncRootPath());
@@ -64,9 +74,10 @@ public class StartPresenter extends Presenter<StartView> {
         view.setSections(sections());
         view.setOnCourseChanged(this::onCourseChanged);
 
+        //Display the course-sections after Moodle-course is choosen.
         config.recentCourseProperty().addListener((observable, oldCourse, newCourse) -> {
-                    view.setSections(sections());
-                    view.setSection(new ObjectProperty<Section>());
+            view.setSections(sections());
+            view.setSection(new ObjectProperty<Section>());
         });
     }
 
@@ -74,12 +85,19 @@ public class StartPresenter extends Presenter<StartView> {
         view.setSections(sections());
     }
 
+
+    /**
+     * Execute an API-call to get users Moodle-courses.
+     *
+     * @return list containing users Moodle-courses.
+     */
     private List<Course> courses() {
         String token = config.getMoodleToken();
         String url = config.getMoodleUrl();
-        if(token == null || token.isEmpty() || token.isBlank() || url == null || url.isEmpty() || url.isBlank()){
+        //Security checks to prevent unwanted behaviour.
+        if (token == null || token.isEmpty() || token.isBlank() || url == null || url.isEmpty() || url.isBlank()) {
             List<Course> dummy = new ArrayList<>();
-          return dummy;
+            return dummy;
         }
         List<Course> courses = List.of();
         try {
@@ -92,14 +110,19 @@ public class StartPresenter extends Presenter<StartView> {
             config.setRecentCourse(null);
         }
 
-        //Kurs soll nicht angezeigt werden, wenn er abgelaufen ist -> Enddate auch bei TU dafür verantwortlich?
+        //Do not show Moodle-courses which are already over.
         courses.removeIf(item -> (item.getEnddate() != 0 && item.getEnddate() < System.currentTimeMillis()));
         return courses;
     }
 
+    /**
+     * Execute an API-call to get a choosen Moodle-courses course-sections.
+     *
+     * @return list containing course-sections.
+     */
     private List<Section> sections() {
         Course course = config.getRecentCourse();
-        if(course == null){
+        if (course == null) {
             List<Section> dummy = new ArrayList<>();
             return dummy;
         }
@@ -116,23 +139,27 @@ public class StartPresenter extends Presenter<StartView> {
         context.getEventBus().post(new CloseApplicationCommand());
     }
 
+    /**
+     * Starts the sync-process.
+     */
     private void onSync() {
-        if(config.getRecentCourse() == null) {
+        //Serveral security checks to prevent unwanted behaviour.
+        if (config.getRecentCourse() == null) {
             showNotification(NotificationType.ERROR, "start.sync.error.title",
                     "start.sync.error.course.message");
             return;
-        }
-        else if(config.getRecentSection() == null){
+        } else if (config.getRecentSection() == null) {
             showNotification(NotificationType.ERROR, "start.sync.error.title",
                     "start.sync.error.section.message");
             return;
         }
-            if(Files.isDirectory(Paths.get(config.getSyncRootPath())) == false) {
+        if (!Files.isDirectory(Paths.get(config.getSyncRootPath()))) {
             showNotification(NotificationType.ERROR, "start.sync.error.title",
                     "start.sync.error.path.message");
             return;
         }
         try {
+            //Open "sync-page".
             context.getEventBus().post(new ShowPresenterCommand<>(SyncPresenter.class));
         } catch (Throwable e) {
             logException(e, "Sync failed");
@@ -142,9 +169,12 @@ public class StartPresenter extends Presenter<StartView> {
         }
     }
 
-    private void updateCourses(){
-            view.setCourses(courses());
-            view.setSections(sections());
+    /**
+     * Method to update the displayed Moodle-Courses.
+     */
+    private void updateCourses() {
+        view.setCourses(courses());
+        view.setSections(sections());
     }
 
 }

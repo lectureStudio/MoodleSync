@@ -9,6 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+
+/**
+ * Class representing the necessary parameters of the http-response to the api-call: getSiteInfo.
+ *
+ * @author Daniel Schröter
+ */
 public class SiteInfo {
     private int userid;
 }

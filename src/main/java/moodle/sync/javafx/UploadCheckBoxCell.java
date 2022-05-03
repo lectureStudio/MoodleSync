@@ -11,7 +11,12 @@ import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.util.StringConverter;
 import moodle.sync.util.UploadElementTableItem;
 
-public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElementTableItem,Boolean> {
+/**
+ * Class used to display the selctedProperty-value inside a CheckBoxTreeTableCell.
+ *
+ * @author Daniel Schröter
+ */
+public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElementTableItem, Boolean> {
 
     private CheckBox checkBox;
 
@@ -24,20 +29,17 @@ public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElemen
     public void updateItem(Boolean item, boolean empty) {
         this.checkBox = new CheckBox();
 
-        super.updateItem(item,empty);
+        super.updateItem(item, empty);
 
         if (booleanProperty instanceof BooleanProperty) {
-            checkBox.selectedProperty().unbindBidirectional((BooleanProperty)booleanProperty);
+            checkBox.selectedProperty().unbindBidirectional((BooleanProperty) booleanProperty);
             booleanProperty = null;
         }
-
-
-
         if (empty) {
             setText(null);
             setGraphic(null);
-        }else if(getTableRow() != null){
-            if(getTableRow().getTreeItem() != null) {
+        } else if (getTableRow() != null) {
+            if (getTableRow().getTreeItem() != null) {
                 setDisable(!getTableRow().getTreeItem().getValue().isSelectable());
             }
         } else {
@@ -61,9 +63,8 @@ public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElemen
             ));
 
 
-            }
         }
-
+    }
 
 
     private ObservableValue<?> getSelectedProperty() {

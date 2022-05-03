@@ -6,10 +6,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 import moodle.sync.presenter.SettingsPresenter;
-import moodle.sync.presenter.StartPresenter;
 import moodle.sync.util.UserInputValidations;
 import moodle.sync.view.SettingsView;
-import moodle.sync.view.StartView;
 import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.beans.StringProperty;
 import org.lecturestudio.core.view.Action;
@@ -20,9 +18,13 @@ import org.lecturestudio.javafx.view.FxView;
 import org.lecturestudio.javafx.view.FxmlView;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Class implementing the functions of the "settings-page".
+ *
+ * @author Daniel Schröter
+ */
 @FxmlView(name = "main-settings", presenter = SettingsPresenter.class)
 public class FxSettingsView extends VBox implements SettingsView, FxView {
 
@@ -66,23 +68,37 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
         super();
     }
 
+    /**
+     * Exiting the "settings-page".
+     *
+     * @param action Users action.
+     */
     @Override
     public void setOnExit(Action action) {
-        //ftpfield.setTextFormatter(UserInputValidations.urlTextFormatter());
         FxUtils.bindAction(closesettingsButton, action);
     }
 
+    /**
+     * Input and inputvalidation of the Moodle-platform Url.
+     *
+     * @param moodleURL User input.
+     */
     @Override
-    public void setMoodleField(StringProperty moodleURL){
+    public void setMoodleField(StringProperty moodleURL) {
         moodleField.textProperty().bindBidirectional(new LectStringProperty(moodleURL));
         moodleField.textProperty().addListener(event -> {
             moodleField.pseudoClassStateChanged(
                     PseudoClass.getPseudoClass("error"),
-                            !moodleField.getText().matches("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")
+                    !moodleField.getText().matches("^(https?)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")
             );
         });
     }
 
+    /**
+     * Input of the Moodle-token.
+     *
+     * @param moodleToken User input.
+     */
     @Override
     public void setMoodleToken(StringProperty moodleToken) {
         tokenField.textProperty().bindBidirectional(new LectStringProperty(moodleToken));
@@ -94,8 +110,13 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
         });
     }
 
+    /**
+     * Input and inputvalidation of the fileserver url.
+     *
+     * @param ftpURL User input.
+     */
     @Override
-    public void setFtpField(StringProperty ftpURL){
+    public void setFtpField(StringProperty ftpURL) {
         ftpField.textProperty().bindBidirectional(new LectStringProperty(ftpURL));
         ftpField.textProperty().addListener(event -> {
             ftpField.pseudoClassStateChanged(
@@ -106,34 +127,64 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
         });
     }
 
+    /**
+     * Input and inputvalidation of the used port.
+     *
+     * @param ftpport User input.
+     */
     @Override
-    public void setFtpPort(StringProperty ftpport){
-        ftpPort.setTextFormatter(new TextFormatter<Integer>(new IntegerStringConverter(),0,UserInputValidations.numberValidationFormatter));
+    public void setFtpPort(StringProperty ftpport) {
+        ftpPort.setTextFormatter(new TextFormatter<Integer>(new IntegerStringConverter(), 0, UserInputValidations.numberValidationFormatter));
         ftpPort.textProperty().bindBidirectional(new LectStringProperty(ftpport));
     }
 
+    /**
+     * Input of the fileserver username.
+     *
+     * @param ftpuser User input.
+     */
     @Override
-    public void setFtpUser(StringProperty ftpuser){
+    public void setFtpUser(StringProperty ftpuser) {
         ftpUser.textProperty().bindBidirectional(new LectStringProperty(ftpuser));
     }
 
+    /**
+     * Input of the fileserver password.
+     *
+     * @param ftppassword User input.
+     */
     @Override
-    public void setFtpPassword(StringProperty ftppassword){
+    public void setFtpPassword(StringProperty ftppassword) {
         ftpPassword.textProperty().bindBidirectional(new LectStringProperty(ftppassword));
     }
 
+    /**
+     * Input of formats used to upload to the Moodle-Platform.
+     *
+     * @param moodleformats User input.
+     */
     @Override
     public void setFormatsMoodle(StringProperty moodleformats) {
         formatsMoodle.textProperty().bindBidirectional(new LectStringProperty(moodleformats));
     }
 
+    /**
+     * Input of formats used to upload to the fileserver.
+     *
+     * @param fileserverformats User input.
+     */
     @Override
     public void setFormatsFileserver(StringProperty fileserverformats) {
         formatsFileserver.textProperty().bindBidirectional(new LectStringProperty(fileserverformats));
     }
 
+    /**
+     * Input of the Root-Directory.
+     *
+     * @param path User input.
+     */
     @Override
-    public void setSyncRootPath(StringProperty path){
+    public void setSyncRootPath(StringProperty path) {
         syncRootPath.textProperty().bindBidirectional(new LectStringProperty(path));
         syncRootPath.textProperty().addListener(event -> {
             syncRootPath.pseudoClassStateChanged(
@@ -145,14 +196,23 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
 
     }
 
+    /**
+     * Opens the explorer.
+     *
+     * @param action User needs to click a button.
+     */
     @Override
     public void setSelectSyncRootPath(Action action) {
         FxUtils.bindAction(syncRootPathButton, action);
     }
 
-
+    /**
+     * User can set if files with unknownFormats should be shown in the "sync-table".
+     *
+     * @param unknownFormats User Input CheckBox.
+     */
     @Override
-    public void setShowUnknownFormats(BooleanProperty unknownFormats){
+    public void setShowUnknownFormats(BooleanProperty unknownFormats) {
         showUnknownFormats.selectedProperty().bindBidirectional(new LectBooleanProperty(unknownFormats));
     }
 }

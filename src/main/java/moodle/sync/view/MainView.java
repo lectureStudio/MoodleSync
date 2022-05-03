@@ -8,24 +8,27 @@ import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.View;
 import org.lecturestudio.core.view.ViewLayer;
 
+/**
+ * Interface defining the functions of the "main-window".
+ */
 public interface MainView extends View {
 
-	Rectangle2D getBounds();
+    Rectangle2D getBounds();
 
-	void close();
+    void close();
 
-	void hide();
+    void hide();
 
-	void removeView(View view, ViewLayer layer);
+    void removeView(View view, ViewLayer layer);
 
-	void showView(View view, ViewLayer layer);
+    void showView(View view, ViewLayer layer);
 
-	void setFullscreen(boolean fullscreen);
+    void setFullscreen(boolean fullscreen);
 
-	void setOnKeyEvent(Predicate<KeyEvent> action);
+    void setOnKeyEvent(Predicate<KeyEvent> action);
 
-	void setOnShown(Action action);
+    void setOnShown(Action action);
 
-	void setOnClose(Action action);
+    void setOnClose(Action action);
 
 }

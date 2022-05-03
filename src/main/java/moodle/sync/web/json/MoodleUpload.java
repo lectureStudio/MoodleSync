@@ -13,6 +13,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 
+/**
+ * Class representing the response-object of a file upload.
+ *
+ * @author Daniel Schröter
+ */
 public class MoodleUpload {
     private String filename;
     private Long itemid;

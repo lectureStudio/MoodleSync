@@ -5,6 +5,11 @@ import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import moodle.sync.web.json.Course;
 
+/**
+ * Class implementing Courses as the content of a ComboBox.
+ *
+ * @author Daniel Schröter
+ */
 
 public class CourseCellFactory implements Callback<ListView<Course>, ListCell<Course>> {
 

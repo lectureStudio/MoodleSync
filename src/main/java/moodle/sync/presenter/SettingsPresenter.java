@@ -3,12 +3,10 @@ package moodle.sync.presenter;
 import moodle.sync.config.DefaultConfiguration;
 import moodle.sync.config.MoodleSyncConfiguration;
 import moodle.sync.view.SettingsView;
-import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
+
 import org.lecturestudio.core.app.ApplicationContext;
-import org.lecturestudio.core.beans.StringProperty;
 import org.lecturestudio.core.presenter.Presenter;
-import org.lecturestudio.core.presenter.command.CloseApplicationCommand;
 import org.lecturestudio.core.view.DirectoryChooserView;
 import org.lecturestudio.core.view.ViewContextFactory;
 
@@ -17,15 +15,21 @@ import java.io.File;
 
 import static java.util.Objects.nonNull;
 
+/**
+ * Class defining the logic of the "settings-page".
+ *
+ * @author Daniel Schröter
+ */
 public class SettingsPresenter extends Presenter<SettingsView> {
 
     private final ViewContextFactory viewFactory;
 
+    //Used MoodleService for executing Web Service API-Calls.
     private final MoodleService moodleService;
 
     @Inject
     SettingsPresenter(ApplicationContext context, SettingsView view,
-                   ViewContextFactory viewFactory, MoodleService moodleService) {
+                      ViewContextFactory viewFactory, MoodleService moodleService) {
         super(context, view);
 
         this.moodleService = moodleService;
@@ -34,9 +38,9 @@ public class SettingsPresenter extends Presenter<SettingsView> {
 
     @Override
     public void initialize() {
-
         MoodleSyncConfiguration config = (MoodleSyncConfiguration) context.getConfiguration();
 
+        //Initialising all functions of the "settings-page" with the help of the configuration.
         view.setOnExit(this::close);
         view.setMoodleField(config.moodleUrlProperty());
         view.setFormatsMoodle(config.formatsMoodleProperty());
@@ -51,25 +55,31 @@ public class SettingsPresenter extends Presenter<SettingsView> {
         view.setShowUnknownFormats(config.showUnknownFormatsProperty());
     }
 
+    /**
+     * Function to close the "settings-page".
+     */
     @Override
-    public void close(){
+    public void close() {
         MoodleSyncConfiguration config = (MoodleSyncConfiguration) context.getConfiguration();
+        //Reconstruct the MoodleService with the new settings.
         moodleService.setApiUrl(config.getMoodleUrl());
         super.close();
     }
 
+    /**
+     * Providing the functionality to choose a Root-Directory.
+     */
     private void selectSyncPath() {
         MoodleSyncConfiguration config = (MoodleSyncConfiguration) context.getConfiguration();
         String syncPath = config.getSyncRootPath();
-        if(syncPath == null || syncPath.isEmpty() || syncPath.isBlank()){
+        //Check whether a default path should be used to prevent unwanted behavior.
+        if (syncPath == null || syncPath.isEmpty() || syncPath.isBlank()) {
             DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
             syncPath = defaultConfiguration.getSyncRootPath();
         }
         File initDirectory = new File(syncPath);
-
         DirectoryChooserView dirChooser = viewFactory.createDirectoryChooserView();
         dirChooser.setInitialDirectory(initDirectory);
-
         File selectedFile = dirChooser.show(view);
 
         if (nonNull(selectedFile)) {

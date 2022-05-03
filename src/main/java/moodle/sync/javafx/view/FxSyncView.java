@@ -19,8 +19,12 @@ import org.lecturestudio.javafx.view.FxmlView;
 
 import java.util.List;
 
-
-@FxmlView(name = "main-sync", presenter =  SyncPresenter.class)
+/**
+ * Class implementing the functions of the "sync-page".
+ *
+ * @author Daniel Schröter
+ */
+@FxmlView(name = "main-sync", presenter = SyncPresenter.class)
 public class FxSyncView extends VBox implements SyncView, FxView {
 
     @FXML
@@ -37,26 +41,48 @@ public class FxSyncView extends VBox implements SyncView, FxView {
     }
 
 
+    /**
+     * Closes the "sync-page" and returns to "start-page".
+     *
+     * @param action User presses button.
+     */
     @Override
-    public void setOnClose(Action action){
+    public void setOnClose(Action action) {
         FxUtils.bindAction(closeButton, action);
     }
 
+    /**
+     * Starts the execution of the sync-process.
+     *
+     * @param action User presses button.
+     */
     @Override
-    public void setOnSync(Action action){
+    public void setOnSync(Action action) {
         FxUtils.bindAction(finalSyncButton, action);
     }
+
+    /**
+     * Displays the UploadData.
+     *
+     * @param files UploadData to show.
+     */
     @Override
-    public void setFiles(List<UploadData> files){
+    public void setFiles(List<UploadData> files) {
         FxUtils.invoke(() -> {
-           //syncItemsTableView.getItems().clear();
+            //syncItemsTableView.getItems().clear();
             TreeItem<UploadElementTableItem> root = new TreeItem<UploadElementTableItem>(new UploadElementTableItem("", ""));
             filesHandler(files, root);
             syncItemsTableView.setRoot(root);
         });
     }
 
-    private void filesHandler(List<UploadData> files, TreeItem<UploadElementTableItem> root){
+    /**
+     * Recursive method needed to show directories as a TreeTable.
+     *
+     * @param files UploadData inside a directory.
+     * @param root  Root-element for this branch.
+     */
+    private void filesHandler(List<UploadData> files, TreeItem<UploadElementTableItem> root) {
         for (UploadData file : files) {
             if (file instanceof UploadElement) {
                 root.getChildren().add(new TreeItem<UploadElementTableItem>(new UploadElementTableItem((UploadElement) file)));

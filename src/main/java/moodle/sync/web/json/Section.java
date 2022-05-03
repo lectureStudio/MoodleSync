@@ -13,13 +13,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 
+/**
+ * Class representing a course-section.
+ *
+ * @author Daniel Schröter
+ */
 public class Section {
     private Integer id;
     private String name;
     private Integer visible;
     private String summary;
     private Integer summaryformat;
-    private Integer section; //Sectionnummer innerhalb des Kurses
+    private Integer section;
     private Integer hiddenbynumsections;
     private Boolean uservisible;
     private List<Module> modules;

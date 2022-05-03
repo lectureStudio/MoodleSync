@@ -8,6 +8,11 @@ import org.lecturestudio.core.view.View;
 
 import java.util.List;
 
+/**
+ * Interface defining the functions of the "sync-page".
+ *
+ * @author Daniel Schröter
+ */
 public interface SyncView extends View {
 
     void setOnClose(Action action);
@@ -15,7 +20,5 @@ public interface SyncView extends View {
     void setOnSync(Action action);
 
     void setFiles(List<UploadData> files);
-
-
 
 }

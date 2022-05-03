@@ -4,6 +4,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<!--
+    In this document, the layout of the "settings-page" is defined
+    @author Daniel Schröter
+-->
+
 <fx:root alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" type="VBox" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label alignment="TOP_CENTER" text="%settings.settings">

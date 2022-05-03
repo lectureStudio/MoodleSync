@@ -2,14 +2,14 @@ package moodle.sync.presenter;
 
 import moodle.sync.config.MoodleSyncConfiguration;
 import moodle.sync.fileserver.FileServerClientFTP;
-import moodle.sync.util.FileServerFile;
+import moodle.sync.fileserver.FileServerFile;
 import moodle.sync.util.FileService;
 import moodle.sync.util.MoodleAction;
 import moodle.sync.util.UploadData.UploadData;
 import moodle.sync.util.UploadData.UploadElement;
 import moodle.sync.util.UploadData.UploadFolderElement;
 import moodle.sync.view.SyncView;
-import moodle.sync.web.MoodleUploadTemp;
+import moodle.sync.web.service.MoodleUploadTemp;
 import moodle.sync.web.json.Content;
 import moodle.sync.web.json.Module;
 import moodle.sync.web.json.MoodleUpload;
@@ -29,22 +29,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Class defining the logic of the "sync-page". The sync-process is prepared and executed inside this class.
+ *
+ * @author Daniel Schröter
+ */
 public class SyncPresenter extends Presenter<SyncView> {
 
+    //Configuration providing the settings.
     private final MoodleSyncConfiguration config;
 
+    //Used MoodleService for executing Web Service API-Calls.
     private final MoodleService moodleService;
 
+    //Course-modules of chooses Moodle-Course.
     private List<Module> modules;
 
+    //Directories inside the choosen director.
     private List<Module> directories;
 
+    //Content of the course-directory.
     private List<UploadData> uploadElements;
 
+    //Already uploaded files on the fileserver.
     private List<FileServerFile> files = List.of();
 
+    //Client used for communication with the fileserver.
     private FileServerClientFTP fileClient;
-
 
     @Inject
     SyncPresenter(ApplicationContext context, SyncView view, MoodleService moodleService) {
@@ -56,7 +67,7 @@ public class SyncPresenter extends Presenter<SyncView> {
 
     @Override
     public void initialize() {
-
+        //Initialising all functions of the "sync-page" .
         uploadElements = prepareSync();
 
         view.setFiles(uploadElements);
@@ -64,30 +75,35 @@ public class SyncPresenter extends Presenter<SyncView> {
         view.setOnClose(this::close);
     }
 
+    /**
+     * Method used to prepare the sync-table.
+     *
+     * @return list containing UploadData which could be displayed in the sync-table.
+     */
     public List<UploadData> prepareSync() {
         List<UploadData> fileList = new ArrayList<>();
         try {
-            //Update Recent Secton
+            //Update recent course-section.
             config.setRecentSection(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
 
             //Create Directory if not existed
-
             Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
             FileService.directoryManager(execute);
-
 
             //List containing all files in directory
             fileList = FileService.getFilesInDirectory(execute);
 
+            //Check whether a fileserver is required depending on fileformats inside the local diretory.
             List<Path> pathList = FileService.fileServerRequired(execute);
             boolean fileServerRequired = false;
 
             for (Path file : pathList) {
-               if (contains(config.getFormatsFileserver().split(","), FilenameUtils.getExtension(file.getFileName().toString())) && !Files.isDirectory(file)) {
+                if (contains(config.getFormatsFileserver().split(","), FilenameUtils.getExtension(file.getFileName().toString())) && !Files.isDirectory(file)) {
                     fileServerRequired = true;
                 }
             }
 
+            //If needed, establish connection to the fileserver and gathering all files regarding to the Moodle-course. Close connection afterwars.
             if (fileServerRequired) {
                 String url = config.getFileserver();
                 String user = config.getUserFileserver();
@@ -99,7 +115,7 @@ public class SyncPresenter extends Presenter<SyncView> {
                     try {
                         fileClient = new FileServerClientFTP(config);
                         fileClient.connect();
-                        files = fileClient.getFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> Directory angeben, wahrscheinlich nach Kursen
+                        files = fileClient.getFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> If there should be support for different upload-sections.
                         fileClient.disconnect();
                     } catch (Exception e) {
                         logException(e, "Sync failed");
@@ -109,6 +125,8 @@ public class SyncPresenter extends Presenter<SyncView> {
                     }
                 }
             }
+
+            //Gather all needed course-modules inside the Moodle-course.
             modules = FileService.getModulesByType("resource", config.getRecentSection());
 
             directories = FileService.getModulesByType("folder", config.getRecentSection());
@@ -123,7 +141,7 @@ public class SyncPresenter extends Presenter<SyncView> {
                 }
             }
 
-            //Iteriertes vorgehen über jedes Element von List<UploadData>
+            //manipulate the list containing elements of the type UploadData representing the local files based on gathered information.
             checkUploadData(fileList);
 
         } catch (Throwable e) {
@@ -134,13 +152,23 @@ public class SyncPresenter extends Presenter<SyncView> {
         return fileList;
     }
 
+    /**
+     * Method manipulate the list containing elements of the type UploadData representing the local files. Formats and already uploaded files are inspected.
+     *
+     * @param data list to manipulate.
+     * @throws IOException
+     */
     private void checkUploadData(List<UploadData> data) throws IOException {
+        //List to remove not needed elements afterwards.
         List<UploadData> remove = new ArrayList<>();
+        //Each element is handled individually.
         for (UploadData item : data) {
+            //Recursive method-call if UplaodData is element of UploadFolderElement.
             if (item instanceof UploadFolderElement) {
                 checkUploadData(((UploadFolderElement) item).getContent());
             } else if (item instanceof UploadElement) {
                 Path path = item.getPath();
+                //Treatment defined by fileformat.
                 if (contains(config.getFormatsFileserver().split(","), FilenameUtils.getExtension(path.getFileName().toString()))) {
                     UploadElement temp = FileService.CheckFileServerModule(files, path);
                     if (temp != null) {
@@ -168,25 +196,27 @@ public class SyncPresenter extends Presenter<SyncView> {
                 }
                 //Case: type not found
                 else {
-                    if(config.showUnknownFormatsProperty().get()){
+                    if (config.showUnknownFormatsProperty().get()) {
                         ((UploadElement) item).setUploaded(false);
                         ((UploadElement) item).setIfuploaded(0);
                         ((UploadElement) item).setChecked(false);
                         ((UploadElement) item).setAction(MoodleAction.DatatypeNotKnown);
                         ((UploadElement) item).setSelectable(false);
                         ((UploadElement) item).setFileName(path.getFileName().toString());
-                    }
-                    else{
+                    } else {
                         remove.add(item);
                     }
                 }
             }
         }
+        //Removal of already uploaded data.
         for (UploadData rem : remove) {
             data.remove(rem);
         }
+
+        //Removal of empty directories.
         List<UploadData> removeDirectories = new ArrayList<>();
-        for(UploadData file : data){
+        for (UploadData file : data) {
             if (file instanceof UploadFolderElement) {
                 if (((UploadFolderElement) file).getContent().isEmpty()) {
                     removeDirectories.add(file);
@@ -198,8 +228,12 @@ public class SyncPresenter extends Presenter<SyncView> {
         }
     }
 
+    /**
+     * Executes the synchronisation-process.
+     */
     private void execute() {
         try {
+            //Check if a fileserver is needed.
             List<UploadData> sync = uploadElements;
             boolean fileServerRequired = false;
             for (UploadData item : sync) {
@@ -210,11 +244,12 @@ public class SyncPresenter extends Presenter<SyncView> {
                     }
                 }
             }
-
+            //If needed connect to it.
             if (fileServerRequired) {
                 fileClient.connect();
             }
 
+            //Call of methods to execute the individual synchronisation.
             for (UploadData item : sync) {
                 if (item instanceof UploadElement) {
                     UploadHandler((UploadElement) item);
@@ -234,15 +269,20 @@ public class SyncPresenter extends Presenter<SyncView> {
         close();
     }
 
-    public static boolean contains(final String[] arr, final String key) {
-        return Arrays.asList(arr).contains(key);
-    }
 
+    /**
+     * Executes the synchronisation of a single file.
+     *
+     * @param item file to synchronize.
+     */
     private void UploadHandler(UploadElement item) {
+        //Individual treatment based of the MoodleAction. Item must be checked.
         if (item.getAction() == MoodleAction.MoodleUpload && item.getChecked().get()) {
             MoodleUploadTemp uploader = new MoodleUploadTemp();
             try {
+                //Upload of the file to the Moodle-platform.
                 MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
+                //Publish it in the Moodle-course.
                 moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), item.getFileNameAsString());
             } catch (Exception e) {
                 logException(e, "Sync failed");
@@ -254,8 +294,11 @@ public class SyncPresenter extends Presenter<SyncView> {
             Module online = modules.get(item.getIfuploaded());
             try {
                 MoodleUploadTemp uploader = new MoodleUploadTemp();
+                //Upload of the new file to the Moodle-platform.
                 MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
+                //Publish it in the Moodle-course above the old course-module containing the old file.
                 moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename(), online.getId());
+                //Removal of the old course-module.
                 moodleService.removeResource(config.getMoodleToken(), online.getId());
             } catch (Exception e) {
                 logException(e, "Sync failed");
@@ -264,18 +307,27 @@ public class SyncPresenter extends Presenter<SyncView> {
                         "sync.sync.error.upload.message");
             }
         } else if (item.getAction() == MoodleAction.FTPUpload && item.getChecked().get()) {
+            //Fileserver upload.
             String url = fileClient.uploadFile(item, config.getRecentCourse().getDisplayname());
+            //Publish the new Url in the Moodle-course.
             moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), item.getPath().getFileName().toString(), url);
         } else if ((item.getAction() == MoodleAction.FTPSynchronize && item.getChecked().get())) {
-            //Depends on fileserver -> does the url change?
+            //Update the file on the fileserver.
             fileClient.uploadFile(item, config.getRecentCourse().getDisplayname());
         }
     }
 
+    /**
+     * Method which executes the synchronization of directories with the Moodle-Platform.
+     *
+     * @param item UploadFolderElement to synchronize.
+     * @throws IOException
+     */
     private void UploadHandlerFolder(UploadFolderElement item) throws IOException {
-        //Checken ob irgendeine Datei verändert werden soll:
+        //Check if a file inside the element should be synchronized.
         boolean sync = item.getChecked().get();
 
+        //Check if the directory should be newly created or updated.
         boolean isnew = true;
         for (Module dir : directories) {
             if (item.getPath().getFileName().toString().equals(dir.getName())) {
@@ -284,26 +336,28 @@ public class SyncPresenter extends Presenter<SyncView> {
             }
         }
 
-        //Folgender Teil Nötig wegen fehlender Moodle Plugin Unterstützung -> add files to folder
+
+        //Create list of UploadData with files which correspond to the supported fileformats.
         List<UploadData> filesInDirectory = FileService.getFilesInDirectory(item.getPath());
         List<UploadData> filesAsContent = new ArrayList<UploadData>();
-        for(UploadData itemInDirectory : filesInDirectory){
-            if(contains(config.getFormatsMoodle().split(","), FilenameUtils.getExtension(itemInDirectory.getPath().getFileName().toString()))){
+        for (UploadData itemInDirectory : filesInDirectory) {
+            if (contains(config.getFormatsMoodle().split(","), FilenameUtils.getExtension(itemInDirectory.getPath().getFileName().toString()))) {
                 filesAsContent.add(itemInDirectory);
             }
         }
         item.setContent(filesAsContent);
-        //if (((UploadFolderElement) item).getAction() == MoodleAction.MoodleUpload) {
-        System.out.println(item.getChecked().toString());
-        if(sync && isnew){
+        //If directory should be newly created.
+        if (sync && isnew) {
             try {
                 MoodleUploadTemp uploader = new MoodleUploadTemp();
+                //Upload all files in same area.
                 MoodleUpload upload = uploader.upload(item.getContent().get(0).getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString() + "/" + item.getContent().get(0).getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
                 if (item.getContent().size() > 1) {
                     for (int i = 1; i < item.getContent().size(); i++) {
                         uploader.upload(item.getContent().get(i).getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString() + "/" + item.getContent().get(i).getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken() + "&itemid=" + upload.getItemid());
                     }
                 }
+                //Publish data by creating the course-module.
                 moodleService.setFolder(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), item.getPath().getFileName().toString());
             } catch (Exception e) {
                 logException(e, "Sync failed");
@@ -312,19 +366,20 @@ public class SyncPresenter extends Presenter<SyncView> {
                         MessageFormat.format(context.getDictionary().get("sync.sync.error.upload.message"), item.getPath().getFileName().toString()));
             }
         }
-        //if (((UploadFolderElement) item).getAction() == MoodleAction.MoodleSynchronize) {
-        if(sync && !isnew){
-            //Gleiche Logik -> neu anlegen und alles aber alten Ordner löschen und dieses an die Position setzen
-            //Gleichen Ordner finden
+        //If directory should be updated.
+        if (sync && !isnew) {
             try {
                 MoodleUploadTemp uploader = new MoodleUploadTemp();
+                //Upload all files in same area
                 MoodleUpload upload = uploader.upload(item.getContent().get(0).getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString() + "/" + item.getContent().get(0).getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
                 if (item.getContent().size() > 1) {
                     for (int i = 1; i < item.getContent().size(); i++) {
                         uploader.upload(item.getContent().get(i).getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString() + "/" + item.getContent().get(i).getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken() + "&itemid=" + upload.getItemid());
                     }
                 }
+                //Publish data by creating the course-module above old course-module.
                 moodleService.setFolder(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), item.getPath().getFileName().toString(), item.getIfuploaded());
+                //Remove old course-module.
                 moodleService.removeResource(config.getMoodleToken(), item.getIfuploaded());
             } catch (Exception e) {
                 logException(e, "Sync failed");
@@ -335,5 +390,9 @@ public class SyncPresenter extends Presenter<SyncView> {
 
 
         }
+    }
+
+    public static boolean contains(final String[] arr, final String key) {
+        return Arrays.asList(arr).contains(key);
     }
 }

@@ -1,4 +1,4 @@
-package moodle.sync.util;
+package moodle.sync.fileserver;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+
+/**
+ * Class representing a file uploaded to a fileserver.
+ *
+ * @author Daniel Schröter
+ */
 public class FileServerFile {
 
     private String filename;

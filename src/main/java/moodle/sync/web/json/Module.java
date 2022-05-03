@@ -12,15 +12,21 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 
+/**
+ * Class representing a course-module.
+ *
+ * @author Daniel Schröter
+ */
 public class Module {
     private Integer id;
     private String url;
     private String name;
-    private Integer instance;  //instance id
-    private Integer contextid;//Activity context id.
-    private Boolean uservisible;//Is the module visible for the user?
+    private Integer instance;
+    private Integer contextid;
+    private Boolean uservisible;
     private String modname;
     private List<Content> contents;
+
 
     public Module(List<Content> contents){
         this.contents = contents;

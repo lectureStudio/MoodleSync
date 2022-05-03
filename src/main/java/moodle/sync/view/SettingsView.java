@@ -5,6 +5,11 @@ import org.lecturestudio.core.beans.StringProperty;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.View;
 
+/**
+ * Interface defining the functions of the "settings-page".
+ *
+ * @author Daniel Schröter
+ */
 public interface SettingsView extends View {
 
     void setOnExit(Action action);

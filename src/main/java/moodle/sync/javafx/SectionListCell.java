@@ -6,6 +6,11 @@ import moodle.sync.web.json.Section;
 
 import static java.util.Objects.isNull;
 
+/**
+ * Class used to display the name of a Section inside a ListCell.
+ *
+ * @author Daniel Schröter
+ */
 public class SectionListCell extends ListCell<Section> {
 
     @Override
@@ -16,8 +21,7 @@ public class SectionListCell extends ListCell<Section> {
 
         if (isNull(item) || empty) {
             setText("");
-        }
-        else {
+        } else {
             setText(item.getName());
         }
     }

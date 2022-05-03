@@ -10,6 +10,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 
+/**
+ * Class representing a course-modules content.
+ *
+ * @author Daniel Schröter
+ */
 public class Content {
     private String filename;
     private Long timemodified;
