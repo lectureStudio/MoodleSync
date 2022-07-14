@@ -8,9 +8,7 @@ import moodle.sync.presenter.command.ShowSettingsCommand;
 import moodle.sync.web.json.*;
 
 import org.lecturestudio.core.app.ApplicationContext;
-import org.lecturestudio.core.beans.ChangeListener;
 import org.lecturestudio.core.beans.ObjectProperty;
-import org.lecturestudio.core.beans.Observable;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.presenter.command.CloseApplicationCommand;
 import org.lecturestudio.core.presenter.command.ShowPresenterCommand;
@@ -21,7 +19,6 @@ import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
 
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -111,7 +108,9 @@ public class StartPresenter extends Presenter<StartView> {
         }
 
         //Do not show Moodle-courses which are already over.
-        courses.removeIf(item -> (item.getEnddate() != 0 && item.getEnddate() < System.currentTimeMillis()));
+        if (!courses.isEmpty()) {
+            courses.removeIf(item -> (item.getEnddate() != 0 && item.getEnddate() < System.currentTimeMillis()));
+        }
         return courses;
     }
 

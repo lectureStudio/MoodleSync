@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+	<title>${package.name}</title>
+	<license file="license.rtf" />
+    <pkg-ref id="moodle.sync"/>
+    <options customize="never" require-scripts="false"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="moodle.sync"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="moodle.sync" visible="false">
+        <pkg-ref id="moodle.sync"/>
+    </choice>
+    <pkg-ref id="moodle.sync" version="${package.version}" onConclusion="none">${package.full.name}.pkg</pkg-ref>
+</installer-gui-script>

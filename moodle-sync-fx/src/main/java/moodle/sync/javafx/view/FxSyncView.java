@@ -1,6 +1,5 @@
 package moodle.sync.javafx.view;
 
-
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.TreeItem;
@@ -70,7 +69,7 @@ public class FxSyncView extends VBox implements SyncView, FxView {
     public void setFiles(List<UploadData> files) {
         FxUtils.invoke(() -> {
             //syncItemsTableView.getItems().clear();
-            TreeItem<UploadElementTableItem> root = new TreeItem<UploadElementTableItem>(new UploadElementTableItem("", ""));
+            TreeItem<UploadElementTableItem> root = new TreeItem<>(new UploadElementTableItem("root", ""));
             filesHandler(files, root);
             syncItemsTableView.setRoot(root);
         });
@@ -85,9 +84,9 @@ public class FxSyncView extends VBox implements SyncView, FxView {
     private void filesHandler(List<UploadData> files, TreeItem<UploadElementTableItem> root) {
         for (UploadData file : files) {
             if (file instanceof UploadElement) {
-                root.getChildren().add(new TreeItem<UploadElementTableItem>(new UploadElementTableItem((UploadElement) file)));
+                root.getChildren().add(new TreeItem<>(new UploadElementTableItem((UploadElement) file)));
             } else if (file instanceof UploadFolderElement) {
-                TreeItem<UploadElementTableItem> dir = new TreeItem<UploadElementTableItem>(new UploadElementTableItem((UploadFolderElement) file, "Mit Moodle Synchronisieren", true));
+                TreeItem<UploadElementTableItem> dir = new TreeItem<>(new UploadElementTableItem((UploadFolderElement) file, "Mit Moodle synchronisieren", true));
                 filesHandler(((UploadFolderElement) file).getContent(), dir);
                 root.getChildren().add(dir);
             }
