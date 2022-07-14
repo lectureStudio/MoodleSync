@@ -41,6 +41,11 @@ public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElemen
         } else if (getTableRow() != null) {
             if (getTableRow().getTreeItem() != null) {
                 setDisable(!getTableRow().getTreeItem().getValue().isSelectable());
+
+                var parent = getTableRow().getTreeItem().getParent();
+                if(!parent.getValue().getFileName().equals("root")){
+                    setGraphic(null);
+                }
             }
         } else {
             StringConverter<Boolean> c = getConverter();
