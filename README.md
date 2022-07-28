@@ -8,3 +8,6 @@ consuming, the objective of this project was to develop a desktop application us
 synchronization between a local directory and the learning platform Moodle. Futhermore a Moodle plugin was developed.
 
 Works with following plugin for Moodle: https://github.com/lectureStudio/moodle-local_sync_service.
+
+## Screenshot
+![Main view](https://github.com/lectureStudio/MoodleSync/blob/main/doc/readme/mainpage.png)
