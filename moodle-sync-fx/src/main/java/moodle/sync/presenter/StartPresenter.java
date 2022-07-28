@@ -2,13 +2,23 @@ package moodle.sync.presenter;
 
 import javax.inject.Inject;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import moodle.sync.config.DefaultConfiguration;
 import moodle.sync.config.MoodleSyncConfiguration;
 import moodle.sync.presenter.command.ShowSettingsCommand;
+import moodle.sync.util.FileService;
+import moodle.sync.util.MoodleAction;
+import moodle.sync.util.UploadData.UploadData;
+import moodle.sync.util.UploadData.UploadElement;
+import moodle.sync.util.syncTableElement;
 import moodle.sync.web.json.*;
 
+import moodle.sync.web.json.Module;
+import moodle.sync.web.service.MoodleUploadTemp;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.beans.ObjectProperty;
+import org.lecturestudio.core.beans.Observable;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.presenter.command.CloseApplicationCommand;
 import org.lecturestudio.core.presenter.command.ShowPresenterCommand;
@@ -19,9 +29,13 @@ import moodle.sync.view.StartView;
 import moodle.sync.web.service.MoodleService;
 
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Objects.isNull;
 
 /**
  * Class defining the logic of the "start-page".
@@ -39,7 +53,9 @@ public class StartPresenter extends Presenter<StartView> {
     private final MoodleSyncConfiguration config;
 
     //Providing the content of a course. Used for the section-combobox.
-    private List<Section> coursecontent;
+    private List<Section> courseContent;
+
+    private ObservableList<syncTableElement> courseData;
 
 
     @Inject
@@ -62,7 +78,7 @@ public class StartPresenter extends Presenter<StartView> {
             DefaultConfiguration defaultConfiguration = new DefaultConfiguration();
             config.setSyncRootPath(defaultConfiguration.getSyncRootPath());
         }
-        view.setOnExit(this::onExit);
+
         view.setOnSync(this::onSync);
         view.setOnSettings(this::onSettings);
         view.setCourse(config.recentCourseProperty());
@@ -70,11 +86,19 @@ public class StartPresenter extends Presenter<StartView> {
         view.setSection(config.recentSectionProperty());
         view.setSections(sections());
         view.setOnCourseChanged(this::onCourseChanged);
+        view.setData(setData());
+
 
         //Display the course-sections after Moodle-course is choosen.
         config.recentCourseProperty().addListener((observable, oldCourse, newCourse) -> {
+            config.setRecentSection(null);
             view.setSections(sections());
             view.setSection(new ObjectProperty<Section>());
+            view.setData(setData());
+        });
+
+        config.recentSectionProperty().addListener((observable, oldSection, newSection) -> {
+            view.setData(setData());
         });
     }
 
@@ -126,7 +150,7 @@ public class StartPresenter extends Presenter<StartView> {
             return dummy;
         }
         List<Section> content = moodleService.getCourseContent(config.getMoodleToken(), config.getRecentCourse().getId());
-        coursecontent = content;
+        courseContent = content;
         return content;
     }
 
@@ -134,22 +158,15 @@ public class StartPresenter extends Presenter<StartView> {
         context.getEventBus().post(new ShowSettingsCommand(this::updateCourses));
     }
 
-    private void onExit() {
-        context.getEventBus().post(new CloseApplicationCommand());
-    }
 
     /**
      * Starts the sync-process.
      */
-    private void onSync() {
+    private void onSync(){
         //Serveral security checks to prevent unwanted behaviour.
         if (config.getRecentCourse() == null) {
             showNotification(NotificationType.ERROR, "start.sync.error.title",
                     "start.sync.error.course.message");
-            return;
-        } else if (config.getRecentSection() == null) {
-            showNotification(NotificationType.ERROR, "start.sync.error.title",
-                    "start.sync.error.section.message");
             return;
         }
         if (!Files.isDirectory(Paths.get(config.getSyncRootPath()))) {
@@ -157,15 +174,51 @@ public class StartPresenter extends Presenter<StartView> {
                     "start.sync.error.path.message");
             return;
         }
-        try {
-            //Open "sync-page".
-            context.getEventBus().post(new ShowPresenterCommand<>(SyncPresenter.class));
-        } catch (Throwable e) {
-            logException(e, "Sync failed");
+        for (syncTableElement courseData : courseData) {
+            if(courseData.isSelected()){
+                if(courseData.getModuleType().equals("resource")){
+                    if(courseData.getAction() == MoodleAction.MoodleUpload){
+                        try {
+                            MoodleUploadTemp uploader = new MoodleUploadTemp();
+                            //Upload of the file to the Moodle-platform.
+                            MoodleUpload upload = uploader.upload(courseData.getExistingFileName(), courseData.getExistingFile(), config.getMoodleUrl(), config.getMoodleToken());
+                            //Publish it in the Moodle-course.
+                            if(courseData.getBeforemod() == -1) {
+                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getModuleName());
+                            } else{
+                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getModuleName(), courseData.getBeforemod());
+                            }
+                        } catch (Exception e) {
+                            logException(e, "Sync failed");
 
-            showNotification(NotificationType.ERROR, "start.sync.error.title",
-                    "start.sync.error.message");
+                            showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                                    MessageFormat.format(context.getDictionary().get("sync.sync.error.upload.message"), courseData.getModuleName()));
+                        }
+                    }
+                    else if(courseData.getAction() == MoodleAction.MoodleSynchronize){
+                        try{
+                            MoodleUploadTemp uploader = new MoodleUploadTemp();
+                            //Upload of the new file to the Moodle-platform.
+                            MoodleUpload upload = uploader.upload(courseData.getExistingFileName(), courseData.getExistingFile(), config.getMoodleUrl(), config.getMoodleToken());
+                            //Publish it in the Moodle-course above the old course-module containing the old file.
+                            if(courseData.getBeforemod() == -1) {
+                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getModuleName(), courseData.getCmid());
+                            } else{
+                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getModuleName(), courseData.getBeforemod());
+                            }
+                            //Removal of the old course-module.
+                            moodleService.removeResource(config.getMoodleToken(), courseData.getCmid());
+                        } catch (Exception e) {
+                            logException(e, "Sync failed");
+
+                            showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                                    "sync.sync.error.upload.message");
+                        }
+                    }
+                }
+            }
         }
+        updateCourses();
     }
 
     /**
@@ -174,6 +227,70 @@ public class StartPresenter extends Presenter<StartView> {
     private void updateCourses() {
         view.setCourses(courses());
         view.setSections(sections());
+        view.setData(setData());
+    }
+
+    private ObservableList<syncTableElement> setData() {
+        if(!isNull(config.getRecentSection())){
+            courseContent.clear();
+            courseContent.add(config.getRecentSection());
+        }
+        ObservableList<syncTableElement> data = FXCollections.observableArrayList();
+        for(Section section : courseContent){
+            int sectionId = section.getSection();
+            data.add(new syncTableElement(section.getName(), section.getId(), sectionId, "section",false, false, null));
+            //Datenfpad zu Sektionsordner, wird erstellt falls nicht vorhanden
+            Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + section.getName());
+            FileService.directoryManager(execute);
+
+            //Alle Dateien auslesen
+            try {
+                List<Path> fileList = FileService.getPathsInDirectory(execute);
+
+            for(Module module : section.getModules()){
+                if(module.getModname().equals("resource")){
+                    boolean found = false;
+                    for(int i = 0; i < fileList.size(); i++){
+                        if(fileList.get(i).getFileName().toString().equals(module.getContents().get(0).getFilename())){
+                            //schauen ob neuer oder älter -> Todo
+                            long onlinemodified = module.getContents().get(0).getTimemodified() * 1000;
+                            long filemodified = Files.getLastModifiedTime(fileList.get(i)).toMillis();
+                            //Check if local file is newer.
+                            if (filemodified > onlinemodified) {
+                                found = true;
+                                data.add(new syncTableElement(module.getName(), module.getId(), sectionId,module.getModname(), fileList.get(i), true,false, MoodleAction.MoodleSynchronize));
+                                fileList.remove(i);
+                                break;
+                            } else {
+                                found = true;
+                                data.add(new syncTableElement(module.getName(), module.getId(), sectionId,module.getModname(), fileList.get(i), false,false, MoodleAction.ExistingFile));
+                                fileList.remove(i);
+                                break;
+                            }
+                        }
+                    }
+                    if(!found){
+                        data.add(new syncTableElement(module.getName(), module.getId(), sectionId,module.getModname(), false,false, MoodleAction.NotLocalFile));
+                    }
+                } else {
+                    //Das sind die die nicht "resource" sind
+                    data.add(new syncTableElement(module.getName(), module.getId(), sectionId,module.getModname(), false,false, MoodleAction.DatatypeNotKnown));
+                }
+            }
+
+            if(fileList.size() != 0){
+                for (Path path : fileList){
+                    data.add(new syncTableElement(path.getFileName().toString(), -1, sectionId,"resource", path, true,false, MoodleAction.MoodleUpload));
+                }
+            }
+            } catch (Throwable e) {
+                logException(e, "Sync failed");
+                showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                        "sync.sync.error.message");
+            }
+        }
+        courseData = data;
+        return data;
     }
 
 }

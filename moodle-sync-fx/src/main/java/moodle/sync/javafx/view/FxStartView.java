@@ -1,5 +1,11 @@
 package moodle.sync.javafx.view;
 
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TreeItem;
+import moodle.sync.util.UploadData.UploadData;
+import moodle.sync.util.UploadElementTableItem;
+import moodle.sync.util.syncTableElement;
 import moodle.sync.web.json.Course;
 import moodle.sync.web.json.Section;
 import org.lecturestudio.core.beans.ObjectProperty;
@@ -29,35 +35,33 @@ import java.util.List;
 public class FxStartView extends VBox implements StartView, FxView {
 
     @FXML
-    private Button exitButton;
-
-    @FXML
     private Button syncButton;
 
     @FXML
     private Button settingsButton;
 
     @FXML
-    private ComboBox<Course> selectcourseCombo;
+    private ComboBox<Course> courseCombo;
 
     @FXML
-    private ComboBox<Section> selectsectionCombo;
+    private ComboBox<Section> sectionCombo;
+
+    @FXML
+    private TableView<syncTableElement> syncTable;
 
 
     public FxStartView() {
         super();
     }
 
-
-    /**
-     * Exit the application
-     *
-     * @param action User presses button.
-     */
     @Override
-    public void setOnExit(Action action) {
-        FxUtils.bindAction(exitButton, action);
+    public void setData(ObservableList<syncTableElement> data) {
+        FxUtils.invoke(() -> {
+            syncTable.getItems().clear();
+            syncTable.setItems(data);
+        });
     }
+
 
     /**
      * Start the synchronisation process.
@@ -86,7 +90,7 @@ public class FxStartView extends VBox implements StartView, FxView {
      */
     @Override
     public void setCourses(List<Course> courses) {
-        FxUtils.invoke(() -> selectcourseCombo.getItems().setAll(courses));
+        FxUtils.invoke(() -> courseCombo.getItems().setAll(courses));
     }
 
     /**
@@ -96,7 +100,7 @@ public class FxStartView extends VBox implements StartView, FxView {
      */
     @Override
     public void setCourse(ObjectProperty<Course> course) {
-        selectcourseCombo.valueProperty().bindBidirectional(new LectObjectProperty<>(course));
+        courseCombo.valueProperty().bindBidirectional(new LectObjectProperty<>(course));
     }
 
     /**
@@ -106,7 +110,7 @@ public class FxStartView extends VBox implements StartView, FxView {
      */
     @Override
     public void setSections(List<Section> sections) {
-        FxUtils.invoke(() -> selectsectionCombo.getItems().setAll(sections));
+        FxUtils.invoke(() -> sectionCombo.getItems().setAll(sections));
     }
 
     /**
@@ -116,7 +120,7 @@ public class FxStartView extends VBox implements StartView, FxView {
      */
     @Override
     public void setSection(ObjectProperty<Section> section) {
-        selectsectionCombo.valueProperty().bindBidirectional(new LectObjectProperty<>(section));
+        sectionCombo.valueProperty().bindBidirectional(new LectObjectProperty<>(section));
     }
 
     /**
@@ -126,9 +130,8 @@ public class FxStartView extends VBox implements StartView, FxView {
      */
     @Override
     public void setOnCourseChanged(ConsumerAction<Course> action) {
-        selectcourseCombo.valueProperty().addListener((observable, oldCourse, newCourse) -> {
+        courseCombo.valueProperty().addListener((observable, oldCourse, newCourse) -> {
             executeAction(action, newCourse);
         });
     }
-
 }

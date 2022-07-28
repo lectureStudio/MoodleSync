@@ -6,7 +6,7 @@ package moodle.sync.util;
  * @author Daniel Schröter
  */
 public enum MoodleAction {
-    MoodleUpload("Datei auf Moodle hochladen"), MoodleSynchronize("Datei auf Moodle aktualisieren"), FTPUpload("Datei auf Fileserver hochladen"), FTPSynchronize("Datei auf Fileserver aktualisieren"), DatatypeNotKnown("Dateiformat nicht gefunden, bitte in Einstellungen anpassen");
+    MoodleUpload("Datei auf Moodle hochladen"), MoodleSynchronize("Datei auf Moodle aktualisieren"), FTPUpload("Datei auf Fileserver hochladen"), FTPSynchronize("Datei auf Fileserver aktualisieren"), NotLocalFile("Datei nicht lokal verfügbar"),ExistingFile("Datei ist in aktuellen Zustand auf der MoodlePlattform"),DatatypeNotKnown("Dateiformat nicht gefunden, bitte in Einstellungen anpassen");
 
     public final String message;
 

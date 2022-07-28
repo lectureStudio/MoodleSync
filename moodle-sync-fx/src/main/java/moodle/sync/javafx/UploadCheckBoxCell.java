@@ -3,6 +3,7 @@ package moodle.sync.javafx;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TreeTableRow;
@@ -10,13 +11,14 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.util.StringConverter;
 import moodle.sync.util.UploadElementTableItem;
+import moodle.sync.util.syncTableElement;
 
 /**
  * Class used to display the selctedProperty-value inside a CheckBoxTreeTableCell.
  *
  * @author Daniel Schröter
  */
-public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElementTableItem, Boolean> {
+public class UploadCheckBoxCell<U, B> extends CheckBoxTableCell<syncTableElement, Boolean> {
 
     private CheckBox checkBox;
 
@@ -28,6 +30,9 @@ public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElemen
     @Override
     public void updateItem(Boolean item, boolean empty) {
         this.checkBox = new CheckBox();
+        this.checkBox.setAlignment(Pos.CENTER);
+        setAlignment(Pos.CENTER);
+        setGraphic(checkBox);
 
         super.updateItem(item, empty);
 
@@ -36,21 +41,20 @@ public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElemen
             booleanProperty = null;
         }
         if (empty) {
+            checkBox.setAlignment(Pos.CENTER);
             setText(null);
             setGraphic(null);
         } else if (getTableRow() != null) {
-            if (getTableRow().getTreeItem() != null) {
-                setDisable(!getTableRow().getTreeItem().getValue().isSelectable());
-
-                var parent = getTableRow().getTreeItem().getParent();
-                if(!parent.getValue().getFileName().equals("root")){
-                    setGraphic(null);
-                }
+            if(getTableRow().getItem() != null && !getTableRow().getItem().isSelectable()) {
+                checkBox.setAlignment(Pos.CENTER);
+                setDisable(false);
+                setGraphic(null);
             }
         } else {
             StringConverter<Boolean> c = getConverter();
 
             if (showLabel) {
+                checkBox.setAlignment(Pos.CENTER);
                 setText(c.toString(item));
             }
             setGraphic(checkBox);
@@ -62,13 +66,16 @@ public class UploadCheckBoxCell<U, B> extends CheckBoxTreeTableCell<UploadElemen
             }
 
             checkBox.disableProperty().bind(Bindings.not(
-                    getTreeTableView().editableProperty().and(
+                    getTableView().editableProperty().and(
                             getTableColumn().editableProperty()).and(
                             editableProperty())
             ));
 
 
         }
+
+        checkBox.setAlignment(Pos.CENTER);
+        setAlignment(Pos.CENTER);
     }
 
 

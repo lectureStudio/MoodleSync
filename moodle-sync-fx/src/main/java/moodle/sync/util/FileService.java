@@ -81,6 +81,22 @@ public class FileService {
         return result;
     }
 
+    public static List<Path> getPathsInDirectory(Path p) throws IOException {
+        List<Path> result = new ArrayList<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(p)) {
+            for (Path entry : stream) {
+                //When an element is a directory, a recursive-call of this method is made.
+
+                result.add(entry);
+
+            }
+        } catch (DirectoryIteratorException ex) {
+            // I/O error encounted during the iteration, the cause is an IOException
+            throw ex.getCause();
+        }
+        return result;
+    }
+
     //Returns List with all Moodle-Moduls of a choosen Module-type
 
     /**
