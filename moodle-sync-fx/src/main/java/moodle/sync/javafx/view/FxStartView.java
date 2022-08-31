@@ -1,8 +1,7 @@
 package moodle.sync.javafx.view;
 
 import javafx.collections.ObservableList;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TreeItem;
+import javafx.scene.control.*;
 import moodle.sync.util.UploadData.UploadData;
 import moodle.sync.util.UploadElementTableItem;
 import moodle.sync.util.syncTableElement;
@@ -17,9 +16,7 @@ import org.lecturestudio.javafx.view.FxView;
 import org.lecturestudio.javafx.view.FxmlView;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
-import javafx.scene.control.ComboBox;
 
 import moodle.sync.presenter.StartPresenter;
 import moodle.sync.view.StartView;

@@ -1,5 +1,7 @@
 package moodle.sync.web.json;
 
+import com.fasterxml.jackson.annotation.JsonRawValue;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -11,7 +13,6 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 @Provider
-
 public class JsonConfigProvider implements ContextResolver<Jsonb> {
 
 	@Override
@@ -21,6 +22,7 @@ public class JsonConfigProvider implements ContextResolver<Jsonb> {
 
 	public static JsonbConfig createConfig() {
 		return new JsonbConfig()
+				.withNullValues(true)
 				.withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
 
 					@Override

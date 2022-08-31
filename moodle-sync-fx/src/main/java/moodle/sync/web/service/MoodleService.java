@@ -125,18 +125,6 @@ public class MoodleService {
         moodleClient.setUrl("json", token, "local_course_add_new_course_module_url", courseid, section, urlname, url, null);
     }
 
-    /**
-     * Create a course-module of the type "resource".
-     *
-     * @param token    The Moodle-token.
-     * @param courseid A Moodle-courses id.
-     * @param section  The moodle-sections number in the moodle-course..
-     * @param name     The displayname of the course-module.
-     * @param itemid   The id of the prior uploaded file, which should be presented by the course-module.
-     */
-    public void setResource(String token, int courseid, int section, Long itemid, String name) {
-        moodleClient.setResource("json", token, "local_course_add_new_course_module_resource", courseid, section, itemid, name, null);
-    }
 
     /**
      * Create a course-module of the type "resource" at a specific position inside a course-section.
@@ -148,8 +136,12 @@ public class MoodleService {
      * @param itemid    The id of the prior uploaded file, which should be presented by the course-module.
      * @param beforemod The course-module id of the course-module at the supposed position. If beforemod ist null, the course-module will be moved to the bottom of the course-section.
      */
-    public void setResource(String token, int courseid, int section, Long itemid, String name, int beforemod) {
-        moodleClient.setResource("json", token, "local_course_add_new_course_module_resource", courseid, section, itemid, name, beforemod);
+    public void setResource(String token, int courseid, int section, Long itemid, Long time, Boolean visible, String name, int beforemod) {
+        if(beforemod == -1){
+            moodleClient.setResource("json", token, "local_course_add_new_course_module_resource", courseid, section, itemid, time, visible, name, null);
+        } else{
+            moodleClient.setResource("json", token, "local_course_add_new_course_module_resource", courseid, section, itemid, time, visible, name, beforemod);
+        }
     }
 
     /**

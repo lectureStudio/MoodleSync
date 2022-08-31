@@ -12,6 +12,7 @@ import javafx.scene.control.cell.CheckBoxTreeTableCell;
 import javafx.util.StringConverter;
 import moodle.sync.util.UploadElementTableItem;
 import moodle.sync.util.syncTableElement;
+import org.lecturestudio.javafx.control.SvgIcon;
 
 /**
  * Class used to display the selctedProperty-value inside a CheckBoxTreeTableCell.

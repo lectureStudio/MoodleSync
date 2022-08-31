@@ -152,6 +152,16 @@
 			<artifactId>guice</artifactId>
 			<version>5.1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>no.tornado</groupId>
+			<artifactId>tornadofx-controls</artifactId>
+			<version>1.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.dlsc.gemsfx</groupId>
+			<artifactId>gemsfx</artifactId>
+			<version>1.47.0</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>

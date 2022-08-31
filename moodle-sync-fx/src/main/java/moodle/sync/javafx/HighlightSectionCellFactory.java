@@ -10,7 +10,6 @@ public class HighlightSectionCellFactory implements Callback<TableColumn<syncTab
     @Override
     public TableCell<syncTableElement, String> call(TableColumn<syncTableElement, String> p) {
         UploadHighlightTableCell<syncTableElement, String> cell = new UploadHighlightTableCell<syncTableElement, String>();
-        //cell.setStyle("-fx-font-weight: bold");
         cell.setAlignment(Pos.CENTER);
         return cell;
     }

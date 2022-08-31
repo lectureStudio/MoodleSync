@@ -1,16 +1,15 @@
 package moodle.sync.web.json;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 
 /**
  * Class representing a course-module.
@@ -23,8 +22,9 @@ public class Module {
     private String name;
     private Integer instance;
     private Integer contextid;
-    private Boolean uservisible;
+    private Integer visible;
     private String modname;
+    private String availability;
     private List<Content> contents;
 
 

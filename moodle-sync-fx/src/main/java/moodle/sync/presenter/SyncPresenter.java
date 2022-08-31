@@ -285,7 +285,7 @@ public class SyncPresenter extends Presenter<SyncView> {
                 //Upload of the file to the Moodle-platform.
                 MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" /*+ config.recentSectionProperty().get().getName() + "/"*/ + item.getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
                 //Publish it in the Moodle-course.
-                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), item.getFileNameAsString());
+                //moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), item.getFileNameAsString());
             } catch (Exception e) {
                 logException(e, "Sync failed");
 
@@ -299,7 +299,7 @@ public class SyncPresenter extends Presenter<SyncView> {
                 //Upload of the new file to the Moodle-platform.
                 MoodleUpload upload = uploader.upload(item.getPath().getFileName().toString(), config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/"/* + config.recentSectionProperty().get().getName() + "/" */ + item.getPath().getFileName().toString(), config.getMoodleUrl(), config.getMoodleToken());
                 //Publish it in the Moodle-course above the old course-module containing the old file.
-                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename(), online.getId());
+                //moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), upload.getItemid(), upload.getFilename(), online.getId());
                 //Removal of the old course-module.
                 moodleService.removeResource(config.getMoodleToken(), online.getId());
             } catch (Exception e) {

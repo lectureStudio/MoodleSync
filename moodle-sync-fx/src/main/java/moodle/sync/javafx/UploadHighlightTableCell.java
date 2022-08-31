@@ -12,7 +12,7 @@ public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement,
 
         if (empty || item == null || getTableRow() == null || getTableRow().getItem() == null) {
             setText(null);
-        } else if(getTableRow().getItem().getAction() == MoodleAction.MoodleUpload) {
+        } else if(getTableRow().getItem().getAction() == MoodleAction.MoodleUpload || getTableRow().getItem().getAction() == MoodleAction.UploadSection) {
             setText(null);
         } else{
             setText(item);

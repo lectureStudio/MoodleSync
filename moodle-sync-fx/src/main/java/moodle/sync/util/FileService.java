@@ -86,7 +86,6 @@ public class FileService {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(p)) {
             for (Path entry : stream) {
                 //When an element is a directory, a recursive-call of this method is made.
-
                 result.add(entry);
 
             }
