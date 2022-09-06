@@ -6,6 +6,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import static java.util.Objects.isNull;
+
 public class TimeDateElement {
     private ObjectProperty<LocalDate> localDate;
     private ObjectProperty<LocalTime> localTime;
@@ -28,6 +30,9 @@ public class TimeDateElement {
     }
 
     public LocalTime getLocalTime() {
+        if(isNull(localTime.get())){
+            return LocalTime.of(0, 0);
+        }
         return localTime.get();
     }
 

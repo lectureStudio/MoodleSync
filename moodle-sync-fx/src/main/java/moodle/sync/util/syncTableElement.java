@@ -95,7 +95,12 @@ public class syncTableElement {
     }
 
     public long getUnixTimeStamp(){
-        LocalDateTime time =  availabilityDateTime.get().getLocalTime().atDate(availabilityDateTime.get().getLocalDate());
+        LocalDateTime time = null;
+        try{
+            time =  availabilityDateTime.get().getLocalTime().atDate(availabilityDateTime.get().getLocalDate());
+        } catch (Exception e) {
+            return 1659776301;
+        }
         return time.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000L;
     }
 

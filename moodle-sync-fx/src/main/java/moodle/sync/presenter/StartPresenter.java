@@ -228,16 +228,16 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                                     MessageFormat.format(context.getDictionary().get("sync.sync.error.upload.message"), courseData.getModuleName()));
                         }
                     }
-                    /*else if(courseData.getAction() == MoodleAction.MoodleSynchronize){
+                    else if(courseData.getAction() == MoodleAction.MoodleSynchronize){
                         try{
                             MoodleUploadTemp uploader = new MoodleUploadTemp();
                             //Upload of the new file to the Moodle-platform.
                             MoodleUpload upload = uploader.upload(courseData.getExistingFileName(), courseData.getExistingFile(), config.getMoodleUrl(), config.getMoodleToken());
                             //Publish it in the Moodle-course above the old course-module containing the old file.
-                            if(courseData.getBeforemod() == -1) {
-                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getModuleName(), courseData.getCmid());
-                            } else{
-                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getModuleName(), courseData.getBeforemod());
+                            if(courseData.getUnixTimeStamp() > System.currentTimeMillis()/1000L){
+                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getUnixTimeStamp(), courseData.getVisible(), courseData.getModuleName(), courseData.getBeforemod());
+                            } else {
+                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), null, courseData.getVisible(), courseData.getModuleName(), courseData.getBeforemod());
                             }
                             //Removal of the old course-module.
                             moodleService.removeResource(config.getMoodleToken(), courseData.getCmid());
@@ -247,12 +247,9 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                             showNotification(NotificationType.ERROR, "sync.sync.error.title",
                                     "sync.sync.error.upload.message");
                         }
-                    }*/
+                    }
                 }
             }
-        }
-        for(syncTableElement elem : courseData){
-            System.out.println(elem.getUnixTimeStamp());
         }
         updateCourses();
     }
@@ -262,7 +259,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
      */
     private void updateCourses() {
         view.setCourses(courses());
-        //view.setSections(sections());
+        view.setSections(sections());
         view.setData(setData());
     }
 

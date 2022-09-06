@@ -18,7 +18,7 @@ public class DefaultConfiguration extends MoodleSyncConfiguration {
 		setFormatsFileserver("mp4");
 		setFormatsMoodle("pdf,png,pptx,docx");
 		setPortFileserver("21");
-		setMoodleUrl("http://localhost");
+		setMoodleUrl("https://localhost");
 	}
 
 }
