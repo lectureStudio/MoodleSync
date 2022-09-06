@@ -112,6 +112,10 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         config.recentSectionProperty().addListener((observable, oldSection, newSection) -> {
             view.setData(setData());
         });
+
+        config.moodleUrlProperty().addListener((observable, oldUrl, newUrl) -> {
+            config.setRecentCourse(null);
+        });
     }
 
     private void onCourseChanged(Course course) {
@@ -263,7 +267,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
     }
 
     private ObservableList<syncTableElement> setData() {
-        if(isNull(courseContent)){
+        if(isNull(courseContent) || isNull(config.recentCourseProperty().get())){
             ObservableList<syncTableElement> dummy = FXCollections.observableArrayList();
             return dummy;
         }
