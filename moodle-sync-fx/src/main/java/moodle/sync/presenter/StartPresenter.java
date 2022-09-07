@@ -248,6 +248,17 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                                     "sync.sync.error.upload.message");
                         }
                     }
+                } else if(courseData.getAction() == MoodleAction.UploadSection){
+                    //Logic for Section-Upload
+                    System.out.println("Section hochladen");
+                    try {
+                        moodleService.setSection(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getModuleName(), courseData.getSection());
+                    } catch (Exception e) {
+                        logException(e, "Sync failed");
+
+                        showNotification(NotificationType.ERROR, "sync.sync.error.title",
+                                "sync.sync.error.upload.message");
+                    }
                 }
             }
         }
@@ -315,6 +326,10 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
             //Datenfpad zu Sektionsordner, wird erstellt falls nicht vorhanden
             Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + section.getName());
             FileService.directoryManager(execute);
+
+            watcher = new FileWatcher(new File(execute.toString()));
+            watcher.addListener(this);
+            watcher.watch();
 
             //Alle Dateien auslesen
             try {
@@ -396,17 +411,22 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
     @Override
     public void onCreated(FileEvent event) {
         System.out.println("Erstellt" + event.getFile().toString());
-        event.getFile();
+        //event.getFile();
+        view.setData(setData());
     }
 
     @Override
     public void onModified(FileEvent event) {
-        System.out.println("Geändert");
+        System.out.println("Geändert" + event.getFile().toString());
+        //event.getFile();
+        view.setData(setData());
     }
 
     @Override
     public void onDeleted(FileEvent event) {
-        System.out.println("Gelöscht");
+        System.out.println("Gelöscht" + event.getFile().toString());
+        //event.getFile();
+        view.setData(setData());
     }
 
     private Boolean getPriorityVisiblity(Boolean visible, Boolean availability){

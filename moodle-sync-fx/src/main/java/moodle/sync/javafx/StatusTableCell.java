@@ -23,6 +23,10 @@ public class StatusTableCell <U, B> extends TableCell<syncTableElement, String> 
                 setText(item);
                 setStyle("-fx-background-color: SKYBLUE");
             }
+            else if(getTableRow().getItem().getAction() == MoodleAction.UploadSection){
+                setText(item);
+                setStyle("-fx-font-weight: bold");
+            }
             else{
                 setText(item);
                 setStyle("-fx-background-color: TRANSPARENT");

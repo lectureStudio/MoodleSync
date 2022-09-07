@@ -6,6 +6,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
+import moodle.sync.util.MoodleAction;
 import moodle.sync.util.TimeDateElement;
 import moodle.sync.util.syncTableElement;
 
@@ -38,7 +39,7 @@ public class LocalDateTimeCell<S, U> extends TableCell<syncTableElement, TimeDat
         } else if (getTableRow() != null && getTableRow().getItem() != null) {
             datePicker.valueProperty().unbindBidirectional(getTableRow().getItem().availabilityDateTimeProperty().get().LocalDateProperty());
             timePicker.timeProperty().unbindBidirectional(getTableRow().getItem().availabilityDateTimeProperty().get().LocalTimeProperty());
-            if (getTableRow().getItem() != null && !getTableRow().getItem().isSelectable()) {
+            if (getTableRow().getItem() != null && (!getTableRow().getItem().isSelectable() || getTableRow().getItem().getAction() == MoodleAction.UploadSection)) {
                 setDisable(false);
                 setGraphic(null);
             }

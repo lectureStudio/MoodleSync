@@ -153,4 +153,10 @@ public interface MoodleClient {
     @POST
     @Path("")
     void removeResource(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("cmids[0]") int cmid);
+
+    @GET
+    @Path("")
+    void setSection(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("sectionname") String sectionname, @QueryParam("sectionnum") int sectionnum);
+
+
 }

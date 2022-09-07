@@ -11,6 +11,7 @@ import org.lecturestudio.core.beans.StringProperty;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.ws.rs.QueryParam;
 
 import moodle.sync.web.json.*;
 import moodle.sync.web.client.MoodleClient;
@@ -180,6 +181,10 @@ public class MoodleService {
      */
     public void setFolder(String token, int courseid, int section, Long itemid, String name, int beforemod) {
         moodleClient.setFolder("json", token, "local_course_add_new_course_module_directory", courseid, section, itemid, name, beforemod);
+    }
+
+    public void setSection(String token, int courseid, String sectionname, int sectionnum) {
+        moodleClient.setSection("json", token, "local_course_add_new_section", courseid, sectionname, sectionnum);
     }
 
 

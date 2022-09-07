@@ -8,6 +8,7 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
+import moodle.sync.util.MoodleAction;
 import moodle.sync.util.syncTableElement;
 
 
@@ -19,11 +20,7 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
     public TableRow<syncTableElement> call(TableView<syncTableElement> tableView) {
 
         final TableRow<syncTableElement> row ;
-        /**if (baseFactory == null) {
-            row = new TableRow<>();
-        } else {
-            row = baseFactory.call(tableView);
-        }*/
+
         row = new TableRow<>();
 
         row.setOnDragDetected(event -> {
@@ -66,12 +63,31 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
                     dropIndex = row.getIndex();
                 }
 
-                draggedElement.setBeforemod(tableView.getItems().get(dropIndex).getCmid());
-                tableView.getItems().add(dropIndex, draggedElement);
+                if(draggedElement.getAction() == MoodleAction.UploadSection){
+                    if(tableView.getItems().get(dropIndex).getModuleType() == "section") {
+                        draggedElement.setSection(tableView.getItems().get(dropIndex).getSection());
+                        draggedElement.setBeforemod(tableView.getItems().get(dropIndex).getCmid());
+                        tableView.getItems().add(dropIndex, draggedElement);
 
-                event.setDropCompleted(true);
-                tableView.getSelectionModel().select(dropIndex);
-                event.consume();
+                        event.setDropCompleted(true);
+                        tableView.getSelectionModel().select(dropIndex);
+                        event.consume();
+                    } else {
+                        tableView.getItems().add(draggedIndex, draggedElement);
+
+                        event.setDropCompleted(true);
+                        tableView.getSelectionModel().select(draggedIndex);
+                        event.consume();
+                    }
+                } else {
+                    draggedElement.setBeforemod(tableView.getItems().get(dropIndex).getCmid());
+                    tableView.getItems().add(dropIndex, draggedElement);
+
+                    event.setDropCompleted(true);
+                    tableView.getSelectionModel().select(dropIndex);
+                    event.consume();
+                }
+
             }
         });
 

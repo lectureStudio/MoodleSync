@@ -20,7 +20,7 @@ import org.lecturestudio.javafx.control.SvgIcon;
  *
  * @author Daniel Schröter
  */
-public class UploadCheckBoxCell<U, B> extends CheckBoxTableCell<syncTableElement, Boolean> {
+public class AvailabilityCheckBoxCell <U, B> extends CheckBoxTableCell<syncTableElement, Boolean> {
 
     private CheckBox checkBox;
 
@@ -47,7 +47,7 @@ public class UploadCheckBoxCell<U, B> extends CheckBoxTableCell<syncTableElement
             setText(null);
             setGraphic(null);
         } else if (getTableRow() != null) {
-            if(getTableRow().getItem() != null && !getTableRow().getItem().isSelectable()) {
+            if(getTableRow().getItem() != null && (!getTableRow().getItem().isSelectable() || getTableRow().getItem().getAction() == MoodleAction.UploadSection)) {
                 checkBox.setAlignment(Pos.CENTER);
                 setDisable(false);
                 setGraphic(null);
