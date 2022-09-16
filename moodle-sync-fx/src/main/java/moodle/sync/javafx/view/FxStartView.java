@@ -38,6 +38,9 @@ public class FxStartView extends VBox implements StartView, FxView {
     private Button settingsButton;
 
     @FXML
+    private Button folderButton;
+
+    @FXML
     private ComboBox<Course> courseCombo;
 
     @FXML
@@ -80,6 +83,10 @@ public class FxStartView extends VBox implements StartView, FxView {
         FxUtils.bindAction(settingsButton, action);
     }
 
+    @Override
+    public void setOnFolder(Action action) {
+        FxUtils.bindAction(folderButton, action);
+    }
     /**
      * Method to set the elements of the Course-Combobox.
      *

@@ -29,6 +29,7 @@
 	</Appenders>
 
 	<Loggers>
+		<Logger name="moodle.sync.web.json" level="debug" />
 		<Logger name="org.lecturestudio" level="error" />
 		<Logger name="org.jboss" level="error" />
 

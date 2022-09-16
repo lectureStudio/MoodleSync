@@ -64,6 +64,21 @@ public class syncTableElement {
         this.availabilityDateTime = new SimpleObjectProperty(availabilityDateTime);
     }
 
+    public syncTableElement(String moduleName, Integer cmid, Integer section, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible, TimeDateElement availabilityDateTime, Integer beforemod){
+        this.moduleName = new SimpleStringProperty(moduleName);
+        this.cmid = new SimpleIntegerProperty(cmid);
+        this.section = new SimpleIntegerProperty(section);
+        this.moduleType = new SimpleStringProperty(moduleType);
+        this.existingFile = new SimpleStringProperty(existingFile.toString());
+        this.existingFileName = new SimpleStringProperty(existingFile.getFileName().toString());
+        this.selectable = new SimpleBooleanProperty(selectable);
+        this.selected = new SimpleBooleanProperty(selected);
+        this.action = action;
+        this.beforemod = new SimpleIntegerProperty(beforemod);
+        this.visible = new SimpleBooleanProperty(visible);
+        this.availabilityDateTime = new SimpleObjectProperty(availabilityDateTime);
+    }
+
     public syncTableElement(String moduleName, Integer cmid, Integer section, String moduleType, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible){
         this.moduleName = new SimpleStringProperty(moduleName);
         this.cmid = new SimpleIntegerProperty(cmid);

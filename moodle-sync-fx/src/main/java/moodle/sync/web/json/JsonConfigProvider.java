@@ -23,6 +23,7 @@ public class JsonConfigProvider implements ContextResolver<Jsonb> {
 	public static JsonbConfig createConfig() {
 		return new JsonbConfig()
 				.withNullValues(true)
+				.withDeserializers(new CourseDeserializer())
 				.withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
 
 					@Override

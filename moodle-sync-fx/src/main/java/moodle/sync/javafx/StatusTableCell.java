@@ -27,6 +27,10 @@ public class StatusTableCell <U, B> extends TableCell<syncTableElement, String> 
                 setText(item);
                 setStyle("-fx-font-weight: bold");
             }
+            /*else if(getTableRow().getItem().getAction() == MoodleAction.DatatypeNotKnown){
+                setText(item);
+                setStyle("-fx-font-weight: bold");
+            }*/
             else{
                 setText(item);
                 setStyle("-fx-background-color: TRANSPARENT");

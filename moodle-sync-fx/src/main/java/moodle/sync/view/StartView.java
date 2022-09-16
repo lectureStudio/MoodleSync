@@ -9,6 +9,7 @@ import org.lecturestudio.core.beans.Observable;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.ConsumerAction;
 import org.lecturestudio.core.view.View;
+import org.lecturestudio.javafx.util.FxUtils;
 
 import java.util.List;
 
@@ -23,6 +24,8 @@ public interface StartView extends View {
     void setOnSync(Action action);
 
     void setOnSettings(Action action);
+
+    void setOnFolder(Action action);
 
     void setCourses(List<Course> courses);
 
