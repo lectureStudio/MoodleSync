@@ -220,8 +220,8 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                         } catch (Exception e) {
                             logException(e, "Sync failed");
 
-                            showNotification(NotificationType.ERROR, "sync.sync.error.title",
-                                    MessageFormat.format(context.getDictionary().get("sync.sync.error.upload.message"), courseData.getModuleName()));
+                            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                                    MessageFormat.format(context.getDictionary().get("start.sync.error.upload.message"), courseData.getModuleName()));
                         }
                     }
                     else if(courseData.getAction() == MoodleAction.MoodleSynchronize){
@@ -240,8 +240,8 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                         } catch (Exception e) {
                             logException(e, "Sync failed");
 
-                            showNotification(NotificationType.ERROR, "sync.sync.error.title",
-                                    "sync.sync.error.upload.message");
+                            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                                    "start.sync.error.upload.message");
                         }
                     }
                 } else if(courseData.getAction() == MoodleAction.UploadSection){
@@ -251,8 +251,8 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     } catch (Exception e) {
                         logException(e, "Sync failed");
 
-                        showNotification(NotificationType.ERROR, "sync.sync.error.title",
-                                "sync.sync.error.upload.message");
+                        showNotification(NotificationType.ERROR, "start.sync.error.title",
+                                "start.sync.error.upload.message");
                     }
                 }
             }
@@ -390,8 +390,8 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
             }
             } catch (Throwable e) {
                 logException(e, "Sync failed");
-                showNotification(NotificationType.ERROR, "sync.sync.error.title",
-                        "sync.sync.error.message");
+                showNotification(NotificationType.ERROR, "start.sync.error.title",
+                        "start.sync.error.message");
             }
         }
 
