@@ -22,6 +22,6 @@ public class Course {
 
     @Override
     public String toString() {
-        return displayname;
+        return shortname;
     }
 }

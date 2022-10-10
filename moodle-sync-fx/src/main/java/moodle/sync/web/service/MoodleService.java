@@ -110,7 +110,11 @@ public class MoodleService {
      * @param beforemod The course-module id of the course-module at the supposed position. If beforemod ist null, the course-module will be moved to the bottom of the course-section.
      */
     public void setMoveModule(String token, int cmid, int sectionid, int beforemod) {
-        moodleClient.setMoveModule("json", token, "local_course_move_module_to_specific_position", cmid, sectionid, beforemod);
+        if(beforemod == -1){
+            moodleClient.setMoveModule("json", token, "local_course_move_module_to_specific_position", cmid, sectionid, null);
+        } else{
+            moodleClient.setMoveModule("json", token, "local_course_move_module_to_specific_position", cmid, sectionid, beforemod);
+        }
     }
 
     /**
@@ -122,8 +126,12 @@ public class MoodleService {
      * @param urlname  The displayname of the course-module.
      * @param url      The course-modules content.
      */
-    public void setUrl(String token, int courseid, int section, String urlname, String url) {
-        moodleClient.setUrl("json", token, "local_course_add_new_course_module_url", courseid, section, urlname, url, null);
+    public void setUrl(String token, int courseid, int section, String urlname, String url, Long time, Boolean visible ,int beforemod) {
+        if(beforemod == -1){
+            moodleClient.setUrl("json", token, "local_course_add_new_course_module_url", courseid, section, urlname, url, time, visible, null);
+        } else {
+            moodleClient.setUrl("json", token, "local_course_add_new_course_module_url", courseid, section, urlname, url, time, visible, beforemod);
+        }
     }
 
 

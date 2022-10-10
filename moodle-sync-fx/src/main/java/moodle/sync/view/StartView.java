@@ -20,6 +20,7 @@ import java.util.List;
  */
 public interface StartView extends View {
 
+    void setOnUpdate(Action action);
 
     void setOnSync(Action action);
 

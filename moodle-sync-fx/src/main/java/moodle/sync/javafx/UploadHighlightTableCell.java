@@ -1,15 +1,12 @@
 package moodle.sync.javafx;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.TableCell;
+import javafx.scene.control.*;
+import javafx.scene.web.WebView;
 import moodle.sync.util.MoodleAction;
 import moodle.sync.util.syncTableElement;
 import org.lecturestudio.javafx.control.SvgIcon;
 
 public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement, String> {
-
-    private TableCell tableCell;
 
     @Override
     protected void updateItem(String item, boolean empty) {
@@ -19,6 +16,21 @@ public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement,
         setGraphic(null);
 
         if (empty || item == null || getTableRow() == null || getTableRow().getItem() == null) {
+            setText(null);
+        } else if(getTableRow().getItem().getAction() == null ){
+            TitledPane titlePlane = new TitledPane();
+            WebView fontWebView = new WebView();
+            fontWebView.getEngine().loadContent(getTableRow().getItem().getModuleType().replaceAll("\\<.*?>", ""));
+            titlePlane.setText(getTableRow().getItem().getModuleName());
+            titlePlane.setContent(fontWebView);
+            titlePlane.expandedProperty().setValue(false);
+            if(getTableRow().getItem().getModuleType().replaceAll("\\<.*?>", "").isEmpty()){
+                titlePlane.setPrefHeight(0);
+                titlePlane.setCollapsible(false);
+            } else {
+                titlePlane.setPrefHeight(70);
+            }
+            setGraphic(titlePlane);
             setText(null);
         } else if(getTableRow().getItem().getAction() == MoodleAction.MoodleUpload || getTableRow().getItem().getAction() == MoodleAction.FTPUpload ||getTableRow().getItem().getAction() == MoodleAction.UploadSection || getTableRow().getItem().getAction() == MoodleAction.DatatypeNotKnown) {
             setText(null);

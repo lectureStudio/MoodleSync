@@ -60,6 +60,7 @@
                     </ComboBox>
                 </VBox>
                <Pane HBox.hgrow="ALWAYS"/>
+                <Button fx:id="updateButton" mnemonicParsing="false" text="%start.update"/>
                 <Button fx:id="syncButton" mnemonicParsing="false" text="%start.sync"/>
                 <Button fx:id="settingsButton" mnemonicParsing="false" text="%start.settings"/>
                 <padding>
@@ -124,14 +125,6 @@
                             <PropertyValueFactory property="availabilityDateTime"/>
                         </cellValueFactory>
                     </TableColumn>
-                    <!--<TableColumn fx:id="visibleTableColumn" styleClass="CENTER" editable="true" prefWidth="75.0" text="Sichtbarkeit">
-                        <cellFactory>
-                            <ToggleButtonTableCellFactory/>
-                        </cellFactory>
-                        <cellValueFactory>
-                            <ToggleButtonCellValueFactory/>
-                        </cellValueFactory>
-                    </TableColumn>-->
                 </columns>
                 <BorderPane.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>

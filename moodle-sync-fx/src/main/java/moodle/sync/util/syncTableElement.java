@@ -16,6 +16,8 @@ public class syncTableElement {
 
     private IntegerProperty section;
 
+    private IntegerProperty sectionId;
+
     private StringProperty moduleType;
 
     private StringProperty existingFile;
@@ -34,10 +36,11 @@ public class syncTableElement {
 
     private ObjectProperty<TimeDateElement> availabilityDateTime;
 
-    public syncTableElement(String moduleName, Integer cmid, Integer section, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible){
+    public syncTableElement(String moduleName, Integer cmid, Integer section, Integer sectionId,String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible){
         this.moduleName = new SimpleStringProperty(moduleName);
         this.cmid = new SimpleIntegerProperty(cmid);
         this.section = new SimpleIntegerProperty(section);
+        this.sectionId = new SimpleIntegerProperty(sectionId);
         this.moduleType = new SimpleStringProperty(moduleType);
         this.existingFile = new SimpleStringProperty(existingFile.toString());
         this.existingFileName = new SimpleStringProperty(existingFile.getFileName().toString());
@@ -49,10 +52,11 @@ public class syncTableElement {
         this.availabilityDateTime = new SimpleObjectProperty(new TimeDateElement(null, null));
     }
 
-    public syncTableElement(String moduleName, Integer cmid, Integer section, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible, TimeDateElement availabilityDateTime){
+    public syncTableElement(String moduleName, Integer cmid, Integer section, Integer sectionId, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible, TimeDateElement availabilityDateTime){
         this.moduleName = new SimpleStringProperty(moduleName);
         this.cmid = new SimpleIntegerProperty(cmid);
         this.section = new SimpleIntegerProperty(section);
+        this.sectionId = new SimpleIntegerProperty(sectionId);
         this.moduleType = new SimpleStringProperty(moduleType);
         this.existingFile = new SimpleStringProperty(existingFile.toString());
         this.existingFileName = new SimpleStringProperty(existingFile.getFileName().toString());
@@ -64,10 +68,11 @@ public class syncTableElement {
         this.availabilityDateTime = new SimpleObjectProperty(availabilityDateTime);
     }
 
-    public syncTableElement(String moduleName, Integer cmid, Integer section, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible, TimeDateElement availabilityDateTime, Integer beforemod){
+    public syncTableElement(String moduleName, Integer cmid, Integer section, Integer sectionId, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible, TimeDateElement availabilityDateTime, Integer beforemod){
         this.moduleName = new SimpleStringProperty(moduleName);
         this.cmid = new SimpleIntegerProperty(cmid);
         this.section = new SimpleIntegerProperty(section);
+        this.sectionId = new SimpleIntegerProperty(sectionId);
         this.moduleType = new SimpleStringProperty(moduleType);
         this.existingFile = new SimpleStringProperty(existingFile.toString());
         this.existingFileName = new SimpleStringProperty(existingFile.getFileName().toString());
@@ -79,10 +84,11 @@ public class syncTableElement {
         this.availabilityDateTime = new SimpleObjectProperty(availabilityDateTime);
     }
 
-    public syncTableElement(String moduleName, Integer cmid, Integer section, String moduleType, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible){
+    public syncTableElement(String moduleName, Integer cmid, Integer section, Integer sectionId, String moduleType, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible){
         this.moduleName = new SimpleStringProperty(moduleName);
         this.cmid = new SimpleIntegerProperty(cmid);
         this.section = new SimpleIntegerProperty(section);
+        this.sectionId = new SimpleIntegerProperty(sectionId);
         this.moduleType = new SimpleStringProperty(moduleType);
         this.existingFile = null;
         this.existingFileName = null;
@@ -94,10 +100,11 @@ public class syncTableElement {
         this.availabilityDateTime = new SimpleObjectProperty(new TimeDateElement(null, null));
     }
 
-    public syncTableElement(String moduleName, Integer cmid, Integer section, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Integer beforemod, Boolean visible){
+    public syncTableElement(String moduleName, Integer cmid, Integer section, Integer sectionId, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Integer beforemod, Boolean visible){
         this.moduleName = new SimpleStringProperty(moduleName);
         this.cmid = new SimpleIntegerProperty(cmid);
         this.section = new SimpleIntegerProperty(section);
+        this.sectionId = new SimpleIntegerProperty(sectionId);
         this.moduleType = new SimpleStringProperty(moduleType);
         this.existingFile = new SimpleStringProperty(existingFile.toString());
         this.existingFileName = new SimpleStringProperty(existingFile.getFileName().toString());
@@ -198,6 +205,32 @@ public class syncTableElement {
      * @param value the new message.
      */
     public void setSection(Integer value) { this.section.set(value);
+    }
+
+    /**
+     * Providing the messageProperty.
+     *
+     * @return the messageProprty.
+     */
+    public IntegerProperty sectionIdProperty() {
+        return sectionId;
+    }
+
+    /**
+     * Providing the files message as a String.
+     *
+     * @return the files message as a String.
+     */
+    public Integer getSectionId() {
+        return this.sectionId.get();
+    }
+
+    /**
+     * Sets a new message.
+     *
+     * @param value the new message.
+     */
+    public void setSectionId(Integer value) { this.sectionId.set(value);
     }
 
     /**

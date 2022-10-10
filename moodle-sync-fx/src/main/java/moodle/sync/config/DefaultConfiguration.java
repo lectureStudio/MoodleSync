@@ -15,7 +15,7 @@ public class DefaultConfiguration extends MoodleSyncConfiguration {
 		setStartMaximized(false);
 		setAdvancedUIMode(false);
 		setSyncRootPath(System.getProperty("user.dir"));
-		setFormatsFileserver("mp4");
+		setFormatsFileserver("");
 		setFormatsMoodle("pdf,png,pptx,docx");
 		setPortFileserver("21");
 		setMoodleUrl("https://localhost");

@@ -22,7 +22,7 @@ public class CourseListCell extends ListCell<Course> {
         if (isNull(item) || empty) {
             setText("");
         } else {
-            setText(item.getDisplayname());
+            setText(item.getShortname());
         }
     }
 

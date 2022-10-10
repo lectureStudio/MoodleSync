@@ -91,7 +91,7 @@ public interface MoodleClient {
      */
     @POST
     @Path("")
-    void setUrl(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("sectionnum") int sectionnum, @QueryParam("urlname") String urlname, @QueryParam("url") String url, @QueryParam("beforemod") Integer beforemod);
+    void setUrl(@QueryParam("moodlewsrestformat") String moodlewsrestformat, @QueryParam("wstoken") String token, @QueryParam("wsfunction") String function, @QueryParam("courseid") int courseid, @QueryParam("sectionnum") int sectionnum, @QueryParam("urlname") String urlname, @QueryParam("url") String url, @QueryParam("time") Long time, @QueryParam("visible") boolean visible, @QueryParam("beforemod") Integer beforemod);
 
     /**
      * Create a course-module of type "resource".

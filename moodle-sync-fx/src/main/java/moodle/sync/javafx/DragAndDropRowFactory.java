@@ -80,7 +80,14 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
                         event.consume();
                     }
                 } else {
-                    draggedElement.setBeforemod(tableView.getItems().get(dropIndex).getCmid());
+                    if(tableView.getItems().get(dropIndex).getModuleType() == "section") {
+                        draggedElement.setBeforemod(-1);
+                    } else{
+                        draggedElement.setBeforemod(tableView.getItems().get(dropIndex).getCmid());
+                    }
+                    draggedElement.setSectionId(tableView.getItems().get(dropIndex).getSectionId());
+                    draggedElement.setSelectable(true);
+
                     tableView.getItems().add(dropIndex, draggedElement);
 
                     event.setDropCompleted(true);

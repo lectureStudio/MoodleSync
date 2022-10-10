@@ -38,6 +38,9 @@ public class FxStartView extends VBox implements StartView, FxView {
     private Button settingsButton;
 
     @FXML
+    private Button updateButton;
+
+    @FXML
     private Button folderButton;
 
     @FXML
@@ -62,6 +65,15 @@ public class FxStartView extends VBox implements StartView, FxView {
         });
     }
 
+    /**
+     * Update the interface
+     *
+     * @param action User presses button.
+     */
+    @Override
+    public void setOnUpdate(Action action) {
+        FxUtils.bindAction(updateButton, action);
+    }
 
     /**
      * Start the synchronisation process.
