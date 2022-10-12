@@ -10,4 +10,4 @@ synchronization between a local directory and the learning platform Moodle. Futh
 Works with following plugin for Moodle: https://github.com/lectureStudio/moodle-local_sync_service.
 
 ## Screenshot
-![Main view](https://github.com/lectureStudio/MoodleSync/blob/main/doc/readme/mainpage.png)
+![Main view](https://github.com/lectureStudio/MoodleSync/blob/main/doc/mainpage.png)
