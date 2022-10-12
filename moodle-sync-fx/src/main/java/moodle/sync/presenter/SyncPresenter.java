@@ -312,7 +312,7 @@ public class SyncPresenter extends Presenter<SyncView> {
             //Fileserver upload.
             String url = fileClient.uploadFile(item, config.getRecentCourse().getDisplayname());
             //Publish the new Url in the Moodle-course.
-            moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), item.getPath().getFileName().toString(), url);
+            //moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getSection(), item.getPath().getFileName().toString(), url);
         } else if ((item.getAction() == MoodleAction.FTPSynchronize && item.getChecked().get())) {
             //Update the file on the fileserver.
             fileClient.uploadFile(item, config.getRecentCourse().getDisplayname());

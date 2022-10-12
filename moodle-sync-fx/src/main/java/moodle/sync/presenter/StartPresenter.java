@@ -179,7 +179,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         }
         try {
             List<Section> content = moodleService.getCourseContent(config.getMoodleToken(), config.getRecentCourse().getId());
-            content.add(0, new Section(-2, "Alle anzeigen", 1, "alle", -1, -1, -1, true, null));
+            content.add(0, new Section(-2, this.context.getDictionary().get("start.sync.showall"), 1, "alle", -1, -1, -1, true, null));
             courseContent = content;
             return content;
         } catch (Exception e) {

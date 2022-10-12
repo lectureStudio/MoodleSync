@@ -38,7 +38,7 @@
                     </Button>
                 </VBox>
                 <VBox>
-                    <Label text ="Kurs"/>
+                    <Label text ="%start.selectcourse"/>
                     <ComboBox fx:id="courseCombo">
                         <buttonCell>
                             <CourseListCell/>
@@ -49,7 +49,7 @@
                     </ComboBox>
                 </VBox>
                 <VBox>
-                    <Label text ="Sektion"/>
+                    <Label text ="%start.selectsection"/>
                     <ComboBox fx:id="sectionCombo">
                         <buttonCell>
                             <SectionListCell/>
@@ -93,7 +93,7 @@
                             <PropertyValueFactory property="moduleName"/>
                         </cellValueFactory>
                     </TableColumn>
-                    <TableColumn fx:id="localViewTableColumn" text="Lokal">
+                    <TableColumn fx:id="localViewTableColumn" text="%start.local">
                         <cellFactory>
                             <StatusCellFactory/>
                         </cellFactory>
@@ -101,7 +101,7 @@
                             <PropertyValueFactory property="existingFileName"/>
                         </cellValueFactory>
                     </TableColumn>
-                    <TableColumn fx:id="executeTableColumn" styleClass="CENTER" editable="true" text="Ausführen">
+                    <TableColumn fx:id="executeTableColumn" styleClass="CENTER" editable="true" text="%start.execute">
                         <cellFactory>
                             <CheckBoxTableCellFactory/>
                         </cellFactory>
@@ -109,7 +109,7 @@
                             <UploadElementCellValueFactory/>
                         </cellValueFactory>
                     </TableColumn>
-                    <TableColumn fx:id="availabilityTableColumn" styleClass="CENTER" editable="true" text="Sichtbarkeit">
+                    <TableColumn fx:id="availabilityTableColumn" styleClass="CENTER" editable="true" text="%start.visible">
                         <cellFactory>
                             <AvailabilityCellFactory/>
                         </cellFactory>
@@ -117,7 +117,7 @@
                             <AvailabilityCellValueFactory/>
                         </cellValueFactory>
                     </TableColumn>
-                    <TableColumn fx:id="availabilityTimeTableColumn" styleClass="CENTER" editable="true" text="Zeitpunkt">
+                    <TableColumn fx:id="availabilityTimeTableColumn" styleClass="CENTER" editable="true" text="%start.availability">
                         <cellFactory>
                             <AvailableDateTimeTableCellFactory/>
                         </cellFactory>
