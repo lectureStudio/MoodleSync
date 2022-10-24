@@ -223,5 +223,10 @@
             <artifactId>javafx-web</artifactId>
             <version>17.0.2</version>
         </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>moodle.sync</groupId>
+			<artifactId>moodle-sync-core</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
 </project>

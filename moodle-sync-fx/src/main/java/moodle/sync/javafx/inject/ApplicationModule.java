@@ -13,7 +13,7 @@ import java.util.ResourceBundle;
 
 import javax.inject.Singleton;
 
-import moodle.sync.web.service.MoodleService;
+import moodle.sync.core.web.service.MoodleService;
 import org.lecturestudio.core.app.AppDataLocator;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.app.LocaleProvider;
@@ -30,9 +30,9 @@ import org.lecturestudio.core.util.DirUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import moodle.sync.config.DefaultConfiguration;
-import moodle.sync.config.MoodleSyncConfiguration;
-import moodle.sync.context.MoodleSyncContext;
+import moodle.sync.core.config.DefaultConfiguration;
+import moodle.sync.core.config.MoodleSyncConfiguration;
+import moodle.sync.core.context.MoodleSyncContext;
 
 public class ApplicationModule extends AbstractModule {
 

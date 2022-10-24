@@ -42,6 +42,7 @@
 	</scm>
 
 	<modules>
+		<module>moodle-sync-core</module>
 		<module>moodle-sync-fx</module>
 		<module>moodle-sync-jpackage</module>
 		<module>moodle-sync-bundle</module>
@@ -345,6 +346,11 @@
 			<groupId>com.dlsc.gemsfx</groupId>
 			<artifactId>gemsfx</artifactId>
 			<version>1.47.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.24</version>
 		</dependency>
 	</dependencies>
 </project>

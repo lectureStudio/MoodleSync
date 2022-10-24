@@ -1,9 +1,9 @@
 package moodle.sync.presenter;
 
-import moodle.sync.config.DefaultConfiguration;
-import moodle.sync.config.MoodleSyncConfiguration;
+import moodle.sync.core.config.DefaultConfiguration;
+import moodle.sync.core.config.MoodleSyncConfiguration;
 import moodle.sync.view.SettingsView;
-import moodle.sync.web.service.MoodleService;
+import moodle.sync.core.web.service.MoodleService;
 
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.presenter.Presenter;

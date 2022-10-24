@@ -2,11 +2,9 @@ package moodle.sync.javafx.view;
 
 import javafx.collections.ObservableList;
 import javafx.scene.control.*;
-import moodle.sync.util.UploadData.UploadData;
-import moodle.sync.util.UploadElementTableItem;
-import moodle.sync.util.syncTableElement;
-import moodle.sync.web.json.Course;
-import moodle.sync.web.json.Section;
+import moodle.sync.core.model.json.Course;
+import moodle.sync.core.model.syncTableElement;
+import moodle.sync.core.model.json.Section;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.ConsumerAction;
