@@ -1,23 +1,31 @@
 package moodle.sync.javafx.custom;
 
+import javafx.beans.InvalidationListener;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.web.WebView;
+import javafx.util.converter.DefaultStringConverter;
+import moodle.sync.core.model.json.Section;
 import moodle.sync.core.util.MoodleAction;
 import moodle.sync.core.model.syncTableElement;
+import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.javafx.control.SvgIcon;
 
-public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement, String> {
+public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTableElement, String> {
 
     @Override
-    protected void updateItem(String item, boolean empty) {
+    public void updateItem(String item, boolean empty) {
 
         super.updateItem(item, empty);
 
+        setConverter(new DefaultStringConverter());
         setGraphic(null);
+        //setText(null);
 
         if (empty || item == null || getTableRow() == null || getTableRow().getItem() == null) {
             setText(null);
-        } else if(getTableRow().getItem().getAction() == null ){
+            setEditable(false);
+        } else if(getTableRow().getItem().getAction() == MoodleAction.ExistingSection ){
             TitledPane titlePlane = new TitledPane();
             WebView fontWebView = new WebView();
             fontWebView.getEngine().loadContent(getTableRow().getItem().getModuleType().replaceAll("\\<.*?>", ""));
@@ -32,9 +40,24 @@ public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement,
             }
             setGraphic(titlePlane);
             setText(null);
+            setEditable(false);
         } else if(getTableRow().getItem().getAction() == MoodleAction.MoodleUpload || getTableRow().getItem().getAction() == MoodleAction.FTPUpload ||getTableRow().getItem().getAction() == MoodleAction.UploadSection || getTableRow().getItem().getAction() == MoodleAction.DatatypeNotKnown) {
-            setText(null);
+            if((getTableRow().getItem().getAction() == MoodleAction.MoodleUpload && getTableRow().getItem() != null) ||(getTableRow().getItem().getAction() == MoodleAction.FTPUpload && getTableRow().getItem() != null)){
+                if(!getTableRow().getItem().selectedProperty().get()){
+                    setVisible(false);
+                }
+                getTableRow().getItem().selectedProperty().addListener((observable, oldBool, newBool) -> {
+                        managedProperty().bind(visibleProperty());
+                        setEditable(getTableRow().getItem().selectedProperty().get());
+                        setText(getTableRow().getItem().getExistingFileName());
+                        setVisible(getTableRow().getItem().selectedProperty().get());
+                });
+            }
+            else {
+                setText(null);
+            }
         } else{
+            setEditable(false);
             SvgIcon icon = new SvgIcon();
             setStyle("-fx-font-weight: normal");
             if(getTableRow().getItem().getModuleType().equals("section")){
@@ -67,3 +90,4 @@ public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement,
         }
     }
 }
+

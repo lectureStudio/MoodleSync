@@ -9,9 +9,11 @@ import moodle.sync.presenter.SettingsPresenter;
 import moodle.sync.util.UserInputValidations;
 import moodle.sync.view.SettingsView;
 import org.lecturestudio.core.beans.BooleanProperty;
+import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.beans.StringProperty;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.javafx.beans.LectBooleanProperty;
+import org.lecturestudio.javafx.beans.LectObjectProperty;
 import org.lecturestudio.javafx.beans.LectStringProperty;
 import org.lecturestudio.javafx.util.FxUtils;
 import org.lecturestudio.javafx.view.FxView;
@@ -19,6 +21,8 @@ import org.lecturestudio.javafx.view.FxmlView;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Class implementing the functions of the "settings-page".
@@ -30,6 +34,9 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
 
     @FXML
     private Button closesettingsButton;
+
+    @FXML
+    private ComboBox<Locale> languageCombo;
 
     @FXML
     private TextField tokenField;
@@ -78,11 +85,17 @@ public class FxSettingsView extends VBox implements SettingsView, FxView {
         FxUtils.bindAction(closesettingsButton, action);
     }
 
-    /**
-     * Input and inputvalidation of the Moodle-platform Url.
-     *
-     * @param moodleURL User input.
-     */
+
+    @Override
+    public void setLocale(ObjectProperty<Locale> locale) {
+        languageCombo.valueProperty().bindBidirectional(new LectObjectProperty<>(locale));
+    }
+
+    @Override
+    public void setLocales(List<Locale> locales) {
+        FxUtils.invoke(() -> languageCombo.getItems().setAll(locales));
+    }
+
     @Override
     public void setMoodleField(StringProperty moodleURL) {
         moodleField.textProperty().bindBidirectional(new LectStringProperty(moodleURL));

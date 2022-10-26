@@ -6,6 +6,7 @@ import moodle.sync.view.SettingsView;
 import moodle.sync.core.web.service.MoodleService;
 
 import org.lecturestudio.core.app.ApplicationContext;
+import org.lecturestudio.core.app.LocaleProvider;
 import org.lecturestudio.core.presenter.Presenter;
 import org.lecturestudio.core.view.DirectoryChooserView;
 import org.lecturestudio.core.view.ViewContextFactory;
@@ -37,11 +38,14 @@ public class SettingsPresenter extends Presenter<SettingsView> {
     }
 
     @Override
-    public void initialize() {
+    public void initialize() throws Exception{
         MoodleSyncConfiguration config = (MoodleSyncConfiguration) context.getConfiguration();
+        LocaleProvider localeProvider = new LocaleProvider();
 
         //Initialising all functions of the "settings-page" with the help of the configuration.
         view.setOnExit(this::close);
+        view.setLocales(localeProvider.getLocales());
+        view.setLocale(config.localeProperty());
         view.setMoodleField(config.moodleUrlProperty());
         view.setFormatsMoodle(config.formatsMoodleProperty());
         view.setFormatsFileserver(config.formatsFileserverProperty());

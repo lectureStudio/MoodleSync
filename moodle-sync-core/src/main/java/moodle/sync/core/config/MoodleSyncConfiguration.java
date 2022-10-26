@@ -8,6 +8,8 @@ import org.lecturestudio.core.app.configuration.Configuration;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.beans.StringProperty;
 
+import java.util.Locale;
+
 /**
  * This class represents a configuration containing several settings.
  */
@@ -48,6 +50,8 @@ public class MoodleSyncConfiguration extends Configuration {
 
     //Whether files of unknown fileformat should be displayed.
     private final BooleanProperty showUnknownFormats = new BooleanProperty();
+
+    private final ObjectProperty<Locale> locale = new ObjectProperty();
 
 
     public String getSyncRootPath() {
@@ -194,4 +198,17 @@ public class MoodleSyncConfiguration extends Configuration {
     public BooleanProperty showUnknownFormatsProperty() {
         return showUnknownFormats;
     }
+
+    public Locale getLocale() {
+        return (Locale)this.locale.get();
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale.set(locale);
+    }
+
+    public ObjectProperty<Locale> localeProperty() {
+        return this.locale;
+    }
+
 }

@@ -1,9 +1,13 @@
 package moodle.sync.view;
 
 import org.lecturestudio.core.beans.BooleanProperty;
+import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.beans.StringProperty;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.View;
+
+import java.util.List;
+import java.util.Locale;
 
 /**
  * Interface defining the functions of the "settings-page".
@@ -13,6 +17,10 @@ import org.lecturestudio.core.view.View;
 public interface SettingsView extends View {
 
     void setOnExit(Action action);
+
+    void setLocale(ObjectProperty<Locale> locale);
+
+    void setLocales(List<Locale> locales);
 
     void setMoodleField(StringProperty moodleURL);
 

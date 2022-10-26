@@ -2,6 +2,7 @@ package moodle.sync.presenter;
 
 import javax.inject.Inject;
 
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import moodle.sync.core.config.DefaultConfiguration;
@@ -116,6 +117,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     config.setRecentSection(null);
                 }
             }
+            view.setSection(config.recentSectionProperty());
             view.setData(setData());
         });
 
@@ -258,6 +260,11 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     //Logic for Section-Upload
                     try {
                         moodleService.setSection(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getModuleName(), courseData.getSection());
+                        if(!courseData.getExistingFileName().split("_", 2)[0].matches("\\d+")){
+                            System.out.println(courseData.getExistingFile());
+                            File temp = new File(courseData.getExistingFile());
+                            temp.renameTo(new File(Path.of(courseData.getExistingFile()).getParent().toString() + "/" + courseData.getSection() + "_" + courseData.getExistingFileName()));
+                        }
                     } catch (Exception e) {
                         logException(e, "Sync failed");
 
@@ -268,9 +275,9 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     //url = fileservice.....
                     String url = "https://wikipedia.org";
                     if (courseData.getUnixTimeStamp() > System.currentTimeMillis() / 1000L) {
-                        moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), courseData.getExistingFileName(), url, courseData.getUnixTimeStamp(), courseData.getVisible(), courseData.getBeforemod());
+                        moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), courseData.getModuleName(), url, courseData.getUnixTimeStamp(), courseData.getVisible(), courseData.getBeforemod());
                     } else {
-                        moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), courseData.getExistingFileName(), url, null, courseData.getVisible(), courseData.getBeforemod());
+                        moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), courseData.getModuleName(), url, null, courseData.getVisible(), courseData.getBeforemod());
                     }
                 } else {
                     moodleService.setMoveModule(config.getMoodleToken(), courseData.getCmid(), courseData.getSectionId(), courseData.getBeforemod());
@@ -291,6 +298,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
             view.setSections(sections());
         }
         view.setData(setData());
+        view.setSection(config.recentSectionProperty());
     }
 
     private ObservableList<syncTableElement> setData() {
@@ -336,10 +344,15 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
             if (section.getId() != -2) {
             int sectionnum = section.getSection();
             int sectionId = section.getId();
-            data.add(new syncTableElement(section.getName(), section.getId(), sectionnum, sectionId, data.size(), section.getSummary(), false, false, null, section.getVisible() == 1));
+            data.add(new syncTableElement(section.getName(), section.getId(), sectionnum, sectionId, data.size(), section.getSummary(), false, false, MoodleAction.ExistingSection, section.getVisible() == 1));
             int remove = -1;
             for (int i = 0; i < sectionList.size(); i++) {
-                if (sectionList.get(i).getFileName().toString().equals(section.getName())) {
+                String[] check = sectionList.get(i).getFileName().toString().split("_", 2);
+                if (check.length > 1 && check[1].equals(section.getName())) {
+                    if(!check[0].equals(section.getSection().toString())){
+                        File temp = new File(sectionList.get(i).toString());
+                        temp.renameTo(new File((sectionList.get(i).getParent().toString() + "/" + section.getSection() + "_" + section.getName())));
+                    }
                     remove = i;
                     break;
                 }
@@ -349,7 +362,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                 sectionList.remove(remove);
             }
             //Datenfpad zu Sektionsordner, wird erstellt falls nicht vorhanden
-            Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + section.getName());
+            Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + section.getSection() + "_" + section.getName());
             FileService.directoryManager(execute);
 
             //initalisierung der fileServerRequired Variable

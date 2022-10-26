@@ -63,7 +63,7 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
                 }
 
                 if(draggedElement.getAction() == MoodleAction.UploadSection){
-                    if(tableView.getItems().get(dropIndex).getModuleType().equals("section")) {
+                    if(tableView.getItems().get(dropIndex).getAction() == MoodleAction.ExistingSection) {
                         draggedElement.setSection(tableView.getItems().get(dropIndex).getSection());
                         draggedElement.setBeforemod(tableView.getItems().get(dropIndex).getCmid());
                         tableView.getItems().add(dropIndex, draggedElement);
@@ -76,8 +76,13 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
                         event.setDropCompleted(true);
                         tableView.getSelectionModel().select(draggedIndex);
                     }
+                } else if (draggedElement.getAction() == MoodleAction.ExistingSection){
+                    tableView.getItems().add(draggedIndex, draggedElement);
+
+                    event.setDropCompleted(true);
+                    tableView.getSelectionModel().select(draggedIndex);
                 } else {
-                    if(tableView.getItems().get(dropIndex).getModuleType().equals("section")) {
+                    if(tableView.getItems().get(dropIndex).getAction() == MoodleAction.ExistingSection) {
                         draggedElement.setBeforemod(-1);
                     } else{
                         if(dropIndex != draggedElement.getOldPos()){
