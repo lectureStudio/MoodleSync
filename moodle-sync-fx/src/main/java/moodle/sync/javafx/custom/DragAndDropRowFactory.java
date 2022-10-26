@@ -89,8 +89,8 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
                             draggedElement.setBeforemod(tableView.getItems().get(dropIndex).getCmid());
                         }
                     }
-                    if(dropIndex != draggedElement.getOldPos()) {
-                        draggedElement.setSectionId(tableView.getItems().get(dropIndex).getSectionId());
+                    if(dropIndex != draggedElement.getOldPos() || draggedElement.getAction() == MoodleAction.MoodleUpload || draggedElement.getAction() == MoodleAction.FTPUpload) {
+                        draggedElement.setSectionId(tableView.getItems().get(dropIndex-1).getSectionId());
                         draggedElement.setSelectable(true);
                     } else{
                         draggedElement.setSelectable(false);
@@ -99,6 +99,7 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
                     tableView.getItems().add(dropIndex, draggedElement);
 
                     event.setDropCompleted(true);
+                    tableView.refresh();
                     tableView.getSelectionModel().select(dropIndex);
                 }
                 event.consume();

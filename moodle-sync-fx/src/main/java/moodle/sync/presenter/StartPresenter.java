@@ -4,6 +4,7 @@ import javax.inject.Inject;
 
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import moodle.sync.core.config.DefaultConfiguration;
 import moodle.sync.core.config.MoodleSyncConfiguration;
@@ -561,6 +562,16 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
             watcher.addListener(this);
             watcher.watch();
 
+            /*data.addListener((ListChangeListener<syncTableElement>) change -> {
+                if(change.next()){
+                if(change.wasUpdated()){
+                    ObservableList<syncTableElement> dummy = FXCollections.observableArrayList();
+                    dummy = (ObservableList<syncTableElement>) change.getList();
+                    for(syncTableElement test : dummy){
+                        System.out.println(test.isSelected());
+                    }
+                }
+            }});*/
             return data;
 
     }

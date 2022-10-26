@@ -1,6 +1,8 @@
 package moodle.sync.javafx.custom;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.web.WebView;
@@ -16,11 +18,11 @@ public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTabl
     @Override
     public void updateItem(String item, boolean empty) {
 
+        Listener listener = new Listener();
         super.updateItem(item, empty);
 
         setConverter(new DefaultStringConverter());
         setGraphic(null);
-        //setText(null);
 
         if (empty || item == null || getTableRow() == null || getTableRow().getItem() == null) {
             setText(null);
@@ -46,12 +48,7 @@ public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTabl
                 if(!getTableRow().getItem().selectedProperty().get()){
                     setVisible(false);
                 }
-                getTableRow().getItem().selectedProperty().addListener((observable, oldBool, newBool) -> {
-                        managedProperty().bind(visibleProperty());
-                        setEditable(getTableRow().getItem().selectedProperty().get());
-                        setText(getTableRow().getItem().getExistingFileName());
-                        setVisible(getTableRow().getItem().selectedProperty().get());
-                });
+                getTableRow().getItem().selectedProperty().addListener(new Listener());
             }
             else {
                 setText(null);
@@ -87,6 +84,16 @@ public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTabl
             }
             setGraphic(icon);
             setText(item);
+        }
+    }
+
+    public class Listener implements ChangeListener {
+        @Override
+        public void changed(ObservableValue observableValue, Object o, Object t1) {
+            managedProperty().bind(visibleProperty());
+            setEditable(getTableRow().getItem().selectedProperty().get());
+            setText(getTableRow().getItem().getExistingFileName());
+            setVisible(getTableRow().getItem().selectedProperty().get());
         }
     }
 }
