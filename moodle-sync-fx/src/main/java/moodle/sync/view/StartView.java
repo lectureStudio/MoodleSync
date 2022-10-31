@@ -4,6 +4,7 @@ import javafx.collections.ObservableList;
 import moodle.sync.core.model.json.Course;
 import moodle.sync.core.model.syncTableElement;
 import moodle.sync.core.model.json.Section;
+import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.ConsumerAction;
@@ -25,6 +26,8 @@ public interface StartView extends View {
     void setOnSettings(Action action);
 
     void setOnFolder(Action action);
+
+    void setSelectAll(BooleanProperty selectAll);
 
     void setCourses(List<Course> courses);
 

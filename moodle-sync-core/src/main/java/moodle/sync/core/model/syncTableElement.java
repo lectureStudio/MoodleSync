@@ -37,6 +37,8 @@ public class syncTableElement {
 
     private ObjectProperty<TimeDateElement> availabilityDateTime;
 
+    private BooleanProperty delete = new SimpleBooleanProperty(false);
+
     public syncTableElement(String moduleName, Integer cmid, Integer section, Integer sectionId, Integer oldPos, String moduleType, Path existingFile, Boolean selectable, Boolean selected, MoodleAction action, Boolean visible){
         this.moduleName = new SimpleStringProperty(moduleName);
         this.cmid = new SimpleIntegerProperty(cmid);
@@ -491,5 +493,31 @@ public class syncTableElement {
      * @param value the new message.
      */
     public void setTimeDateElement(TimeDateElement value) { this.availabilityDateTime.set(value);
+    }
+
+    /**
+     * Providing the messageProperty.
+     *
+     * @return the messageProprty.
+     */
+    public BooleanProperty deleteProperty() {
+        return delete;
+    }
+
+    /**
+     * Providing the files message as a String.
+     *
+     * @return the files message as a String.
+     */
+    public boolean getDelete() {
+        return this.delete.get();
+    }
+
+    /**
+     * Sets a new message.
+     *
+     * @param value the new message.
+     */
+    public void setDelete(boolean value) { this.delete.set(value);
     }
 }

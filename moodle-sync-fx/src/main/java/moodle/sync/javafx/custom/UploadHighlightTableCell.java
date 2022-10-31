@@ -15,14 +15,17 @@ import org.lecturestudio.javafx.control.SvgIcon;
 
 public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTableElement, String> {
 
+    private Listener listener = new Listener();
+
     @Override
     public void updateItem(String item, boolean empty) {
 
-        Listener listener = new Listener();
         super.updateItem(item, empty);
 
+        if(getTableRow().getItem() != null) getTableRow().getItem().selectedProperty().removeListener(listener);
         setConverter(new DefaultStringConverter());
         setGraphic(null);
+        setVisible(true);
 
         if (empty || item == null || getTableRow() == null || getTableRow().getItem() == null) {
             setText(null);
@@ -46,9 +49,9 @@ public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTabl
         } else if(getTableRow().getItem().getAction() == MoodleAction.MoodleUpload || getTableRow().getItem().getAction() == MoodleAction.FTPUpload ||getTableRow().getItem().getAction() == MoodleAction.UploadSection || getTableRow().getItem().getAction() == MoodleAction.DatatypeNotKnown) {
             if((getTableRow().getItem().getAction() == MoodleAction.MoodleUpload && getTableRow().getItem() != null) ||(getTableRow().getItem().getAction() == MoodleAction.FTPUpload && getTableRow().getItem() != null)){
                 if(!getTableRow().getItem().selectedProperty().get()){
-                    setVisible(false);
+                   setText(null);
                 }
-                getTableRow().getItem().selectedProperty().addListener(new Listener());
+                getTableRow().getItem().selectedProperty().addListener(listener);
             }
             else {
                 setText(null);
@@ -90,9 +93,8 @@ public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTabl
     public class Listener implements ChangeListener {
         @Override
         public void changed(ObservableValue observableValue, Object o, Object t1) {
-            managedProperty().bind(visibleProperty());
             setEditable(getTableRow().getItem().selectedProperty().get());
-            setText(getTableRow().getItem().getExistingFileName());
+            if(getTableRow().getItem().selectedProperty().get()) setText(getTableRow().getItem().getExistingFileName());
             setVisible(getTableRow().getItem().selectedProperty().get());
         }
     }

@@ -18,6 +18,7 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
     @Override
     public TableRow<syncTableElement> call(TableView<syncTableElement> tableView) {
 
+
         final TableRow<syncTableElement> row ;
 
         row = new TableRow<>();
@@ -70,17 +71,20 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
 
                         event.setDropCompleted(true);
                         tableView.getSelectionModel().select(dropIndex);
+                        tableView.refresh();
                     } else {
                         tableView.getItems().add(draggedIndex, draggedElement);
 
                         event.setDropCompleted(true);
                         tableView.getSelectionModel().select(draggedIndex);
+                        tableView.refresh();
                     }
                 } else if (draggedElement.getAction() == MoodleAction.ExistingSection){
                     tableView.getItems().add(draggedIndex, draggedElement);
 
                     event.setDropCompleted(true);
                     tableView.getSelectionModel().select(draggedIndex);
+                    tableView.refresh();
                 } else {
                     if(tableView.getItems().get(dropIndex).getAction() == MoodleAction.ExistingSection) {
                         draggedElement.setBeforemod(-1);
@@ -102,6 +106,7 @@ public class DragAndDropRowFactory implements Callback<TableView<syncTableElemen
                     tableView.refresh();
                     tableView.getSelectionModel().select(dropIndex);
                 }
+
                 event.consume();
 
             }

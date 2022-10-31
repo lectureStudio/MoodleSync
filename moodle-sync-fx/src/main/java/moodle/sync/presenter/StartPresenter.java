@@ -2,9 +2,9 @@ package moodle.sync.presenter;
 
 import javax.inject.Inject;
 
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import moodle.sync.core.config.DefaultConfiguration;
 import moodle.sync.core.config.MoodleSyncConfiguration;
@@ -24,8 +24,10 @@ import moodle.sync.core.model.syncTableElement;
 import moodle.sync.core.web.service.MoodleUploadTemp;
 import org.apache.commons.io.FilenameUtils;
 import org.lecturestudio.core.app.ApplicationContext;
+import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.presenter.Presenter;
+import org.lecturestudio.core.presenter.command.ShowPresenterCommand;
 import org.lecturestudio.core.view.NotificationType;
 import org.lecturestudio.core.view.ViewContextFactory;
 
@@ -73,6 +75,8 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
 
     private FileServerClientFTP fileClient;
 
+    private BooleanProperty selectAll;
+
     @Inject
     StartPresenter(ApplicationContext context, StartView view,
                    ViewContextFactory viewFactory, MoodleService moodleService) {
@@ -80,6 +84,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         this.viewFactory = viewFactory;
         this.moodleService = moodleService;
         this.config = (MoodleSyncConfiguration) context.getConfiguration();
+        this.selectAll = new BooleanProperty(false);
     }
 
     @Override
@@ -102,28 +107,37 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         view.setOnCourseChanged(this::onCourseChanged);
         view.setData(setData());
         view.setOnFolder(this::openCourseDirectory);
+        view.setSelectAll(selectAll);
 
 
         //Display the course-sections after Moodle-course is choosen.
         config.recentCourseProperty().addListener((observable, oldCourse, newCourse) -> {
             config.setRecentSection(null);
-            view.setSections(sections());
-            view.setSection(new ObjectProperty<Section>());
             view.setData(setData());
         });
 
         config.recentSectionProperty().addListener((observable, oldSection, newSection) -> {
-            if(!isNull(newSection)) {
-                if (newSection.getId() == -2) {
-                    config.setRecentSection(null);
-                }
-            }
-            view.setSection(config.recentSectionProperty());
             view.setData(setData());
         });
 
         config.moodleUrlProperty().addListener((observable, oldUrl, newUrl) -> {
             config.setRecentCourse(null);
+        });
+
+        selectAll.addListener((observable, oldUrl, newUrl) -> {
+            if(newUrl){
+                for(syncTableElement elem : courseData){
+                    if(elem.isSelectable()){
+                        elem.selectedProperty().setValue(true);
+                    }
+                }
+            } else {
+                for(syncTableElement elem : courseData){
+                    if(elem.isSelectable()){
+                        elem.selectedProperty().setValue(false);
+                    }
+                }
+            }
         });
     }
 
@@ -186,11 +200,9 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
             courseContent = content;
             return content;
         } catch (Exception e) {
-        }
 
-        List<Section> content = new ArrayList<>();
-        ;
-        return content;
+        }
+        return new ArrayList<>();
     }
 
     private void onSettings() {
@@ -257,21 +269,6 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     } else {
                         moodleService.setMoveModule(config.getMoodleToken(), courseData.getCmid(), courseData.getSectionId(), courseData.getBeforemod());
                     }
-                } else if (courseData.getAction() == MoodleAction.UploadSection) {
-                    //Logic for Section-Upload
-                    try {
-                        moodleService.setSection(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getModuleName(), courseData.getSection());
-                        if(!courseData.getExistingFileName().split("_", 2)[0].matches("\\d+")){
-                            System.out.println(courseData.getExistingFile());
-                            File temp = new File(courseData.getExistingFile());
-                            temp.renameTo(new File(Path.of(courseData.getExistingFile()).getParent().toString() + "/" + courseData.getSection() + "_" + courseData.getExistingFileName()));
-                        }
-                    } catch (Exception e) {
-                        logException(e, "Sync failed");
-
-                        showNotification(NotificationType.ERROR, "start.sync.error.title",
-                                "start.sync.error.upload.message");
-                    }
                 } else if (courseData.getAction() == MoodleAction.FTPUpload) {
                     //url = fileservice.....
                     String url = "https://wikipedia.org";
@@ -281,7 +278,25 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                         moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), courseData.getModuleName(), url, null, courseData.getVisible(), courseData.getBeforemod());
                     }
                 } else {
-                    moodleService.setMoveModule(config.getMoodleToken(), courseData.getCmid(), courseData.getSectionId(), courseData.getBeforemod());
+                    if(courseData.getAction() != MoodleAction.UploadSection) moodleService.setMoveModule(config.getMoodleToken(), courseData.getCmid(), courseData.getSectionId(), courseData.getBeforemod());
+                }
+            }
+        }
+        for (syncTableElement courseData : courseData) {
+            if (courseData.getAction() == MoodleAction.UploadSection && courseData.isSelected()) {
+                //Logic for Section-Upload
+                try {
+                    moodleService.setSection(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getModuleName(), courseData.getSection());
+                    if (!courseData.getExistingFileName().split("_", 2)[0].matches("\\d+")) {
+                        System.out.println(courseData.getExistingFile());
+                        File temp = new File(courseData.getExistingFile());
+                        temp.renameTo(new File(Path.of(courseData.getExistingFile()).getParent().toString() + "/" + courseData.getSection() + "_" + courseData.getExistingFileName()));
+                    }
+                } catch (Exception e) {
+                    logException(e, "Sync failed");
+
+                    showNotification(NotificationType.ERROR, "start.sync.error.title",
+                            "start.sync.error.upload.message");
                 }
             }
         }
@@ -292,14 +307,10 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
      * Method to update the displayed Moodle-Courses.
      */
     private void updateCourses() {
-        view.setCourses(courses());
-        if(!isNull(config.getRecentSection())){
+        if(!isNull(config.getRecentSection()) && config.getRecentSection().getId() != -2){
             config.setRecentSection(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
-        } else{
-            view.setSections(sections());
         }
         view.setData(setData());
-        view.setSection(config.recentSectionProperty());
     }
 
     private ObservableList<syncTableElement> setData() {
@@ -318,15 +329,15 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     "start.sync.error.message");
         }
 
-        if (!isNull(config.getRecentSection())) {
+        if (!isNull(config.getRecentSection()) && config.getRecentSection().getId() != -2) {
             courseContent.clear();
-            courseContent.add(config.getRecentSection());
+            courseContent.add(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
         }
 
         List<Path> sectionList = List.of();
 
         try {
-            if (isNull(config.getRecentSection())) {
+            if (isNull(config.getRecentSection()) || config.getRecentSection().getId() == -2) {
                 //Zur Prüfung neuer Ordner, um sie hinzuzufügen
                 Path sections = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
                 FileService.directoryManager(sections);
@@ -555,6 +566,15 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     data.add(new syncTableElement(elem.getFileName().toString(), -1, -1, -1, data.size(), "section", elem, true, false, MoodleAction.UploadSection, true));
                 }
             }
+
+            /**for(syncTableElement listener : data){
+                listener.deleteProperty().addListener((observable, oldSection, newSection) -> {
+                    if(newSection){
+                        deleteModule(listener);
+                    }
+                });
+            }*/
+
             courseData = data;
 
             //FileWatcher aktivieren
@@ -576,6 +596,14 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
 
     }
 
+    /*private void deleteModule(syncTableElement element){
+        if(element.getAction() == MoodleAction.ExistingFile || element.getAction() == MoodleAction.NotLocalFile || element.getAction() == MoodleAction.MoodleSynchronize || element.getAction() == MoodleAction.FTPSynchronize){
+            if(element.getDelete()){
+                //Hier nochmal Nutzerdialog
+                context.getEventBus().post(new ShowPresenterCommand<>(ConfirmDeleteModulePresenter.class));
+            }
+        }
+    }*/
 
     @Override
     public void onCreated(FileEvent event) {
@@ -615,4 +643,5 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
     public static boolean contains(final String[] arr, final String key) {
         return Arrays.asList(arr).contains(key);
     }
+
 }

@@ -5,9 +5,11 @@ import javafx.scene.control.*;
 import moodle.sync.core.model.json.Course;
 import moodle.sync.core.model.syncTableElement;
 import moodle.sync.core.model.json.Section;
+import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.view.Action;
 import org.lecturestudio.core.view.ConsumerAction;
+import org.lecturestudio.javafx.beans.LectBooleanProperty;
 import org.lecturestudio.javafx.beans.LectObjectProperty;
 import org.lecturestudio.javafx.util.FxUtils;
 import org.lecturestudio.javafx.view.FxView;
@@ -42,6 +44,9 @@ public class FxStartView extends VBox implements StartView, FxView {
     private Button folderButton;
 
     @FXML
+    private CheckBox allSelected;
+
+    @FXML
     private ComboBox<Course> courseCombo;
 
     @FXML
@@ -54,6 +59,7 @@ public class FxStartView extends VBox implements StartView, FxView {
     public FxStartView() {
         super();
     }
+
 
     @Override
     public void setData(ObservableList<syncTableElement> data) {
@@ -94,6 +100,11 @@ public class FxStartView extends VBox implements StartView, FxView {
     }
 
     @Override
+    public void setSelectAll(BooleanProperty selectAll) {
+        allSelected.selectedProperty().bindBidirectional(new LectBooleanProperty(selectAll));
+    }
+
+    @Override
     public void setOnFolder(Action action) {
         FxUtils.bindAction(folderButton, action);
     }
@@ -125,6 +136,7 @@ public class FxStartView extends VBox implements StartView, FxView {
     @Override
     public void setSections(List<Section> sections) {
         FxUtils.invoke(() -> sectionCombo.getItems().setAll(sections));
+        sectionCombo.getSelectionModel().selectFirst();
     }
 
     /**

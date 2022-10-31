@@ -32,6 +32,7 @@
 <?import moodle.sync.javafx.custom.AvailabilityCellValueFactory?>
 <?import moodle.sync.javafx.custom.AvailableDateTimeTableCellFactory?>
 
+<?import moodle.sync.javafx.custom.DeleteButtonCellFactory?>
 <fx:root alignment="CENTER" type="VBox" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
     <BorderPane VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
         <top>
@@ -82,10 +83,10 @@
                 <columnResizePolicy>
                     <DynamicResizePolicy tableView="$syncTable">
                         <columnConstraints>
-                            <ColumnSizeConstraints percentWidth="0.5"/>
-                            <ColumnSizeConstraints percentWidth="0.5"/>
-                            <ColumnSizeConstraints prefWidth="100.0"/>
-                            <ColumnSizeConstraints prefWidth="100.0"/>
+                            <ColumnSizeConstraints percentWidth="0.495"/>
+                            <ColumnSizeConstraints percentWidth="0.495"/>
+                            <ColumnSizeConstraints prefWidth="90.0"/>
+                            <ColumnSizeConstraints prefWidth="85.0"/>
                             <ColumnSizeConstraints prefWidth="200.0"/>
                         </columnConstraints>
                     </DynamicResizePolicy>
@@ -108,6 +109,9 @@
                         </cellValueFactory>
                     </TableColumn>
                     <TableColumn fx:id="executeTableColumn" styleClass="CENTER" editable="true" text="%start.execute">
+                        <graphic>
+                            <CheckBox fx:id="allSelected" mnemonicParsing="false" />
+                        </graphic>
                         <cellFactory>
                             <CheckBoxTableCellFactory/>
                         </cellFactory>
@@ -131,6 +135,11 @@
                             <PropertyValueFactory property="availabilityDateTime"/>
                         </cellValueFactory>
                     </TableColumn>
+                    <!--- <TableColumn fx:id="deleteColumn" styleClass="Center" editable="false" text="%start.delete">
+                        <cellFactory>
+                            <DeleteButtonCellFactory/>
+                        </cellFactory>
+                    </TableColumn> -->
                 </columns>
                 <BorderPane.margin>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
