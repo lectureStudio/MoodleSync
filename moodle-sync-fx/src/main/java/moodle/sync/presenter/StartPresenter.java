@@ -206,7 +206,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
     }
 
     private void onSettings() {
-        context.getEventBus().post(new ShowSettingsCommand(this::updateCourses));
+        context.getEventBus().post(new ShowSettingsCommand(this::refreshCourseList));
     }
 
 
@@ -307,10 +307,14 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
      * Method to update the displayed Moodle-Courses.
      */
     private void updateCourses() {
-        if(!isNull(config.getRecentSection()) && config.getRecentSection().getId() != -2){
+        /*if(!isNull(config.getRecentSection()) && config.getRecentSection().getId() != -2){
             config.setRecentSection(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
-        }
+        }*/
         view.setData(setData());
+    }
+
+    private void refreshCourseList() {
+        view.setCourses(courses());
     }
 
     private ObservableList<syncTableElement> setData() {
