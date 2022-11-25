@@ -14,6 +14,7 @@ import java.util.ResourceBundle;
 import javax.inject.Singleton;
 
 import moodle.sync.core.web.service.MoodleService;
+import moodle.sync.core.web.service.UploadService;
 import org.lecturestudio.core.app.AppDataLocator;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.app.LocaleProvider;
@@ -96,7 +97,6 @@ public class ApplicationModule extends AbstractModule {
 	@Singleton
 	MoodleService createMoodleService(Configuration config){
 		MoodleSyncConfiguration syncConfig = (MoodleSyncConfiguration) config;
-		System.out.println(syncConfig.getSyncRootPath());
 		return new MoodleService(syncConfig.moodleUrlProperty());
 	}
 

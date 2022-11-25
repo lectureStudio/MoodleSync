@@ -53,6 +53,7 @@ public class MoodleSyncConfiguration extends Configuration {
 
     private final ObjectProperty<Locale> locale = new ObjectProperty();
 
+    private final BooleanProperty executeDeletion = new BooleanProperty();
 
     public String getSyncRootPath() {
         return syncRootPath.get();
@@ -209,6 +210,18 @@ public class MoodleSyncConfiguration extends Configuration {
 
     public ObjectProperty<Locale> localeProperty() {
         return this.locale;
+    }
+
+    public Boolean getExecuteDeletion() {
+        return executeDeletion.get();
+    }
+
+    public void setExecuteDeletion(Boolean executeDeletion) {
+        this.executeDeletion.set(executeDeletion);
+    }
+
+    public BooleanProperty executeDeletionProperty() {
+        return executeDeletion;
     }
 
 }

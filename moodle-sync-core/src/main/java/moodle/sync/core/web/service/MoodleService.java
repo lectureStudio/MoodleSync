@@ -1,6 +1,8 @@
 package moodle.sync.core.web.service;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -14,6 +16,10 @@ import org.lecturestudio.core.beans.StringProperty;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 
 import moodle.sync.core.web.client.MoodleClient;
 
@@ -195,6 +201,7 @@ public class MoodleService {
     public void setSection(String token, int courseid, String sectionname, int sectionnum) {
         moodleClient.setSection("json", token, "local_course_add_new_section", courseid, sectionname, sectionnum);
     }
+
 
 
     /**

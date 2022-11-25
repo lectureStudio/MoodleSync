@@ -46,7 +46,8 @@
 		<module>moodle-sync-fx</module>
 		<module>moodle-sync-jpackage</module>
 		<module>moodle-sync-bundle</module>
-	</modules>
+        <module>moodle-sync-cli</module>
+    </modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -341,16 +342,6 @@
 			<groupId>no.tornado</groupId>
 			<artifactId>tornadofx-controls</artifactId>
 			<version>1.0.6</version>
-		</dependency>
-		<dependency>
-			<groupId>com.dlsc.gemsfx</groupId>
-			<artifactId>gemsfx</artifactId>
-			<version>1.47.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.24</version>
 		</dependency>
 	</dependencies>
 </project>

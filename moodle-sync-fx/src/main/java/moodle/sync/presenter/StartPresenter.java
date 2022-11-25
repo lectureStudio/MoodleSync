@@ -2,8 +2,6 @@ package moodle.sync.presenter;
 
 import javax.inject.Inject;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import moodle.sync.core.config.DefaultConfiguration;
@@ -25,9 +23,8 @@ import moodle.sync.core.web.service.MoodleUploadTemp;
 import org.apache.commons.io.FilenameUtils;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.beans.BooleanProperty;
-import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.presenter.Presenter;
-import org.lecturestudio.core.presenter.command.ShowPresenterCommand;
+
 import org.lecturestudio.core.view.NotificationType;
 import org.lecturestudio.core.view.ViewContextFactory;
 
@@ -171,9 +168,9 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         }
 
         //Do not show Moodle-courses which are already over.
-        if (!courses.isEmpty()) {
-            courses.removeIf(item -> (item.getEnddate() != 0 && (item.getEnddate() < System.currentTimeMillis()/1000)));
-        }
+        //if (!courses.isEmpty()) {
+        //    courses.removeIf(item -> (item.getEnddate() != 0 && (item.getEnddate() < System.currentTimeMillis()/1000)));
+        //}
         //Sort Courses if Possible
         /*if(courses.get(0).getShortname().contains("SoSe") || courses.get(0).getShortname().contains("WiSe")){
             if(courses.get(0).getShortname().contains("20")){
@@ -307,9 +304,6 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
      * Method to update the displayed Moodle-Courses.
      */
     private void updateCourses() {
-        /*if(!isNull(config.getRecentSection()) && config.getRecentSection().getId() != -2){
-            config.setRecentSection(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
-        }*/
         view.setData(setData());
     }
 
@@ -571,7 +565,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                 }
             }
 
-            /**for(syncTableElement listener : data){
+            /*for(syncTableElement listener : data){
                 listener.deleteProperty().addListener((observable, oldSection, newSection) -> {
                     if(newSection){
                         deleteModule(listener);
@@ -633,9 +627,8 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
 
     private void openCourseDirectory(){
         Desktop desktop = Desktop.getDesktop();
-        File dirToOpen = null;
         try {
-            dirToOpen = new File(config.getSyncRootPath() + "/" + config.getRecentCourse().getDisplayname());
+            File dirToOpen = new File(config.getSyncRootPath() + "/" + config.getRecentCourse().getDisplayname());
             desktop.open(dirToOpen);
         } catch (Throwable e) {
             logException(e, "Sync failed");

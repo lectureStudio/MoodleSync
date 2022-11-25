@@ -8,6 +8,7 @@ import javafx.util.converter.IntegerStringConverter;
 import moodle.sync.presenter.SettingsPresenter;
 import moodle.sync.util.UserInputValidations;
 import moodle.sync.view.SettingsView;
+import org.controlsfx.control.PopOver;
 import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.beans.ObjectProperty;
 import org.lecturestudio.core.beans.StringProperty;

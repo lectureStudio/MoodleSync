@@ -76,7 +76,7 @@
             </HBox>
         </top>
         <center>
-            <TableView fx:id="syncTable" BorderPane.alignment="CENTER" editable="true" prefHeight="20.0">
+            <TableView fx:id="syncTable" BorderPane.alignment="CENTER" editable="true" prefHeight="27.0">
                 <rowFactory>
                     <DragAndDropRowFactory/>
                 </rowFactory>

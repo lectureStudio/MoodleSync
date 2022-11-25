@@ -3,19 +3,32 @@ package moodle.sync.javafx.custom;
 import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
 import javafx.util.converter.DefaultStringConverter;
 import moodle.sync.core.model.json.Section;
 import moodle.sync.core.util.MoodleAction;
 import moodle.sync.core.model.syncTableElement;
+import org.controlsfx.control.PopOver;
 import org.lecturestudio.core.beans.ObjectProperty;
+import org.lecturestudio.javafx.beans.LectStringProperty;
 import org.lecturestudio.javafx.control.SvgIcon;
 
-public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTableElement, String> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement, String> {
 
     private Listener listener = new Listener();
+    private PopOver popOver;
 
     @Override
     public void updateItem(String item, boolean empty) {
@@ -23,29 +36,51 @@ public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTabl
         super.updateItem(item, empty);
 
         if(getTableRow().getItem() != null) getTableRow().getItem().selectedProperty().removeListener(listener);
-        setConverter(new DefaultStringConverter());
+
+        if(popOver != null){
+            popOver = null;
+            this.setOnMouseEntered(mouseEvent -> {
+            });
+
+            this.setOnMouseExited(mouseEvent -> {
+            });
+        }
+
         setGraphic(null);
         setVisible(true);
+        getTableRow().getStyleClass().remove("headerstyle");
 
         if (empty || item == null || getTableRow() == null || getTableRow().getItem() == null) {
             setText(null);
             setEditable(false);
         } else if(getTableRow().getItem().getAction() == MoodleAction.ExistingSection ){
-            TitledPane titlePlane = new TitledPane();
-            WebView fontWebView = new WebView();
-            fontWebView.getEngine().loadContent(getTableRow().getItem().getModuleType().replaceAll("\\<.*?>", ""));
-            titlePlane.setText(getTableRow().getItem().getModuleName());
-            titlePlane.setContent(fontWebView);
-            titlePlane.expandedProperty().setValue(false);
-            if(getTableRow().getItem().getModuleType().replaceAll("\\<.*?>", "").isEmpty()){
-                titlePlane.setPrefHeight(0);
-                titlePlane.setCollapsible(false);
-            } else {
-                titlePlane.setPrefHeight(70);
+            if(!(getTableRow().getItem().getModuleType().replaceAll("\\<.*?>", "")).isEmpty()){
+                Label textArea = new Label();
+                textArea.setText(getTableRow().getItem().getModuleType().replaceAll("\\<.*?>", ""));
+                textArea.setWrapText(true);
+                textArea.setMaxWidth(200);
+                textArea.setStyle("-fx-font-weight: normal");
+                textArea.getStyleClass().add("popUpTextArea");
+                VBox vBox = new VBox(textArea);
+                vBox.setPadding(new Insets(5));
+                popOver = new PopOver(vBox);
+                popOver.setArrowLocation(PopOver.ArrowLocation.LEFT_CENTER);
+
+                this.setOnMouseEntered(mouseEvent -> {
+                    //Show PopOver when mouse enters label
+                    popOver.show(this);
+                });
+                this.setOnMouseExited(mouseEvent -> {
+                    //Hide PopOver when mouse exits label
+                    popOver.hide();
+                });
             }
-            setGraphic(titlePlane);
-            setText(null);
-            setEditable(false);
+            setText(getTableRow().getItem().getModuleName());
+            setStyle("-fx-font-weight: bold");
+
+
+            getTableRow().getStyleClass().add("headerstyle");
+
         } else if(getTableRow().getItem().getAction() == MoodleAction.MoodleUpload || getTableRow().getItem().getAction() == MoodleAction.FTPUpload ||getTableRow().getItem().getAction() == MoodleAction.UploadSection || getTableRow().getItem().getAction() == MoodleAction.DatatypeNotKnown) {
             if((getTableRow().getItem().getAction() == MoodleAction.MoodleUpload && getTableRow().getItem() != null) ||(getTableRow().getItem().getAction() == MoodleAction.FTPUpload && getTableRow().getItem() != null)){
                 if(!getTableRow().getItem().selectedProperty().get()){
@@ -86,7 +121,7 @@ public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTabl
                 icon.getStyleClass().add("other-icon");
             }
             setGraphic(icon);
-            setText(item);
+            setText(item.replaceAll("\\u00a0\\n|&nbsp;\\r\\n", ""));
         }
     }
 
@@ -98,5 +133,6 @@ public class UploadHighlightTableCell <U, B> extends TextFieldTableCell<syncTabl
             setVisible(getTableRow().getItem().selectedProperty().get());
         }
     }
+
 }
 
