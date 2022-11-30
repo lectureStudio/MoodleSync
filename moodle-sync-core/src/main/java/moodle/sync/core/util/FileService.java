@@ -3,6 +3,7 @@ package moodle.sync.core.util;
 import moodle.sync.core.model.json.Module;
 import moodle.sync.core.model.json.Section;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
@@ -32,6 +33,22 @@ public class FileService {
     }
 
 
+    public static List<Path> formatSectionFolder(List<Path> sectionList, Section section){
+        int remove = -1;
+        for(int i = 0; i < sectionList.size(); i++){
+            String[] sectionFolder = sectionList.get(i).getFileName().toString().split("_", 2);
+            if(sectionFolder[sectionFolder.length-1].equals(section.getName())){
+                File temp = new File(sectionList.get(i).toString());
+                temp.renameTo(new File((sectionList.get(i).getParent().toString() + "/" + section.getSection() + "_" + section.getName())));
+                remove = i;
+                break;
+            }
+        }
+        if(remove != -1){
+            sectionList.remove(remove);
+        }
+        return sectionList;
+    }
     /**
      * Obtaining a list containing all paths inside a directory.
      *
@@ -51,32 +68,6 @@ public class FileService {
         return result;
     }
 
-    /**
-     * Recursive method to retain a list representing a directories-structure.
-     *
-     * @param p Path of the directory.
-     * @return list containing objects of the type UploadData.
-     */
-    /**
-    public static List<UploadData> getFilesInDirectory(Path p) throws IOException {
-        List<UploadData> result = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(p)) {
-            for (Path entry : stream) {
-                //When an element is a directory, a recursive-call of this method is made.
-                if (Files.isDirectory(entry)) {
-                    if (!getFilesInDirectory(entry).isEmpty()) {
-                        result.add(new UploadFolderElement(getFilesInDirectory(entry), entry, MoodleAction.DatatypeNotKnown, false));
-                    }
-                } else {
-                    result.add(new UploadElement(entry));
-                }
-            }
-        } catch (DirectoryIteratorException ex) {
-            // I/O error encounted during the iteration, the cause is an IOException
-            throw ex.getCause();
-        }
-        return result;
-    }*/
 
     public static List<Path> getPathsInDirectory(Path p) throws IOException {
         List<Path> result = new ArrayList<>();
@@ -84,7 +75,6 @@ public class FileService {
             for (Path entry : stream) {
                 //When an element is a directory, a recursive-call of this method is made.
                 result.add(entry);
-
             }
         } catch (DirectoryIteratorException ex) {
             // I/O error encounted during the iteration, the cause is an IOException
@@ -111,66 +101,5 @@ public class FileService {
         }
         return modules;
     }
-
-
-    /**
-     * Method constructing a UploadElement based of a given local file matching the fileformat for a Moodle-upload.
-     *
-     * @param module list with Modules to check whether the given file is already uploaded.
-     * @param path   Path of the file.
-     * @return created UploadElement.
-     */
-    /*
-    public static UploadElement CheckMoodleModule(List<Module> module, Path path) throws IOException {
-        boolean uploaded = false;
-        int ifuploaded = 0;
-        for (int i = 0; i < module.size(); i++) {
-            //Check if file is already uploaded.
-            if (path.getFileName().toString().equals(module.get(i).getContents().get(0).getFilename())) {
-                uploaded = true;
-                ifuploaded = i;
-                long onlinemodified = module.get(i).getContents().get(0).getTimemodified() * 1000;
-                long filemodified = Files.getLastModifiedTime(path).toMillis();
-                //Check if local file is newer.
-                if (filemodified > onlinemodified) {
-                    return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.MoodleSynchronize, true);
-                }
-            }
-        }
-        if (!uploaded) {
-            return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.MoodleUpload, true);
-        }
-        return null;
-    }*/
-
-    /**
-     * Method constructing a UploadElement based of a given local file matching the fileformat for a Fileserver-upload.
-     *
-     * @param files list containing objects of type FileServerFile to check whether the given file is already uploaded.
-     * @param path  Path of the file.
-     * @return created UploadElement.
-     */
-    /*
-    public static UploadElement CheckFileServerModule(List<FileServerFile> files, Path path) throws IOException {
-        boolean uploaded = false;
-        int ifuploaded = 0;
-        for (int i = 0; i < files.size(); i++) {
-            //Check if file is already uploaded.
-            if (path.getFileName().toString().equals(files.get(i).getFilename())) {
-                uploaded = true;
-                ifuploaded = i;
-                long onlinemodified = files.get(i).getLastTimeModified();
-                long filemodified = Files.getLastModifiedTime(path).toMillis();
-                //Check if local file is newer.
-                if (filemodified > onlinemodified) {
-                    return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.FTPSynchronize, true);
-                }
-            }
-        }
-        if (!uploaded) {
-            return new UploadElement(path, uploaded, ifuploaded, false, MoodleAction.FTPUpload, true);
-        }
-        return null;
-    }*/
 }
 
