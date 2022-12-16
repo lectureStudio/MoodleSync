@@ -16,8 +16,8 @@ import moodle.sync.core.util.FileWatcherService.FileEvent;
 import moodle.sync.core.util.FileWatcherService.FileListener;
 import moodle.sync.core.util.FileWatcherService.FileWatcher;
 import moodle.sync.core.util.MoodleAction;
-import moodle.sync.core.model.TimeDateElement;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.TimeDateElement;
+import moodle.sync.javafx.model.syncTableElement;
 
 import moodle.sync.core.web.service.MoodleUploadTemp;
 import org.apache.commons.io.FilenameUtils;

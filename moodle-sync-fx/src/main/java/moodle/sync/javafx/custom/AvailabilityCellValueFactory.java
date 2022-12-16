@@ -5,7 +5,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.syncTableElement;
 
 public class AvailabilityCellValueFactory implements Callback<TableColumn.CellDataFeatures<syncTableElement,Boolean>, ObservableValue<Boolean>> {
     @Override

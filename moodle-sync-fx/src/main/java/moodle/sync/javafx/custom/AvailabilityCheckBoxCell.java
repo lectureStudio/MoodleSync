@@ -8,7 +8,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.util.StringConverter;
 import moodle.sync.core.util.MoodleAction;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.syncTableElement;
 
 /**
  * Class used to display the selctedProperty-value inside a CheckBoxTreeTableCell.

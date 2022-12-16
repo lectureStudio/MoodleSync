@@ -8,7 +8,7 @@ import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.util.Callback;
 import moodle.sync.core.util.MoodleAction;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.syncTableElement;
 
 
 public class DragAndDropRowFactory implements Callback<TableView<syncTableElement>, TableRow<syncTableElement>> {

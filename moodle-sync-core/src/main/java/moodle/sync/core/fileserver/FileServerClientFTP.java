@@ -1,7 +1,7 @@
 package moodle.sync.core.fileserver;
 
 import moodle.sync.core.config.MoodleSyncConfiguration;
-import moodle.sync.core.model.syncTableElement;
+
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
@@ -96,20 +96,20 @@ public class FileServerClientFTP implements FileServerClient {
      * @param pathname Dedicated directory at the ftpserver.
      * @return the url of the uploaded file.
      */
-    @Override
-    public String uploadFile(syncTableElement item, String pathname) {
-        //Evtl noch pathname einbringen
-        String url = null;
-        try {
-            InputStream file = Files.newInputStream(Paths.get(item.getExistingFile()));
-            ftpClient.storeFile("/"  /*+ config.getRecentSection().getName() + "/" */ + item.getExistingFileName(), file);
-            //ToDo add functionality Url
-            url = config.getFileserver() + "/" /*+  config.getRecentSection().getName() + "/" */ + item.getExistingFileName();
-            file.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return url;
-    }
+//    @Override
+//    public String uploadFile(syncTableElement item, String pathname) {
+//        //Evtl noch pathname einbringen
+//        String url = null;
+//        try {
+//            InputStream file = Files.newInputStream(Paths.get(item.getExistingFile()));
+//            ftpClient.storeFile("/"  /*+ config.getRecentSection().getName() + "/" */ + item.getExistingFileName(), file);
+//            //ToDo add functionality Url
+//            url = config.getFileserver() + "/" /*+  config.getRecentSection().getName() + "/" */ + item.getExistingFileName();
+//            file.close();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return url;
+//    }
 
 }

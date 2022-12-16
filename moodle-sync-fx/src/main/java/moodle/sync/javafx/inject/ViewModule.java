@@ -10,7 +10,6 @@ import javax.inject.Provider;
 import javafx.util.BuilderFactory;
 
 import moodle.sync.javafx.view.*;
-import moodle.sync.presenter.ConfirmDeleteModulePresenter;
 import moodle.sync.view.*;
 
 import org.lecturestudio.core.inject.DIViewContextFactory;
@@ -30,12 +29,12 @@ public class ViewModule extends AbstractModule {
 
 		bind(DirectoryChooserView.class).to(FxDirectoryChooserView.class);
 		bind(FileChooserView.class).to(FxFileChooserView.class);
+		bind(NewVersionView.class).to(FxNewVersionView.class);
 		bind(NotificationView.class).to(FxNotificationView.class);
 		bind(NotificationPopupView.class).to(FxNotificationPopupView.class);
 		bind(NotificationPopupManager.class).to(FxNotificationPopupManager.class);
 		bind(ProgressView.class).to(FxProgressView.class);
 		bind(ProgressDialogView.class).to(FxProgressDialogView.class);
-		bind(ConfirmDeleteModuleView.class).to(FxConfirmDeleteModuleView.class);
 
 		bind(MainView.class).to(FxMainView.class);
 		bind(StartView.class).to(FxStartView.class);

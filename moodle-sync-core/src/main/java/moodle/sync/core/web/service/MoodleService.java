@@ -1,8 +1,6 @@
 package moodle.sync.core.web.service;
 
-import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Path;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -10,18 +8,15 @@ import java.util.List;
 import moodle.sync.core.model.json.Course;
 import moodle.sync.core.model.json.Section;
 import moodle.sync.core.model.json.SiteInfo;
+import moodle.sync.core.web.client.MoodleClient;
+
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
+
 import org.lecturestudio.core.beans.StringProperty;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
-import moodle.sync.core.web.client.MoodleClient;
 
 /**
  * Class which contains methods to instantiate the interface MoodleClient and to call methods defined in this interface.
@@ -78,7 +73,7 @@ public class MoodleService {
      * Method used to provide a users subscribed Moodle-courses.
      *
      * @param token  The Moodle-token.
-     * @param userid A users id.
+     * @param userid A user's id.
      * @return list of Moodle-Courses.
      */
     public List<Course> getEnrolledCourses(String token, int userid) {

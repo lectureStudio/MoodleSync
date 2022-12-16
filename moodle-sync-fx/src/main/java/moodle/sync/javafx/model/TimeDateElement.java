@@ -1,4 +1,4 @@
-package moodle.sync.core.model;
+package moodle.sync.javafx.model;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;

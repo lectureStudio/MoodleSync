@@ -69,6 +69,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>moodle.sync</groupId>
+			<artifactId>moodle-sync-core</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
 			<groupId>commons-net</groupId>
 			<artifactId>commons-net</artifactId>
 			<version>3.8.0</version>
@@ -102,6 +107,16 @@
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-swing</artifactId>
 			<version>${javafx.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-web</artifactId>
+			<version>17.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>no.tornado</groupId>
+			<artifactId>tornadofx-controls</artifactId>
+			<version>1.0.6</version>
 		</dependency>
 		<dependency>
 			<groupId>org.lecturestudio.core</groupId>
@@ -217,16 +232,6 @@
 					<artifactId>jakarta.activation</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-web</artifactId>
-            <version>17.0.2</version>
-        </dependency>
-		<dependency>
-			<groupId>moodle.sync</groupId>
-			<artifactId>moodle-sync-core</artifactId>
-			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
 </project>

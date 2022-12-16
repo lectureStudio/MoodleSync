@@ -1,29 +1,14 @@
 package moodle.sync.javafx.custom;
 
-import javafx.beans.InvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.web.WebView;
-import javafx.util.converter.DefaultStringConverter;
-import moodle.sync.core.model.json.Section;
 import moodle.sync.core.util.MoodleAction;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.syncTableElement;
 import org.controlsfx.control.PopOver;
-import org.lecturestudio.core.beans.ObjectProperty;
-import org.lecturestudio.javafx.beans.LectStringProperty;
 import org.lecturestudio.javafx.control.SvgIcon;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement, String> {
 

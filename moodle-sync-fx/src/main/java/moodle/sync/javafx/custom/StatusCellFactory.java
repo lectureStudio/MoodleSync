@@ -4,7 +4,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.syncTableElement;
 
 public class StatusCellFactory implements Callback<TableColumn<syncTableElement, String>, TableCell<syncTableElement, String>> {
     @Override
