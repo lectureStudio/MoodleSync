@@ -101,7 +101,7 @@
 								</artifactItems>
 								<stripVersion>true</stripVersion>
 								<outputDirectory>${project.parent.build.directory}/${package.dir}</outputDirectory>
-								</configuration>
+							</configuration>
 						</execution>
 						<execution>
 							<id>copy-dependencies</id>

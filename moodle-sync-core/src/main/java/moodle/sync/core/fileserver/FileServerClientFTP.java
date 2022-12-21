@@ -96,7 +96,7 @@ public class FileServerClientFTP implements FileServerClient {
      * @param pathname Dedicated directory at the ftpserver.
      * @return the url of the uploaded file.
      */
-    //    @Override
+//    @Override
 //    public String uploadFile(syncTableElement item, String pathname) {
 //        //Evtl noch pathname einbringen
 //        String url = null;
