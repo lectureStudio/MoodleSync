@@ -10,8 +10,10 @@ import moodle.sync.core.model.json.*;
 import moodle.sync.core.fileserver.FileServerClientFTP;
 import moodle.sync.core.fileserver.FileServerFile;
 import moodle.sync.core.model.json.Module;
+import moodle.sync.core.util.VerifyDataService;
+import moodle.sync.javafx.model.ReturnValue;
 import moodle.sync.presenter.command.ShowSettingsCommand;
-import moodle.sync.core.util.FileService;
+import moodle.sync.util.FileService;
 import moodle.sync.core.util.FileWatcherService.FileEvent;
 import moodle.sync.core.util.FileWatcherService.FileListener;
 import moodle.sync.core.util.FileWatcherService.FileWatcher;
@@ -19,7 +21,7 @@ import moodle.sync.core.util.MoodleAction;
 import moodle.sync.javafx.model.TimeDateElement;
 import moodle.sync.javafx.model.syncTableElement;
 
-import moodle.sync.core.web.service.MoodleUploadTemp;
+import moodle.sync.util.SetModuleService;
 import org.apache.commons.io.FilenameUtils;
 import org.lecturestudio.core.app.ApplicationContext;
 import org.lecturestudio.core.beans.BooleanProperty;
@@ -74,6 +76,13 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
 
     private BooleanProperty selectAll;
 
+    private String token;
+
+    private String url;
+
+    private Course course;
+
+
     @Inject
     StartPresenter(ApplicationContext context, StartView view,
                    ViewContextFactory viewFactory, MoodleService moodleService) {
@@ -108,6 +117,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
 
         //Display the course-sections after Moodle-course is choosen.
         config.recentCourseProperty().addListener((observable, oldCourse, newCourse) -> {
+            course = config.getRecentCourse(); //Todo hier schauen ob das ausreicht!
             config.setRecentSection(null);
             view.setData(setData());
         });
@@ -118,6 +128,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
 
         config.moodleUrlProperty().addListener((observable, oldUrl, newUrl) -> {
             config.setRecentCourse(null);
+            course = null;
         });
 
         selectAll.addListener((observable, oldUrl, newUrl) -> {
@@ -141,29 +152,27 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         view.setSections(sections());
     }
 
-
     /**
      * Execute an API-call to get users Moodle-courses.
      *
      * @return list containing users Moodle-courses.
      */
     private List<Course> courses() {
-        String token = config.getMoodleToken();
-        String url = config.getMoodleUrl();
+        url = config.getMoodleUrl();
         //Security checks to prevent unwanted behaviour.
-        if (token == null || token.isEmpty() || token.isBlank() || url == null || url.isEmpty() || url.isBlank()) {
-            List<Course> dummy = new ArrayList<>();
-            return dummy;
+        //Todo überprüfen neu
+        if(!VerifyDataService.validateString(url) || !VerifyDataService.validateString(token)){
+            return new ArrayList<>();
         }
         List<Course> courses = List.of();
         try {
-            courses = moodleService.getEnrolledCourses(config.getMoodleToken(), moodleService.getUserId(config.getMoodleToken()));
+            courses = moodleService.getEnrolledCourses(token, moodleService.getUserId(token));
         } catch (Exception e) {
             logException(e, "Sync failed");
-
             showNotification(NotificationType.ERROR, "start.sync.error.title",
                     "start.sync.error.invalidurl.message");
             config.setRecentCourse(null);
+            course = null;
         }
 
         //Do not show Moodle-courses which are already over.
@@ -185,18 +194,18 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
      * @return list containing course-sections.
      */
     private List<Section> sections() {
-        Course course = config.getRecentCourse();
         if (course == null) {
-            List<Section> dummy = new ArrayList<>();
-            return dummy;
+            return new ArrayList<>();
         }
         try {
-            List<Section> content = moodleService.getCourseContent(config.getMoodleToken(), config.getRecentCourse().getId());
+            List<Section> content = moodleService.getCourseContent(token, course.getId());
             content.add(0, new Section(-2, this.context.getDictionary().get("start.sync.showall"), 1, "alle", -1, -1, -1, true, null));
             courseContent = content;
             return content;
         } catch (Exception e) {
-
+            logException(e, "Sync failed");
+            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                    "start.sync.error.invalidurl.message");
         }
         return new ArrayList<>();
     }
@@ -222,73 +231,29 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
             return;
         }
         for (syncTableElement courseData : courseData) {
-            if (courseData.isSelected()) {
-                if (courseData.getModuleType().equals("resource")) {
-                    if (courseData.getAction() == MoodleAction.MoodleUpload) {
-                        try {
-                            MoodleUploadTemp uploader = new MoodleUploadTemp();
-                            //Upload of the file to the Moodle-platform.
-                            MoodleUpload upload = uploader.upload(courseData.getExistingFileName(), courseData.getExistingFile(), config.getMoodleUrl(), config.getMoodleToken());
-                            //Publish it in the Moodle-course.
-                            if (courseData.getUnixTimeStamp() > System.currentTimeMillis() / 1000L) {
-                                //Time in future
-                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getUnixTimeStamp(), courseData.getVisible(), courseData.getModuleName(), courseData.getBeforemod());
-                            } else {
-                                //Time not modified, time should be null
-                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), null, courseData.getVisible(), courseData.getModuleName(), courseData.getBeforemod());
-                            }
-                        } catch (Exception e) {
-                            logException(e, "Sync failed");
-
-                            showNotification(NotificationType.ERROR, "start.sync.error.title",
-                                    MessageFormat.format(context.getDictionary().get("start.sync.error.upload.message"), courseData.getModuleName()));
-                        }
-                    } else if (courseData.getAction() == MoodleAction.MoodleSynchronize) {
-                        try {
-                            MoodleUploadTemp uploader = new MoodleUploadTemp();
-                            //Upload of the new file to the Moodle-platform.
-                            MoodleUpload upload = uploader.upload(courseData.getExistingFileName(), courseData.getExistingFile(), config.getMoodleUrl(), config.getMoodleToken());
-                            //Publish it in the Moodle-course above the old course-module containing the old file.
-                            if (courseData.getUnixTimeStamp() > System.currentTimeMillis() / 1000L) {
-                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), courseData.getUnixTimeStamp(), courseData.getVisible(), courseData.getModuleName(), courseData.getBeforemod());
-                            } else {
-                                moodleService.setResource(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), upload.getItemid(), null, courseData.getVisible(), courseData.getModuleName(), courseData.getBeforemod());
-                            }
-                            //Removal of the old course-module.
-                            moodleService.removeResource(config.getMoodleToken(), courseData.getCmid());
-                        } catch (Exception e) {
-                            logException(e, "Sync failed");
-
-                            showNotification(NotificationType.ERROR, "start.sync.error.title",
-                                    "start.sync.error.upload.message");
-                        }
-                    } else {
-                        moodleService.setMoveModule(config.getMoodleToken(), courseData.getCmid(), courseData.getSectionId(), courseData.getBeforemod());
+            try {
+                if (courseData.isSelected()) {
+                    if (courseData.getModuleType().equals("resource")) {
+                        SetModuleService.publishResource(moodleService, courseData, course, url, token);
+                    } else if (courseData.getAction() == MoodleAction.FTPUpload) {
+                        SetModuleService.publishFileserverResource(moodleService, courseData, course, token);
+                    } else if (courseData.getAction() != MoodleAction.UploadSection) {
+                        SetModuleService.moveResource(moodleService, courseData, token);
                     }
-                } else if (courseData.getAction() == MoodleAction.FTPUpload) {
-                    //url = fileservice.....
-                    String url = "https://wikipedia.org";
-                    if (courseData.getUnixTimeStamp() > System.currentTimeMillis() / 1000L) {
-                        moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), courseData.getModuleName(), url, courseData.getUnixTimeStamp(), courseData.getVisible(), courseData.getBeforemod());
-                    } else {
-                        moodleService.setUrl(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getSection(), courseData.getModuleName(), url, null, courseData.getVisible(), courseData.getBeforemod());
-                    }
-                } else {
-                    if (courseData.getAction() != MoodleAction.UploadSection)
-                        moodleService.setMoveModule(config.getMoodleToken(), courseData.getCmid(), courseData.getSectionId(), courseData.getBeforemod());
                 }
+            } catch (Exception e) {
+            logException(e, "Sync failed");
+
+            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                    MessageFormat.format(context.getDictionary().get("start.sync.error.upload.message"), courseData.getModuleName()));
             }
         }
+        //Adding of new sections at the end of the sync-process to prevent new section-numbers
         for (syncTableElement courseData : courseData) {
             if (courseData.getAction() == MoodleAction.UploadSection && courseData.isSelected()) {
                 //Logic for Section-Upload
                 try {
-                    moodleService.setSection(config.getMoodleToken(), config.getRecentCourse().getId(), courseData.getModuleName(), courseData.getSection());
-                    if (!courseData.getExistingFileName().split("_", 2)[0].matches("\\d+")) {
-                        System.out.println(courseData.getExistingFile());
-                        File temp = new File(courseData.getExistingFile());
-                        temp.renameTo(new File(Path.of(courseData.getExistingFile()).getParent().toString() + "/" + courseData.getSection() + "_" + courseData.getExistingFileName()));
-                    }
+                    SetModuleService.createSection(moodleService, courseData, course, token);
                 } catch (Exception e) {
                     logException(e, "Sync failed");
 
@@ -312,15 +277,11 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
     }
 
     private ObservableList<syncTableElement> setData() {
-        if (isNull(courseContent) || isNull(config.recentCourseProperty().get())) {
-            ObservableList<syncTableElement> dummy = FXCollections.observableArrayList();
-            return dummy;
-        }
+        token = config.getMoodleToken();
+        if (isNull(courseContent) || isNull(config.recentCourseProperty().get())) return FXCollections.observableArrayList();
 
         try {
-            if (watcher != null) {
-                watcher.close();
-            }
+            if (watcher != null) watcher.close();
         } catch (Exception e) {
             logException(e, "Sync failed");
             showNotification(NotificationType.ERROR, "start.sync.error.title",
@@ -329,7 +290,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
 
         if (!isNull(config.getRecentSection()) && config.getRecentSection().getId() != -2) {
             courseContent.clear();
-            courseContent.add(moodleService.getCourseContentSection(config.getMoodleToken(), config.getRecentCourse().getId(), config.getRecentSection().getId()).get(0));
+            courseContent.add(moodleService.getCourseContentSection(token, course.getId(), config.getRecentSection().getId()).get(0));
         }
 
         List<Path> sectionList = List.of();
@@ -337,9 +298,9 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         try {
             if (isNull(config.getRecentSection()) || config.getRecentSection().getId() == -2) {
                 //Zur Prüfung neuer Ordner, um sie hinzuzufügen
-                Path sections = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
-                FileService.directoryManager(sections);
-                sectionList = FileService.getPathsInDirectory(sections);
+                Path courseDirectory = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname());
+                FileService.directoryManager(courseDirectory);
+                sectionList = FileService.getPathsInDirectory(courseDirectory);
                 courseContent = sections();
             }
         } catch (Exception e) {
@@ -351,15 +312,18 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         ObservableList<syncTableElement> data = FXCollections.observableArrayList();
 
         for (Section section : courseContent) {
+            try{
             if (section.getId() != -2) {
-                int sectionnum = section.getSection();
+                String sectionName = section.getName();
+                int sectionNum = section.getSection();
                 int sectionId = section.getId();
-                data.add(new syncTableElement(section.getName(), section.getId(), sectionnum, sectionId, data.size(), section.getSummary(), false, false, MoodleAction.ExistingSection, section.getVisible() == 1));
+
+                data.add(new syncTableElement(sectionName, sectionId, sectionNum, sectionId, data.size(), section.getSummary(), false, false, MoodleAction.ExistingSection, section.getVisible() == 1));
 
                 sectionList = FileService.formatSectionFolder(sectionList, section);
 
                 //Datenfpad zu Sektionsordner, wird erstellt falls nicht vorhanden
-                Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + section.getSection() + "_" + section.getName());
+                Path execute = Paths.get(config.getSyncRootPath() + "/" + config.recentCourseProperty().get().getDisplayname() + "/" + section.getSection() + "_" + sectionName);
                 FileService.directoryManager(execute);
 
                 //initalisierung der fileServerRequired Variable
@@ -375,44 +339,10 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     List<Path> fileList = FileService.getPathsInDirectory(execute);
                     for (Module module : section.getModules()) {
                         if (module.getModname().equals("resource")) {
-                            boolean found = false;
-                            for (int i = 0; i < fileList.size(); i++) {
-                                if (fileList.get(i).getFileName().toString().equals(module.getContents().get(0).getFilename())) {
-                                    long onlinemodified = module.getContents().get(0).getTimemodified() * 1000;
-                                    long filemodified = Files.getLastModifiedTime(fileList.get(i)).toMillis();
-                                    //Check if local file is newer.
-                                    if (filemodified > onlinemodified) {
-                                        found = true;
-                                        if (module.getAvailability() != null) {
-                                            var JsonB = new JsonConfigProvider().getContext(null);
-                                            JsonB.fromJson(module.getAvailability(), ModuleAvailability.class);
-                                            LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getTimeDateCondition().getT() * 1000L), ZoneId.systemDefault());
-                                            data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), fileList.get(i), true, false, MoodleAction.MoodleSynchronize, getPriorityVisiblity(module.getVisible() == 1, JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getConditionVisibility()), new TimeDateElement(time.toLocalDate(), time.toLocalTime()), module.getId()));
-                                        } else {
-                                            data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), fileList.get(i), true, false, MoodleAction.MoodleSynchronize, module.getVisible() == 1, module.getId()));
-                                        }
-                                        fileList.remove(i);
-                                        break;
-                                    } else {
-                                        found = true;
-                                        if (module.getAvailability() != null) {
-                                            var JsonB = new JsonConfigProvider().getContext(null);
-                                            JsonB.fromJson(module.getAvailability(), ModuleAvailability.class);
-                                            LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getTimeDateCondition().getT() * 1000L), ZoneId.systemDefault());
-                                            data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), fileList.get(i), false, false, MoodleAction.ExistingFile, getPriorityVisiblity(module.getVisible() == 1, JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getConditionVisibility()), new TimeDateElement(time.toLocalDate(), time.toLocalTime())));
-                                        } else {
-                                            data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), fileList.get(i), false, false, MoodleAction.ExistingFile, module.getVisible() == 1));
-                                        }
-                                        fileList.remove(i);
-                                        break;
-                                    }
-                                }
-                            }
-                            if (!found) {
-                                data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), false, false, MoodleAction.NotLocalFile, module.getVisible() == 1));
-                            }
+                            ReturnValue resource = FileService.findModuleInFiles(fileList, module, sectionNum, sectionId, data.size());
+                            data.add(resource.getElement());
+                            fileList = resource.getFileList();
                         } else if (module.getModname().equals("url") && !config.getFormatsFileserver().isEmpty()) {
-                            System.out.println(module.getName());
                             boolean found = false;
                             for (Path file : fileList) {
                                 if (module.getName().equals(file.getFileName().toString())) {
@@ -420,28 +350,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                                     //Datei ist auf Moodle veröffentlicht
                                     //einmalig durchgeführte initialisierung der Fileserver-Dateien Liste
                                     if (!fileServerRequired) {
-                                        //Bei erstmaligen bekanntwerden, dass der Fileserver benötigt wird, wird die Verbindung hergestellt und eine liste mit allen, dem Kurs
-                                        // zugehörigen Dateien abgerufen. Diese wird "länger" gespeichert, um nur einen Verbindunscyclus zu haben
-                                        String url = config.getFileserver();
-                                        String user = config.getUserFileserver();
-                                        String password = config.getPasswordFileserver();
-                                        if (url == null || url.isEmpty() || url.isBlank() || user == null || user.isEmpty() || user.isBlank()
-                                                || password == null || password.isEmpty() || password.isBlank()) {
-                                            showNotification(NotificationType.ERROR, "start.sync.error.title",
-                                                    "start.sync.error.fileserver1.message");
-                                        } else {
-                                            try {
-                                                fileClient = new FileServerClientFTP(config);
-                                                fileClient.connect();
-                                                files = fileClient.getFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> If there should be support for different upload-sections.
-                                                fileClient.disconnect();
-                                            } catch (Exception e) {
-                                                logException(e, "Sync failed");
-                                                showNotification(NotificationType.ERROR, "start.sync.error.title",
-                                                        "start.sync.error.fileserver2.message");
-                                            }
-                                        }
-                                        fileServerRequired = true;
+                                        files = provideFileserverFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> If there should be support for different upload-sections.
                                     }
                                     for (FileServerFile fileServerFile : files) {
                                         if (fileServerFile.getFilename().equals(file.getFileName().toString())) {
@@ -452,9 +361,9 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                                                     var JsonB = new JsonConfigProvider().getContext(null);
                                                     JsonB.fromJson(module.getAvailability(), ModuleAvailability.class);
                                                     LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getTimeDateCondition().getT() * 1000L), ZoneId.systemDefault());
-                                                    data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), file, true, false, MoodleAction.FTPSynchronize, getPriorityVisiblity(module.getVisible() == 1, JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getConditionVisibility()), new TimeDateElement(time.toLocalDate(), time.toLocalTime()), module.getId()));
+                                                    data.add(new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, data.size(), module.getModname(), file, true, false, MoodleAction.FTPSynchronize, getPriorityVisibility(module.getVisible() == 1, JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getConditionVisibility()), new TimeDateElement(time.toLocalDate(), time.toLocalTime()), module.getId()));
                                                 } else {
-                                                    data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), file, true, false, MoodleAction.FTPSynchronize, module.getVisible() == 1));
+                                                    data.add(new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, data.size(), module.getModname(), file, true, false, MoodleAction.FTPSynchronize, module.getVisible() == 1));
                                                 }
                                                 fileList.remove(file);
                                                 break;
@@ -464,9 +373,9 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                                                     var JsonB = new JsonConfigProvider().getContext(null);
                                                     JsonB.fromJson(module.getAvailability(), ModuleAvailability.class);
                                                     LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getTimeDateCondition().getT() * 1000L), ZoneId.systemDefault());
-                                                    data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), file, false, false, MoodleAction.ExistingFile, getPriorityVisiblity(module.getVisible() == 1, JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getConditionVisibility()), new TimeDateElement(time.toLocalDate(), time.toLocalTime())));
+                                                    data.add(new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, data.size(), module.getModname(), file, false, false, MoodleAction.ExistingFile, getPriorityVisibility(module.getVisible() == 1, JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getConditionVisibility()), new TimeDateElement(time.toLocalDate(), time.toLocalTime())));
                                                 } else {
-                                                    data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), file, false, false, MoodleAction.ExistingFile, module.getVisible() == 1));
+                                                    data.add(new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, data.size(), module.getModname(), file, false, false, MoodleAction.ExistingFile, module.getVisible() == 1));
                                                 }
                                                 fileList.remove(file);
                                                 break;
@@ -476,46 +385,27 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                                 }
                             }
                             if (!found) {
-                                data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), false, false, MoodleAction.NotLocalFile, module.getVisible() == 1));
+                                data.add(new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, data.size(), module.getModname(), false, false, MoodleAction.NotLocalFile, module.getVisible() == 1));
                             }
                         } else {
                             //Das sind die die nicht "resource" sind
-                            data.add(new syncTableElement(module.getName(), module.getId(), sectionnum, sectionId, data.size(), module.getModname(), false, false, MoodleAction.NotLocalFile, module.getVisible() == 1));
+                            data.add(new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, data.size(), module.getModname(), false, false, MoodleAction.NotLocalFile, module.getVisible() == 1));
                         }
                     }
 
                     if (fileList.size() != 0) {
+                        //All files inside here should be uploaded, if DataType is known
                         for (Path path : fileList) {
+                            
                             if (contains(config.getFormatsMoodle().split(","), FilenameUtils.getExtension(path.getFileName().toString()))) {
-                                data.add(new syncTableElement(path.getFileName().toString(), -1, sectionnum, sectionId, data.size(), "resource", path, true, false, MoodleAction.MoodleUpload, true));
+                                data.add(new syncTableElement(path.getFileName().toString(), -1, sectionNum, sectionId, data.size(), "resource", path, true, false, MoodleAction.MoodleUpload, true));
                             }
 
                             //More Complicated: all Files for the Fileserver-Upload (if new upload oder update) are found here:
                             else if ((contains(config.getFormatsFileserver().split(","), FilenameUtils.getExtension(path.getFileName().toString()))) && !config.getFormatsFileserver().isBlank()) {
                                 //alle die hier sind, sind lokal vorhanden aber nicht auf Moodle veröffentlicht
                                 if (!fileServerRequired) {
-                                    //Bei erstmaligen bekanntwerden, dass der Fileserver benötigt wird, wird die Verbindung hergestellt und eine liste mit allen, dem Kurs
-                                    // zugehörigen Dateien abgerufen. Diese wird "länger" gespeichert, um nur einen Verbindunscyclus zu haben
-                                    String url = config.getFileserver();
-                                    String user = config.getUserFileserver();
-                                    String password = config.getPasswordFileserver();
-                                    if (url == null || url.isEmpty() || url.isBlank() || user == null || user.isEmpty() || user.isBlank()
-                                            || password == null || password.isEmpty() || password.isBlank()) {
-                                        showNotification(NotificationType.ERROR, "start.sync.error.title",
-                                                "start.sync.error.fileserver1.message");
-                                    } else {
-                                        try {
-                                            fileClient = new FileServerClientFTP(config);
-                                            fileClient.connect();
-                                            files = fileClient.getFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> If there should be support for different upload-sections.
-                                            fileClient.disconnect();
-                                        } catch (Exception e) {
-                                            logException(e, "Sync failed");
-                                            showNotification(NotificationType.ERROR, "start.sync.error.title",
-                                                    "start.sync.error.fileserver2.message");
-                                        }
-                                    }
-                                    fileServerRequired = true;
+                                    files = provideFileserverFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> If there should be support for different upload-sections.
                                 }
                                 //Checken ob Modul vorhanden oder ob Datei hochgeladen?
                                 //Änderungsdatum mit FTP-Datei vergleichen
@@ -524,17 +414,17 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                                     if (fileServerFile.getFilename().equals(path.getFileName())) {
                                         if (fileServerFile.getLastTimeModified() < Files.getLastModifiedTime(path).toMillis()) {
                                             //Datei ist nicht auf Moodle aber auf FTP, muss aber aktualisiert werden -> neuer Upload
-                                            data.add(new syncTableElement(path.getFileName().toString(), -1, sectionnum, sectionId, data.size(), "url", path, true, false, MoodleAction.FTPUpload, true));
+                                            data.add(new syncTableElement(path.getFileName().toString(), -1, sectionNum, sectionId, data.size(), "url", path, true, false, MoodleAction.FTPUpload, true));
                                         } else {
-                                            data.add(new syncTableElement(path.getFileName().toString(), -1, sectionnum, sectionId, data.size(), "url", path, true, false, MoodleAction.FTPLink, true));
+                                            data.add(new syncTableElement(path.getFileName().toString(), -1, sectionNum, sectionId, data.size(), "url", path, true, false, MoodleAction.FTPLink, true));
                                         }
                                     }
                                 }
                                 //Datei nicht auf Moodle und nicht auf dem FileServer
-                                data.add(new syncTableElement(path.getFileName().toString(), -1, sectionnum, sectionId, data.size(), "url", path, true, false, MoodleAction.FTPUpload, true));
+                                data.add(new syncTableElement(path.getFileName().toString(), -1, sectionNum, sectionId, data.size(), "url", path, true, false, MoodleAction.FTPUpload, true));
 
                             } else {
-                                data.add(new syncTableElement(path.getFileName().toString(), -1, sectionnum, sectionId, data.size(), "resource", path, false, false, MoodleAction.DatatypeNotKnown, false));
+                                data.add(new syncTableElement(path.getFileName().toString(), -1, sectionNum, sectionId, data.size(), "resource", path, false, false, MoodleAction.DatatypeNotKnown, false));
                             }
                         }
                     }
@@ -543,6 +433,11 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
                     showNotification(NotificationType.ERROR, "start.sync.error.title",
                             "start.sync.error.message");
                 }
+            }
+        } catch (Exception e){
+                logException(e, "Sync failed");
+                showNotification(NotificationType.ERROR, "start.sync.error.title",
+                        "start.sync.error.message");
             }
         }
 
@@ -587,7 +482,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         view.setData(setData());
     }
 
-    private Boolean getPriorityVisiblity(Boolean visible, Boolean availability) {
+    private Boolean getPriorityVisibility(Boolean visible, Boolean availability) {
         if (!visible || !availability) {
             return false;
         }
@@ -597,7 +492,7 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
     private void openCourseDirectory() {
         Desktop desktop = Desktop.getDesktop();
         try {
-            File dirToOpen = new File(config.getSyncRootPath() + "/" + config.getRecentCourse().getDisplayname());
+            File dirToOpen = new File(config.getSyncRootPath() + "/" + course.getDisplayname());
             desktop.open(dirToOpen);
         } catch (Throwable e) {
             logException(e, "Sync failed");
@@ -610,4 +505,26 @@ public class StartPresenter extends Presenter<StartView> implements FileListener
         return Arrays.asList(arr).contains(key);
     }
 
+    private List<FileServerFile> provideFileserverFiles(String pathname) throws Exception {
+        List<FileServerFile> files = List.of();
+        if(!VerifyDataService.validateString(config.getFileserver()) || !VerifyDataService.validateString(config.getUserFileserver())
+                || !VerifyDataService.validateString(config.getPasswordFileserver())) {
+            showNotification(NotificationType.ERROR, "start.sync.error.title",
+                    "start.sync.error.fileserver1.message");
+        } else {
+            try {
+                fileClient = new FileServerClientFTP(config);
+                fileClient.connect();
+                files = fileClient.getFiles(/*config.getRecentSection().getName()*/ ""); //ToDo -> If there should be support for different upload-sections.
+                fileClient.disconnect();
+            } catch (Exception e) {
+                logException(e, "Sync failed");
+                showNotification(NotificationType.ERROR, "start.sync.error.title",
+                        "start.sync.error.fileserver2.message");
+            }
+        }
+        fileServerRequired = true;
+
+        return files;
+    }
 }
