@@ -6,11 +6,22 @@ package moodle.sync.core.util;
  * @author Daniel Schröter
  */
 public enum MoodleAction {
-    MoodleUpload("Datei auf Moodle hochladen"), MoodleSynchronize("Datei auf Moodle aktualisieren"), FTPUpload("Datei auf Fileserver hochladen"), FTPSynchronize("Datei auf Fileserver aktualisieren"), FTPLink("Datei mit Moodle verlinken"), NotLocalFile("Datei nicht lokal verfügbar"),ExistingFile("Datei ist in aktuellen Zustand auf der MoodlePlattform"),DatatypeNotKnown("Dateiformat nicht gefunden, bitte in Einstellungen anpassen"),ExistingSection("Bestehende Section"),UploadSection("Neue Sektion anlegen");
+
+    MoodleUpload("Upload file to moodle"),
+    MoodleSynchronize("Update file on moodle"),
+    FTPUpload("Upload file to fileserver"),
+    FTPSynchronize("Update file on fileserver"),
+    FTPLink("Link file to moodle"),
+    NotLocalFile("File not locally saved"),
+    ExistingFile("File is up to date"),
+    DatatypeNotKnown("Data-Format noch specified"),
+    ExistingSection("Exisiting section"),
+    UploadSection("Create a new section");
 
     public final String message;
 
     MoodleAction(String message) {
         this.message = message;
     }
+
 }

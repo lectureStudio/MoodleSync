@@ -1,14 +1,20 @@
 package moodle.sync.javafx.custom;
 
 import com.dlsc.gemsfx.TimePicker;
+
 import javafx.geometry.Pos;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
+
 import moodle.sync.core.util.MoodleAction;
+
 import moodle.sync.javafx.model.TimeDateElement;
 import moodle.sync.javafx.model.syncTableElement;
 
+/**
+ * Class used to display a time/date setter inside a TableCell.
+ */
 public class LocalDateTimeCell<S, U> extends TableCell<syncTableElement, TimeDateElement> {
 
     private DatePicker datePicker;
@@ -34,7 +40,8 @@ public class LocalDateTimeCell<S, U> extends TableCell<syncTableElement, TimeDat
         } else if (getTableRow() != null && getTableRow().getItem() != null) {
             datePicker.valueProperty().unbindBidirectional(getTableRow().getItem().availabilityDateTimeProperty().get().LocalDateProperty());
             timePicker.timeProperty().unbindBidirectional(getTableRow().getItem().availabilityDateTimeProperty().get().LocalTimeProperty());
-            if (getTableRow().getItem() != null && (!getTableRow().getItem().isSelectable() || getTableRow().getItem().getAction() == MoodleAction.UploadSection)) {
+            if (getTableRow().getItem() != null && (!getTableRow().getItem().isSelectable() ||
+                    getTableRow().getItem().getAction() == MoodleAction.UploadSection)) {
                 setDisable(false);
                 setGraphic(null);
             }

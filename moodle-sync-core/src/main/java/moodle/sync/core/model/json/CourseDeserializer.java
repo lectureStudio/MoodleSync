@@ -7,8 +7,12 @@ import javax.json.JsonObject;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
+
 import java.lang.reflect.Type;
 
+/**
+ * Class which helps deserialize and debug a course
+ */
 public class CourseDeserializer implements JsonbDeserializer<Course> {
     private static final Logger LOG = LogManager.getLogger(CourseDeserializer.class);
 

@@ -1,8 +1,10 @@
 package moodle.sync.core.util.FileWatcherService;
 
 import static java.nio.file.StandardWatchEventKinds.*;
+
 import java.io.File;
 import java.io.IOException;
+
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -10,10 +12,14 @@ import java.nio.file.Paths;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Class which monitors a directory for changes.
+ */
 public class FileWatcher implements Runnable {
 
     protected List<FileListener> listeners = new ArrayList<>();
@@ -34,7 +40,7 @@ public class FileWatcher implements Runnable {
     }
 
     public void close() throws IOException {
-        for(int i = 0; i < watchServices.size(); i++){
+        for (int i = 0; i < watchServices.size(); i++) {
             watchServices.get(i).close();
         }
     }
@@ -72,13 +78,11 @@ public class FileWatcher implements Runnable {
             if (file.isDirectory()) {
                 new FileWatcher(file).setListeners(listeners).watch();
             }
-        }
-   else if (kind == ENTRY_MODIFY) {
+        } else if (kind == ENTRY_MODIFY) {
             for (FileListener listener : listeners) {
                 listener.onModified(event);
             }
-        }
-   else if (kind == ENTRY_DELETE) {
+        } else if (kind == ENTRY_DELETE) {
             for (FileListener listener : listeners) {
                 listener.onDeleted(event);
             }

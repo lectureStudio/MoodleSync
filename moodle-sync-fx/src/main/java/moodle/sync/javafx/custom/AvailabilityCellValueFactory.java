@@ -7,6 +7,11 @@ import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
 import moodle.sync.javafx.model.syncTableElement;
 
+/**
+ * Class used for determining the state of a CheckBox inside the "sync-page"-table.
+ *
+ * @author Daniel Schröter
+ */
 public class AvailabilityCellValueFactory implements Callback<TableColumn.CellDataFeatures<syncTableElement,Boolean>, ObservableValue<Boolean>> {
     @Override
     public ObservableValue<Boolean> call(TableColumn.CellDataFeatures<syncTableElement, Boolean> param)

@@ -10,6 +10,9 @@ import moodle.sync.javafx.model.syncTableElement;
 import org.controlsfx.control.PopOver;
 import org.lecturestudio.javafx.control.SvgIcon;
 
+/**
+ * Class used to display the Name of a Section/ Module including different styles/background colors inside a cell.
+ */
 public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement, String> {
 
     private Listener listener = new Listener();
@@ -66,8 +69,13 @@ public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement,
 
             getTableRow().getStyleClass().add("headerstyle");
 
-        } else if(getTableRow().getItem().getAction() == MoodleAction.MoodleUpload || getTableRow().getItem().getAction() == MoodleAction.FTPUpload ||getTableRow().getItem().getAction() == MoodleAction.UploadSection || getTableRow().getItem().getAction() == MoodleAction.DatatypeNotKnown) {
-            if((getTableRow().getItem().getAction() == MoodleAction.MoodleUpload && getTableRow().getItem() != null) ||(getTableRow().getItem().getAction() == MoodleAction.FTPUpload && getTableRow().getItem() != null)){
+        }
+        else if(getTableRow().getItem().getAction() == MoodleAction.MoodleUpload ||
+                getTableRow().getItem().getAction() == MoodleAction.FTPUpload ||
+                getTableRow().getItem().getAction() == MoodleAction.UploadSection ||
+                getTableRow().getItem().getAction() == MoodleAction.DatatypeNotKnown) {
+            if((getTableRow().getItem().getAction() == MoodleAction.MoodleUpload && getTableRow().getItem() != null) ||
+                    (getTableRow().getItem().getAction() == MoodleAction.FTPUpload && getTableRow().getItem() != null)) {
                 if(!getTableRow().getItem().selectedProperty().get()){
                    setText(null);
                 }
@@ -76,34 +84,24 @@ public class UploadHighlightTableCell <U, B> extends TableCell<syncTableElement,
             else {
                 setText(null);
             }
-        } else{
+        }
+        else{
             setEditable(false);
             SvgIcon icon = new SvgIcon();
             setStyle("-fx-font-weight: normal");
-            if(getTableRow().getItem().getModuleType().equals("section")){
-                setStyle("-fx-font-weight: bold");
-            } else if(getTableRow().getItem().getModuleType().equals("resource")) {
-                icon.getStyleClass().add("file-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("forum")) {
-                icon.getStyleClass().add("forum-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("folder")) {
-                icon.getStyleClass().add("folder-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("label")) {
-                icon.getStyleClass().add("label-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("quiz")) {
-                icon.getStyleClass().add("quiz-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("assign")) {
-                icon.getStyleClass().add("assignment-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("chat")) {
-                icon.getStyleClass().add("chat-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("feedback")) {
-                icon.getStyleClass().add("feedback-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("url")) {
-                icon.getStyleClass().add("url-icon");
-            } else if(getTableRow().getItem().getModuleType().equals("survey")) {
-                icon.getStyleClass().add("survey-icon");
-            } else{
-                icon.getStyleClass().add("other-icon");
+            switch (getTableRow().getItem().getModuleType()) {
+                case "section" -> setStyle("-fx-font-weight: bold");
+                case "resource" -> icon.getStyleClass().add("file-icon");
+                case "forum" -> icon.getStyleClass().add("forum-icon");
+                case "folder" -> icon.getStyleClass().add("folder-icon");
+                case "label" -> icon.getStyleClass().add("label-icon");
+                case "quiz" -> icon.getStyleClass().add("quiz-icon");
+                case "assign" -> icon.getStyleClass().add("assignment-icon");
+                case "chat" -> icon.getStyleClass().add("chat-icon");
+                case "feedback" -> icon.getStyleClass().add("feedback-icon");
+                case "url" -> icon.getStyleClass().add("url-icon");
+                case "survey" -> icon.getStyleClass().add("survey-icon");
+                default -> icon.getStyleClass().add("other-icon");
             }
             setGraphic(icon);
             setText(item.replaceAll("\\u00a0\\n|&nbsp;\\r\\n", ""));

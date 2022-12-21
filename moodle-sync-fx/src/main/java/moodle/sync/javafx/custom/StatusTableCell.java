@@ -1,10 +1,15 @@
 package moodle.sync.javafx.custom;
 
 import javafx.scene.control.TableCell;
+
 import moodle.sync.core.util.MoodleAction;
 import moodle.sync.javafx.model.syncTableElement;
+
 import org.lecturestudio.javafx.control.SvgIcon;
 
+/**
+ * Class used to change the background color of a TableCell.
+ */
 public class StatusTableCell <U, B> extends TableCell<syncTableElement, String> {
 
     @Override

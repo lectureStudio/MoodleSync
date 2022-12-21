@@ -51,14 +51,15 @@ public class MoodleSyncConfiguration extends Configuration {
     //Whether files of unknown fileformat should be displayed.
     private final BooleanProperty showUnknownFormats = new BooleanProperty();
 
+    //Language
     private final ObjectProperty<Locale> locale = new ObjectProperty();
 
+    //Delete file property - still in work
     private final BooleanProperty executeDeletion = new BooleanProperty();
 
     public String getSyncRootPath() {
         return syncRootPath.get();
     }
-
 
     public void setSyncRootPath(String path) {
         this.syncRootPath.set(path);

@@ -15,7 +15,7 @@ import moodle.sync.javafx.model.syncTableElement;
  *
  * @author Daniel Schröter
  */
-public class AvailabilityCheckBoxCell <U, B> extends CheckBoxTableCell<syncTableElement, Boolean> {
+public class AvailabilityCheckBoxCell<U, B> extends CheckBoxTableCell<syncTableElement, Boolean> {
 
     private CheckBox checkBox;
 
@@ -42,7 +42,8 @@ public class AvailabilityCheckBoxCell <U, B> extends CheckBoxTableCell<syncTable
             setText(null);
             setGraphic(null);
         } else if (getTableRow() != null) {
-            if(getTableRow().getItem() != null && (!getTableRow().getItem().isSelectable() || getTableRow().getItem().getAction() == MoodleAction.UploadSection)) {
+            if (getTableRow().getItem() != null && (!getTableRow().getItem().isSelectable() ||
+                    getTableRow().getItem().getAction() == MoodleAction.UploadSection)) {
                 checkBox.setAlignment(Pos.CENTER);
                 setDisable(false);
                 setGraphic(null);
@@ -62,13 +63,8 @@ public class AvailabilityCheckBoxCell <U, B> extends CheckBoxTableCell<syncTable
                 checkBox.selectedProperty().bindBidirectional((BooleanProperty) booleanProperty);
             }
 
-            checkBox.disableProperty().bind(Bindings.not(
-                    getTableView().editableProperty().and(
-                            getTableColumn().editableProperty()).and(
-                            editableProperty())
-            ));
-
-
+            checkBox.disableProperty().bind(Bindings.not(getTableView().
+                    editableProperty().and(getTableColumn().editableProperty()).and(editableProperty())));
         }
 
         checkBox.setAlignment(Pos.CENTER);
@@ -77,8 +73,7 @@ public class AvailabilityCheckBoxCell <U, B> extends CheckBoxTableCell<syncTable
 
 
     private ObservableValue<?> getSelectedProperty() {
-        return getSelectedStateCallback() != null ?
-                getSelectedStateCallback().call(getIndex()) :
+        return getSelectedStateCallback() != null ? getSelectedStateCallback().call(getIndex()) :
                 getTableColumn().getCellObservableValue(getIndex());
     }
 }

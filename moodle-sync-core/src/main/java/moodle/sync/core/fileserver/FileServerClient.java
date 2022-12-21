@@ -9,12 +9,15 @@ import java.util.List;
  */
 public interface FileServerClient {
 
+    //Retrieve list of FileServerFiles from dedicated directory
     List<FileServerFile> getFiles(String pathname) throws Exception;
 
 //    String uploadFile(syncTableElement item, String pathname);
 
+    //Disconnect from fileserver
     void disconnect();
 
+    //Connect to fileserver
     void connect();
 
 }

@@ -40,22 +40,23 @@ public class FileService {
     }
 
 
-    public static List<Path> formatSectionFolder(List<Path> sectionList, Section section){
+    public static List<Path> formatSectionFolder(List<Path> sectionList, Section section) {
         int remove = -1;
-        for(int i = 0; i < sectionList.size(); i++){
+        for (int i = 0; i < sectionList.size(); i++) {
             String[] sectionFolder = sectionList.get(i).getFileName().toString().split("_", 2);
-            if(sectionFolder[sectionFolder.length-1].equals(section.getName())){
+            if (sectionFolder[sectionFolder.length - 1].equals(section.getName())) {
                 File temp = new File(sectionList.get(i).toString());
                 temp.renameTo(new File((sectionList.get(i).getParent().toString() + "/" + section.getSection() + "_" + section.getName())));
                 remove = i;
                 break;
             }
         }
-        if(remove != -1){
+        if (remove != -1) {
             sectionList.remove(remove);
         }
         return sectionList;
     }
+
     /**
      * Obtaining a list containing all paths inside a directory.
      *
@@ -109,7 +110,8 @@ public class FileService {
         return modules;
     }
 
-    public static ReturnValue findModuleInFiles(List<Path> fileList, Module module, int sectionNum, int sectionId, int position /* Substitute data.size()*/ ) throws Exception{
+    public static ReturnValue findModuleInFiles(List<Path> fileList, Module module, int sectionNum, int sectionId,
+                                                int position /* Substitute data.size()*/) throws Exception {
         syncTableElement element = null;
         boolean found = false;
         for (int i = 0; i < fileList.size(); i++) {
@@ -122,10 +124,19 @@ public class FileService {
                     if (module.getAvailability() != null) {
                         var JsonB = new JsonConfigProvider().getContext(null);
                         JsonB.fromJson(module.getAvailability(), ModuleAvailability.class);
-                        LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getTimeDateCondition().getT() * 1000L), ZoneId.systemDefault());
-                        element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, position, module.getModname(), fileList.get(i), true, false, MoodleAction.MoodleSynchronize, getPriorityVisibility(module.getVisible() == 1, JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getConditionVisibility()), new TimeDateElement(time.toLocalDate(), time.toLocalTime()), module.getId());
+                        LocalDateTime time =
+                                LocalDateTime.ofInstant(Instant.ofEpochMilli(JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""),
+                                        ModuleAvailability.class).getTimeDateCondition().getT() * 1000L), ZoneId.systemDefault());
+                        element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId,
+                                position, module.getModname(), fileList.get(i), true, false,
+                                MoodleAction.MoodleSynchronize, getPriorityVisibility(module.getVisible() == 1,
+                                JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""),
+                                        ModuleAvailability.class).getConditionVisibility()),
+                                new TimeDateElement(time.toLocalDate(), time.toLocalTime()), module.getId());
                     } else {
-                        element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, position, module.getModname(), fileList.get(i), true, false, MoodleAction.MoodleSynchronize, module.getVisible() == 1, module.getId());
+                        element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId,
+                                position, module.getModname(), fileList.get(i), true, false,
+                                MoodleAction.MoodleSynchronize, module.getVisible() == 1, module.getId());
                     }
                     fileList.remove(i);
                     break;
@@ -134,10 +145,20 @@ public class FileService {
                     if (module.getAvailability() != null) {
                         var JsonB = new JsonConfigProvider().getContext(null);
                         JsonB.fromJson(module.getAvailability(), ModuleAvailability.class);
-                        LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochMilli(JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getTimeDateCondition().getT() * 1000L), ZoneId.systemDefault());
-                        element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, position, module.getModname(), fileList.get(i), false, false, MoodleAction.ExistingFile, getPriorityVisibility(module.getVisible() == 1, JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""), ModuleAvailability.class).getConditionVisibility()), new TimeDateElement(time.toLocalDate(), time.toLocalTime()));
-                    } else {
-                        element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, position, module.getModname(), fileList.get(i), false, false, MoodleAction.ExistingFile, module.getVisible() == 1);
+                        LocalDateTime time =
+                                LocalDateTime.ofInstant(Instant.ofEpochMilli(JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""),
+                                        ModuleAvailability.class).getTimeDateCondition().getT() * 1000L), ZoneId.systemDefault());
+                        element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId,
+                                position, module.getModname(), fileList.get(i), false, false,
+                                MoodleAction.ExistingFile, getPriorityVisibility(module.getVisible() == 1,
+                                JsonB.fromJson(module.getAvailability().replaceAll("\\\\", ""),
+                                        ModuleAvailability.class).getConditionVisibility()),
+                                new TimeDateElement(time.toLocalDate(), time.toLocalTime()));
+                    }
+                    else {
+                        element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId,
+                                position, module.getModname(), fileList.get(i), false, false,
+                                MoodleAction.ExistingFile, module.getVisible() == 1);
                     }
                     fileList.remove(i);
                     break;
@@ -145,7 +166,8 @@ public class FileService {
             }
         }
         if (!found) {
-            element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, position, module.getModname(), false, false, MoodleAction.NotLocalFile, module.getVisible() == 1);
+            element = new syncTableElement(module.getName(), module.getId(), sectionNum, sectionId, position,
+                    module.getModname(), false, false, MoodleAction.NotLocalFile, module.getVisible() == 1);
         }
 
         return new ReturnValue(fileList, element);

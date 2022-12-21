@@ -1,5 +1,8 @@
-package moodle.sync.core.util;
+package moodle.sync.util;
 
+/**
+ * Class used to implement Methods to verify data.
+ */
 public final class VerifyDataService {
 
     public static boolean validateString(String string){

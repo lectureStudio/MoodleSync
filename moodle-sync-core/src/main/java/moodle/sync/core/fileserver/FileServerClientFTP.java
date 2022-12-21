@@ -9,10 +9,8 @@ import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,10 +47,10 @@ public class FileServerClientFTP implements FileServerClient {
                 ftpClient.disconnect();
                 throw new IOException("Exception in connecting to FTP Server");
             }
-
             ftpClient.login(config.getUserFileserver(), config.getPasswordFileserver());
             ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -64,7 +62,8 @@ public class FileServerClientFTP implements FileServerClient {
     public void disconnect() {
         try {
             ftpClient.disconnect();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -83,7 +82,8 @@ public class FileServerClientFTP implements FileServerClient {
             for (FTPFile item : ftpFiles) {
                 files.add(new FileServerFile(item.getName(), item.getTimestamp().getTimeInMillis()));
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new Exception();
         }
         return files;
