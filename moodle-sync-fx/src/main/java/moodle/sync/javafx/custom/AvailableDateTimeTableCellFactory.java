@@ -4,8 +4,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.util.Callback;
-import moodle.sync.core.model.TimeDateElement;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.TimeDateElement;
+import moodle.sync.javafx.model.syncTableElement;
 
 public class AvailableDateTimeTableCellFactory implements Callback<TableColumn<syncTableElement, TimeDateElement>, TableCell<syncTableElement, TimeDateElement>> {
     @Override

@@ -10,7 +10,6 @@ import javax.inject.Provider;
 import javafx.util.BuilderFactory;
 
 import moodle.sync.javafx.view.*;
-import moodle.sync.presenter.ConfirmDeleteModulePresenter;
 import moodle.sync.view.*;
 
 import org.lecturestudio.core.inject.DIViewContextFactory;

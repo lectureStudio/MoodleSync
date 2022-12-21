@@ -2,7 +2,7 @@ package moodle.sync.view;
 
 import javafx.collections.ObservableList;
 import moodle.sync.core.model.json.Course;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.syncTableElement;
 import moodle.sync.core.model.json.Section;
 import org.lecturestudio.core.beans.BooleanProperty;
 import org.lecturestudio.core.beans.ObjectProperty;

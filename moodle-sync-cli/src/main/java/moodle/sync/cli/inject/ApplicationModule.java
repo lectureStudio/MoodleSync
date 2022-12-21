@@ -2,7 +2,9 @@ package moodle.sync.cli.inject;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+
 import moodle.sync.core.web.service.MoodleService;
+
 import org.lecturestudio.core.app.LocaleProvider;
 import org.lecturestudio.core.app.dictionary.Dictionary;
 import org.lecturestudio.core.beans.StringProperty;

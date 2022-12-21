@@ -1,6 +1,5 @@
 package moodle.sync.core.fileserver;
 
-import moodle.sync.core.model.syncTableElement;
 import java.util.List;
 
 /**
@@ -12,9 +11,10 @@ public interface FileServerClient {
 
     List<FileServerFile> getFiles(String pathname) throws Exception;
 
-    String uploadFile(syncTableElement item, String pathname);
+    //    String uploadFile(syncTableElement item, String pathname);
 
     void disconnect();
 
     void connect();
+
 }

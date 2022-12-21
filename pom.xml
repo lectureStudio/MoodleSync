@@ -43,17 +43,19 @@
 
 	<modules>
 		<module>moodle-sync-core</module>
+		<module>moodle-sync-cli</module>
 		<module>moodle-sync-fx</module>
-		<module>moodle-sync-jpackage</module>
-		<module>moodle-sync-bundle</module>
-        <module>moodle-sync-cli</module>
+		<module>moodle-sync-package-cli</module>
+		<module>moodle-sync-package-fx</module>
+		<module>moodle-sync-package-archive</module>
     </modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<build.output.dir>${platform.name}-${platform.arch}</build.output.dir>
-		<package.name>MoodleSync</package.name>
+		<package.name>moodle-sync</package.name>
 		<package.version>1.0.${git.commitsCount}</package.version>
+		<package.dir>${package.name}-${os.name}</package.dir>
+		<package.bundle.dir>${package.name}-bundle-${os.name}</package.bundle.dir>
 		<maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 		<license.path>${project.basedir}/../</license.path>
 	</properties>
@@ -71,16 +73,6 @@
 						<showDeprecation>true</showDeprecation>
 						<showWarnings>true</showWarnings>
 					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-plugin</artifactId>
-					<version>3.0.0-M5</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-surefire-report-plugin</artifactId>
-					<version>3.0.0-M5</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -108,8 +100,8 @@
 									</artifactItem>
 								</artifactItems>
 								<stripVersion>true</stripVersion>
-								<outputDirectory>${project.parent.build.directory}/${build.output.dir}</outputDirectory>
-							</configuration>
+								<outputDirectory>${project.parent.build.directory}/${package.dir}</outputDirectory>
+								</configuration>
 						</execution>
 						<execution>
 							<id>copy-dependencies</id>
@@ -123,7 +115,7 @@
 								<excludeTransitive>false</excludeTransitive>
 								<excludeTypes>war</excludeTypes>
 								<excludeScope>provided</excludeScope>
-								<outputDirectory>${project.parent.build.directory}/${build.output.dir}/lib</outputDirectory>
+								<outputDirectory>${project.parent.build.directory}/${package.dir}/lib</outputDirectory>
 							</configuration>
 						</execution>
 					</executions>
@@ -177,11 +169,6 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>3.1.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>3.1.0</version>
 					<executions>
@@ -222,6 +209,18 @@
 					<groupId>ru.concerteza.buildnumber</groupId>
 					<artifactId>maven-jgit-buildnumber-plugin</artifactId>
 					<version>1.2.10</version>
+				</plugin>
+				<plugin>
+					<groupId>org.tentackle</groupId>
+					<artifactId>tentackle-jlink-maven-plugin</artifactId>
+					<version>17.12.0.0</version>
+					<extensions>true</extensions>
+					<configuration>
+						<noHeaderFiles>true</noHeaderFiles>
+						<noManPages>true</noManPages>
+						<stripDebug>true</stripDebug>
+						<compress>0</compress>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -315,33 +314,18 @@
 		</profile>
 	</profiles>
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>3.0.0-M7</version>
-			</plugin>
-		</plugins>
-	</reporting>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-api</artifactId>
-			<version>5.6.0</version>
+			<version>5.9.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<version>5.6.0</version>
+			<version>5.9.1</version>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>no.tornado</groupId>
-			<artifactId>tornadofx-controls</artifactId>
-			<version>1.0.6</version>
 		</dependency>
 	</dependencies>
 </project>

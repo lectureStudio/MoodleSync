@@ -6,8 +6,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.layout.HBox;
 import moodle.sync.core.util.MoodleAction;
-import moodle.sync.core.model.TimeDateElement;
-import moodle.sync.core.model.syncTableElement;
+import moodle.sync.javafx.model.TimeDateElement;
+import moodle.sync.javafx.model.syncTableElement;
 
 public class LocalDateTimeCell<S, U> extends TableCell<syncTableElement, TimeDateElement> {
 

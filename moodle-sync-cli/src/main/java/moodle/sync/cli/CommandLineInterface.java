@@ -1,24 +1,31 @@
 package moodle.sync.cli;
 
+import static java.util.Objects.nonNull;
+
 import moodle.sync.cli.inject.ApplicationModule;
 import moodle.sync.core.model.json.Course;
 import moodle.sync.core.model.json.MoodleUpload;
 import moodle.sync.core.model.json.Section;
 import moodle.sync.core.web.service.MoodleService;
 import moodle.sync.core.web.service.MoodleUploadTemp;
+
 import org.apache.commons.cli.*;
-import org.lecturestudio.core.app.ApplicationContext;
+
 import org.lecturestudio.core.app.dictionary.Dictionary;
 import org.lecturestudio.core.inject.GuiceInjector;
 import org.lecturestudio.core.inject.Injector;
 
-import javax.inject.Inject;
-import java.io.*;
-import java.net.URL;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
+
+import javax.inject.Inject;
 
 public class CommandLineInterface {
 
@@ -26,25 +33,18 @@ public class CommandLineInterface {
 
     private final Dictionary dictionary;
 
-    private CommandLine cmd;
-
     private String url;
 
     private String token;
 
     private int userId;
 
-    private Course course;
-
-    private Section section;
 
     public static void main(String[] args) {
-
         Injector injector = new GuiceInjector(new ApplicationModule());
 
         CommandLineInterface cliTool = injector.getInstance(CommandLineInterface.class);
-
-        cliTool.initialize(args);
+        cliTool.execute(args);
     }
 
     @Inject
@@ -53,91 +53,39 @@ public class CommandLineInterface {
         this.dictionary = dictionary;
     }
 
-    public void initialize(String[] args) {
-
-        allArgsCli(args);
-
-    }
-
-    private void allArgsCli(String[] args) {
+    public void execute(String[] args) {
+        Options options = generateDefaultOptions();
 
         try {
-            Options options = generateDefaultOptions();
-            cmd = parseCommandLine(options, args);
-            //Hiermit schauen ob Parameter überhaupt gegeben
-            if (!cmd.hasOption("c") || !cmd.hasOption("s") || !cmd.hasOption("p") || !cmd.hasOption("l")) {
-                System.err.println(dictionary.get("cli.args.not.complete"));
-                printHelp();
-                return;
+            CommandLine cmd = parseCommandLine(options, args);
+
+            // Check for required parameters
+            checkParameters(cmd);
+
+            // Login to moodle
+            String loginConfigPath = cmd.getOptionValue("l");
+            login(loginConfigPath);
+
+            // Get the dedicated course
+            String courseId = cmd.getOptionValue("course");
+            Course course = getCourse(courseId);
+
+            // Get the dedicated section
+            String sectionId = cmd.getOptionValue("section");
+            Section section = getSection(course, sectionId);
+
+            // Get file path to upload
+            Path file = getFilePath(cmd.getOptionValue("path"));
+
+            // Execute file upload
+            upload(course, section, file);
+        }
+        catch (Exception e) {
+            if (nonNull(e.getMessage())) {
+                printError(e.getMessage());
             }
-            //Falls Parameter gegeben aber kein Arg, wird automatisch exception geworfen
-        } catch (Exception exp) {
-            // oops, something went wrong
-            System.err.println("Parsing failed.  Reason: " + exp.getMessage());
             printHelp();
-            return;
         }
-
-        //Check properties file
-
-        if(!checkProperties(cmd.getOptionValue("l"))) return;
-
-        //initialize the moodleService
-
-        moodleService.setApiUrl(url);
-
-        //Nach Überprüfung der Parameter -> Kursliste abfragen und checken ob Kurs vorhanden
-        try {
-            userId = moodleService.getUserId(token);
-        } catch (Exception e) {
-            System.err.println(dictionary.get("cli.moodle.connection.failed"));
-            return;
-        }
-
-
-        //Getting the dedicated course
-        try {
-            course = findCourseById(cmd.getOptionValue("course"));
-        } catch (Exception e) {
-            System.err.println(dictionary.get("cli.moodle.external.service"));
-            return;
-        }
-        if (course == null) {
-            System.err.println(dictionary.get("cli.moodle.course"));
-            return;
-        }
-
-        //Getting the dedicated section
-        try {
-            section = findSectionById(cmd.getOptionValue("section"));
-        } catch (Exception e) {
-            System.err.println(dictionary.get("cli.moodle.section"));
-            return;
-        }
-
-        //Check filepath
-        Path file = Path.of(cmd.getOptionValue("path"));
-        try {
-            if (!checkFilePath(file)) {
-                System.err.println(dictionary.get("cli.path.unvalid"));
-                return;
-            }
-        } catch (Exception e) {
-            System.err.println(dictionary.get("cli.path.unvalid"));
-            return;
-        }
-
-        //Execute file upload
-        try {
-            moodleService.setResource(token, course.getId(), section.getSection(), uploadFile(file).getItemid(), null, true, file.getFileName().toString(), -1);
-        } catch (Exception e) {
-            System.err.println(dictionary.get("cli.moodle.upload"));
-        }
-    }
-
-    private CommandLine parseCommandLine(Options options, String[] args) throws Exception {
-        CommandLineParser parser = new DefaultParser();
-        return parser.parse(options, args);
     }
 
     private Options generateDefaultOptions() {
@@ -145,70 +93,140 @@ public class CommandLineInterface {
         options.addOption("c", "course", true, dictionary.get("cli.option.course"));
         options.addOption("s", "section", true, dictionary.get("cli.option.section"));
         options.addOption("p", "path", true, dictionary.get("cli.option.path"));
-        options.addOption("l", "log-in", true, dictionary.get("cli.option.login"));
+        options.addOption("l", "login", true, dictionary.get("cli.option.login"));
+
         return options;
     }
 
-    private MoodleUpload uploadFile(Path file) throws Exception {
-        MoodleUploadTemp uploader = new MoodleUploadTemp();
-        return uploader.upload(file.getFileName().toString(), file.toString(), url, token);
-    }
+    private CommandLine parseCommandLine(Options options, String[] args) {
+        CommandLineParser parser = new DefaultParser();
 
-    private Boolean checkFilePath(Path file) throws Exception {
-        return Files.exists(file);
-    }
-
-    private Section findSectionById(String id) throws Exception {
-        return moodleService.getCourseContentSection(token, course.getId(), Integer.parseInt(id)).get(0);
-    }
-
-    private Course findCourseById(String id) throws Exception {
-        List<Course> courses = getCourseList();
-        Course courseById = null;
-        for (Course elem : courses) {
-            if (elem.getId().toString().equals(id)) {
-                courseById = elem;
-                break;
-            }
-        }
-        return courseById;
-    }
-
-    private List<Course> getCourseList() throws Exception {
-        List<Course> courses = List.of();
-        courses = moodleService.getEnrolledCourses(token, userId);
-        return courses;
-    }
-
-    private boolean checkProperties(String path) {
-        if (path == null) {
-            System.err.println(dictionary.get("cli.properties.unvalid"));
-            return false;
-        }
-
-        Properties moodleProps = new Properties();
         try {
-            moodleProps.load(new FileInputStream(Path.of(path).toFile()));
-        } catch (IOException e) {
-            System.err.println(dictionary.get("cli.properties.buggy"));
-            return false;
+            return parser.parse(options, args);
+        }
+        catch (Exception e) {
+            // If parameter specified but no value given
+            throw new IllegalArgumentException(e.getMessage());
+        }
+    }
+
+    private void checkParameters(CommandLine cmd) {
+        if (!cmd.hasOption("c") || !cmd.hasOption("s") || !cmd.hasOption("p")) {
+            throw new IllegalArgumentException("cli.args.incomplete");
+        }
+    }
+
+    private Course getCourse(String courseId) {
+        Course course;
+
+        try {
+            List<Course> courses = moodleService.getEnrolledCourses(token, userId);
+
+            course = courses.stream()
+                    .filter(c -> c.getId().toString().equals(courseId))
+                    .findFirst().orElse(null);
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException("cli.moodle.external.service.error");
         }
 
-        url = moodleProps.getProperty("url");
-        token = moodleProps.getProperty("token");
+        if (course == null) {
+            throw new IllegalArgumentException("cli.moodle.course.invalid");
+        }
+
+        return course;
+    }
+
+    private Section getSection(Course course, String sectionId) {
+        try {
+            return moodleService.getCourseContentSection(token, course.getId(),
+                    Integer.parseInt(sectionId)).get(0);
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException("cli.moodle.section.invalid");
+        }
+    }
+
+    private Path getFilePath(String filePath) {
+        Path path = Path.of(filePath);
+
+        if (!Files.exists(path)) {
+            throw new IllegalArgumentException("cli.path.invalid");
+        }
+
+        return path;
+    }
+
+    private void login(String configPath) throws IllegalAccessException {
+        if (nonNull(configPath) && !configPath.isEmpty() && !configPath.isBlank()) {
+            // Parse config file to get credentials
+            Properties moodleProps = new Properties();
+
+            try {
+                moodleProps.load(new FileInputStream(Path.of(configPath).toFile()));
+            }
+            catch (IOException e) {
+                throw new IllegalArgumentException("cli.login.properties.invalid");
+            }
+
+            url = moodleProps.getProperty("url");
+            token = moodleProps.getProperty("token");
+        }
+        else {
+            // Read credentials from environment variables
+            url = System.getenv("MOODLE_SYNC_URL");
+            token = System.getenv("MOODLE_SYNC_TOKEN");
+        }
+
         if (url == null || token == null) {
-            System.err.println(dictionary.get("cli.properties.wrong"));
-            return false;
+            throw new IllegalArgumentException("cli.moodle.login.invalid");
         }
 
-        return true;
+        moodleService.setApiUrl(url);
+
+        // Check if user exists
+        try {
+            userId = moodleService.getUserId(token);
+        }
+        catch (Exception e) {
+            throw new IllegalAccessException("cli.moodle.connection.failed");
+        }
     }
 
-    private void printHelp(){
-        String courseHeader = dictionary.get("cli.help.title");
-        String footer = "";
+    private void upload(Course course, Section section, Path file) throws IOException {
+        MoodleUploadTemp uploader = new MoodleUploadTemp();
+        MoodleUpload upload;
+
+        String fileName = file.getFileName().toString();
+
+        try {
+            upload = uploader.upload(fileName, file.toString(), url, token);
+
+            moodleService.setResource(token, course.getId(), section.getSection(),
+                    upload.getItemid(), null, true, fileName, -1);
+        }
+        catch (Exception e) {
+            throw new IOException("cli.moodle.upload.error", e);
+        }
+    }
+
+    private void printHelp() {
+        String prefix = dictionary.get("cli.usage");
+        String header = dictionary.get("cli.help.header");
+        String footer = dictionary.get("cli.help.footer");
+
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp(" ", courseHeader, generateDefaultOptions(), footer, true);
+        PrintWriter writer = new PrintWriter(new PrintStream(System.out, true,
+                StandardCharsets.UTF_16));
+
+        formatter.setSyntaxPrefix(prefix);
+        formatter.printHelp(writer, 80, "moodle-sync-cli", header,
+                generateDefaultOptions(), 3, 5, footer, true);
+
+        writer.flush();
     }
 
+    private void printError(String error) {
+        System.err.println(dictionary.contains(error) ? dictionary.get(error) : error);
+    }
 }
